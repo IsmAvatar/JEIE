@@ -1,0 +1,35 @@
+Jeie (Java Easy Image Editor) is a copyleft project which
+is aimed at making a small and simple image editing UI.
+
+Whilst the project is easily extensible, you should make
+sure that you understand our goal before adding anything.
+Therefore, our goal is outlined within this document.
+
+Copyleft
+Jeie is built under the realization that because it
+can be easily redistributed to hundreds of people
+with the simple click of a button, unlike a finite
+resource such as a chair or food, and because its
+use does not limit others' uses of it, it does not
+make sense to make it proprietary, and likewise,
+Intellectual Property Rights do not make sense.
+Therefore, in order to ensure that it, and all other
+software that uses it, remains free, it has been
+placed under a viral copyleft license, GPL.
+
+Note: We do not condone violation of Intellectual
+Property Rights or copyright law. Please work
+within the law to see it changed.
+
+Simplicity
+We aim for a simple and non-bulky interface. Unlike
+GIMP, which is extremely bulky with hundreds of menus,
+we wish to keep this down to a few commonly used
+buttons, more like MS Paint, so as to appeal to the
+novice user. Multiple layers, fancy palettes, and
+vector graphics are all beyond the scope of this
+project, and if you feel so inclined, you are
+absolutely welcome to create a branch. That said,
+we also realize that there are many limitations to
+paint which could easily be corrected while still
+maintaining the philosophy of simplicity.
