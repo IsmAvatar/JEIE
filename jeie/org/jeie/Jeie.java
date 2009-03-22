@@ -45,6 +45,7 @@ public class Jeie implements ActionListener
 	public JFrame f;
 	public Canvas canvas;
 	public JButton bUndo, bGrid, bZoomIn, bZoomOut;
+	private JScrollPane scroll;
 
 	public JMenuBar menuBar;
 	public JMenu effectsMenu;
@@ -59,10 +60,10 @@ public class Jeie implements ActionListener
 		f.setContentPane(p);
 		p.add(makeToolBar(),BorderLayout.WEST);
 		canvas = new Canvas(image);
-		JScrollPane sp = new JScrollPane(canvas);
-		sp.getVerticalScrollBar().setUnitIncrement(10);
-		sp.getHorizontalScrollBar().setUnitIncrement(10);
-		p.add(sp,BorderLayout.CENTER);
+		scroll = new JScrollPane(canvas);
+		scroll.getVerticalScrollBar().setUnitIncrement(10);
+		scroll.getHorizontalScrollBar().setUnitIncrement(10);
+		p.add(scroll,BorderLayout.CENTER);
 		f.setMinimumSize(new Dimension(200,200));
 		f.pack();
 		f.setLocationRelativeTo(null);
@@ -154,7 +155,7 @@ public class Jeie implements ActionListener
 			if (canvas.zoom < 32)
 				{
 				canvas.zoom *= 2;
-				canvas.updateUI();
+				scroll.updateUI();
 				}
 			return;
 			}
@@ -163,7 +164,7 @@ public class Jeie implements ActionListener
 			if (canvas.zoom > 1)
 				{
 				canvas.zoom /= 2;
-				canvas.updateUI();
+				scroll.updateUI();
 				}
 			return;
 			}
