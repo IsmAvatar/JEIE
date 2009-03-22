@@ -1,0 +1,200 @@
+/*
+ * Copyright (C) 2009 IsmAvatar <IsmAvatar@gmail.com>
+ * Copyright (C) 2009 Serge Humphrey <bob@bobtheblueberry.com>
+ * 
+ * This file is part of Jeie.
+ * 
+ * Jeie is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Jeie is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License (COPYING) for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.jeie;
+
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Composite;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
+import java.awt.image.RescaleOp;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+
+public class EffectsMenu extends JMenu
+	{
+	private static final long serialVersionUID = 1L;
+	public Jeie jeie;
+
+	public class Blur extends ImageAction
+		{
+		public int amount;
+
+		public Blur(int amt)
+			{
+			amount = amt;
+			}
+
+		@Override
+		public void paint(Graphics g)
+			{
+			Canvas c = jeie.canvas;
+			Graphics2D g2 = (Graphics2D) g;
+
+			// create the blur kernel
+			int numCoords = amount * amount;
+			float blurFactor = 1.0f / (float) numCoords;
+
+			float[] blurKernel = new float[numCoords];
+			for (int j = 0; j < numCoords; j++)
+				blurKernel[j] = blurFactor;
+
+			Kernel k = new Kernel(amount,amount,blurKernel);
+			ConvolveOp blur = new ConvolveOp(k,ConvolveOp.EDGE_NO_OP,null);
+			g2.drawImage(c.getRenderImage(),blur,0,0);
+			}
+		}
+
+	public class Value extends ImageAction
+		{
+		public float amount;
+
+		public Value(float amt)
+			{
+			amount = amt;
+			}
+
+		@Override
+		public void paint(Graphics g)
+			{
+			Canvas c = jeie.canvas;
+			Graphics2D g2 = (Graphics2D) g;
+			float[] scale = { amount,amount,amount,1.0f }; // keep alpha
+			float[] offsets = { 0.0f,0.0f,0.0f,0.0f };
+			RescaleOp value = new RescaleOp(scale,offsets,null);
+			g2.drawImage(c.getRenderImage(),value,0,0);
+			}
+		}
+
+	public class Invert extends ImageAction
+		{
+		@Override
+		public void paint(Graphics g)
+			{
+			Canvas c = jeie.canvas;
+			Graphics2D g2d = (Graphics2D) g;
+			float[] negFactors = { -1.0f,-1.0f,-1.0f,1.0f }; // keep alpha
+			float[] offsets = { 255f,255f,255f,0.0f };
+			RescaleOp invert = new RescaleOp(negFactors,offsets,null);
+			g2d.drawImage(c.getRenderImage(),invert,0,0);
+			}
+		}
+
+	public class Fade extends ImageAction
+		{
+		public Color fadeTo;
+		public float amount;
+
+		public Fade(Color to, float amt)
+			{
+			fadeTo = to;
+			amount = amt;
+			}
+
+		public void paint(Graphics g)
+			{
+			Canvas c = jeie.canvas;
+			Graphics2D g2d = (Graphics2D) g;
+
+			Composite oldComp = g2d.getComposite();
+			Color oldCol = g2d.getColor();
+
+			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,amount));
+			g2d.setColor(fadeTo);
+			Dimension d = c.getImageSize();
+			g2d.fillRect(0,0,d.width,d.height);
+			g2d.setColor(oldCol);
+			g2d.setComposite(oldComp);
+			}
+		}
+
+	public void applyAction(ImageAction act)
+		{
+		Canvas c = jeie.canvas;
+		c.acts.add(act);
+		c.redrawCache();
+		c.repaint();
+		}
+
+	public EffectsMenu(Jeie jeie)
+		{
+		super("Effects");
+		this.jeie = jeie;
+
+		//	TODO: Menu Icons
+		JMenuItem item;
+
+		item = new JMenuItem("Blur");
+		item.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+					{
+					Integer integer = IntegerDialog.getInteger("Blur amount (1-9)",1,9,3,3);
+					if (integer != null) applyAction(new Blur(integer * 2 + 2));
+					}
+			});
+		add(item);
+
+		item = new JMenuItem("Value");
+		item.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+					{
+					Integer integer = IntegerDialog.getInteger("Value",-10,10,0,5);
+					if (integer != null) applyAction(new Value(((float) (integer + 10)) / 10.0f));
+					}
+			});
+		add(item);
+
+		item = new JMenuItem("Invert");
+		item.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+					{
+					applyAction(new Invert());
+					}
+			});
+		add(item);
+
+		item = new JMenuItem("Fade to Black");
+		item.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+					{
+					Integer integer = IntegerDialog.getInteger("Fade amount (0-256)",0,256,128,64);
+					if (integer != null) applyAction(new Fade(Color.BLACK,((float) integer) / 256.0f));
+					}
+			});
+		add(item);
+
+		addSeparator();
+
+		item = new JMenuItem("Colorize");
+		item.setEnabled(false);
+		add(item);
+		}
+	}

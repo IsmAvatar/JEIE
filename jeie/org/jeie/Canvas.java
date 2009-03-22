@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 IsmAvatar <cmagicj@nni.com>
+ * Copyright (C) 2008, 2009 IsmAvatar <IsmAvatar@gmail.com>
  * 
  * This file is part of Jeie.
  * 
@@ -22,6 +22,7 @@ package org.jeie;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.util.ArrayList;
@@ -41,19 +42,39 @@ public class Canvas extends JLabel implements ImageObserver
 
 	public Canvas(BufferedImage image)
 		{
-		if (image == null)
-			{
-			image = new BufferedImage(32,32,BufferedImage.TYPE_INT_RGB);
-			Graphics g = image.getGraphics();
-			g.setColor(Color.WHITE);
-			g.fillRect(0,0,32,32);
-			}
-
 		setOpaque(true);
 		raster = image;
 		acts = new ArrayList<ImageAction>();
 		redrawCache();
 		zoom = 1;
+		}
+
+	public void setImage(BufferedImage image)
+		{
+		raster = image;
+		acts.clear();
+		redrawCache();
+		//XXX: necessary?
+		updateUI();
+		repaint();
+		}
+
+	public BufferedImage getRenderImage()
+		{
+		BufferedImage img = new BufferedImage(raster.getWidth(),raster.getHeight(),
+				BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g = img.createGraphics();
+
+		g.drawImage(raster,0,0,null);
+		g.drawImage(cache,0,0,null);
+
+		g.dispose();
+		return img;
+		}
+
+	public Dimension getImageSize()
+		{
+		return new Dimension(raster.getWidth(),raster.getHeight());
 		}
 
 	@Override
@@ -76,7 +97,6 @@ public class Canvas extends JLabel implements ImageObserver
 		int cw = cache.getWidth() * zoom;
 		int ch = cache.getHeight() * zoom;
 
-		//javadocs: observer not needed for BufferedImage
 		g.drawImage(raster,0,0,raster.getWidth() * zoom,raster.getHeight() * zoom,null);
 		g.drawImage(cache,0,0,cw,ch,null);
 

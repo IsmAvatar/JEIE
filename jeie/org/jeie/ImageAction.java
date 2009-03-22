@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 IsmAvatar <cmagicj@nni.com>
+ * Copyright (C) 2008 IsmAvatar <IsmAvatar@gmail.com>
  * 
  * This file is part of Jeie.
  * 
@@ -37,17 +37,17 @@ import java.awt.event.MouseMotionListener;
 
 public abstract class ImageAction extends MouseAdapter implements MouseMotionListener
 	{
-	protected Jeie j;
+//	protected Jeie j;
 
 	/** Provided so subclasses don't bitch */
-	protected ImageAction()
-		{
-		}
+//	protected ImageAction()
+//		{
+//		}
 
-	public ImageAction(Jeie j)
-		{
-		this.j = j;
-		}
+//	public ImageAction(Jeie j)
+//		{
+//		this.j = j;
+//		}
 
 	public abstract void paint(Graphics g);
 
