@@ -49,7 +49,6 @@ public class EffectsMenu extends JMenu
 			amount = amt;
 			}
 
-		@Override
 		public void paint(Graphics g)
 			{
 			Canvas c = jeie.canvas;
@@ -78,7 +77,6 @@ public class EffectsMenu extends JMenu
 			amount = amt;
 			}
 
-		@Override
 		public void paint(Graphics g)
 			{
 			Canvas c = jeie.canvas;
@@ -92,7 +90,6 @@ public class EffectsMenu extends JMenu
 
 	public class Invert implements ImageAction
 		{
-		@Override
 		public void paint(Graphics g)
 			{
 			Canvas c = jeie.canvas;

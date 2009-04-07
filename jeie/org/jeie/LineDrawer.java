@@ -45,7 +45,6 @@ public class LineDrawer implements MouseListener,MouseMotionListener
 
 	long mouseTime;
 
-	@Override
 	public void mousePressed(MouseEvent e)
 		{
 		Point p = e.getPoint();
@@ -63,7 +62,6 @@ public class LineDrawer implements MouseListener,MouseMotionListener
 			}
 		}
 
-	@Override
 	public void mouseReleased(MouseEvent e)
 		{
 		if (e.getWhen() - mouseTime < 200) return;
@@ -85,13 +83,11 @@ public class LineDrawer implements MouseListener,MouseMotionListener
 			}
 		}
 
-	@Override
 	public void mouseDragged(MouseEvent e)
 		{
 		mouseMoved(e);
 		}
 
-	@Override
 	public void mouseMoved(MouseEvent e)
 		{
 		ImageAction ia = canvas.active;
@@ -103,17 +99,14 @@ public class LineDrawer implements MouseListener,MouseMotionListener
 		}
 
 	//Unused
-	@Override
 	public void mouseClicked(MouseEvent e)
 		{
 		}
 
-	@Override
 	public void mouseEntered(MouseEvent e)
 		{
 		}
 
-	@Override
 	public void mouseExited(MouseEvent e)
 		{
 		}

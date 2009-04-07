@@ -31,7 +31,6 @@ public interface ImageAction
 		{
 		public int w, h;
 
-		@Override
 		public void paint(Graphics g)
 			{
 			g.setClip(0,0,w,h);
@@ -51,7 +50,6 @@ public interface ImageAction
 			p2 = p;
 			}
 
-		@Override
 		public void paint(Graphics g)
 			{
 			g.setColor(c);
@@ -65,7 +63,6 @@ public interface ImageAction
 		public Color c;
 		public Point p;
 
-		@Override
 		public void paint(Graphics g)
 			{
 			g.setColor(c);
