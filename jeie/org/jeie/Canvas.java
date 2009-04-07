@@ -48,7 +48,7 @@ public class Canvas extends JLabel implements ImageObserver
 		raster = image;
 		acts = new ArrayDeque<ImageAction>();
 		redrawCache();
-		setZoom(8);
+		setZoom(1);
 		}
 
 	public void setImage(BufferedImage image)
