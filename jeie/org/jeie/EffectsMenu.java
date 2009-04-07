@@ -40,7 +40,7 @@ public class EffectsMenu extends JMenu
 	private static final long serialVersionUID = 1L;
 	public Jeie jeie;
 
-	public class Blur extends ImageAction
+	public class Blur implements ImageAction
 		{
 		public int amount;
 
@@ -57,7 +57,7 @@ public class EffectsMenu extends JMenu
 
 			// create the blur kernel
 			int numCoords = amount * amount;
-			float blurFactor = 1.0f / (float) numCoords;
+			float blurFactor = 1.0f / numCoords;
 
 			float[] blurKernel = new float[numCoords];
 			for (int j = 0; j < numCoords; j++)
@@ -69,7 +69,7 @@ public class EffectsMenu extends JMenu
 			}
 		}
 
-	public class Value extends ImageAction
+	public class Value implements ImageAction
 		{
 		public float amount;
 
@@ -90,7 +90,7 @@ public class EffectsMenu extends JMenu
 			}
 		}
 
-	public class Invert extends ImageAction
+	public class Invert implements ImageAction
 		{
 		@Override
 		public void paint(Graphics g)
@@ -104,7 +104,7 @@ public class EffectsMenu extends JMenu
 			}
 		}
 
-	public class Fade extends ImageAction
+	public class Fade implements ImageAction
 		{
 		public Color fadeTo;
 		public float amount;
@@ -165,7 +165,7 @@ public class EffectsMenu extends JMenu
 				public void actionPerformed(ActionEvent e)
 					{
 					Integer integer = IntegerDialog.getInteger("Value",-10,10,0,5);
-					if (integer != null) applyAction(new Value(((float) (integer + 10)) / 10.0f));
+					if (integer != null) applyAction(new Value((integer + 10) / 10.0f));
 					}
 			});
 		add(item);

@@ -25,28 +25,30 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
-import java.util.ArrayList;
+import java.util.ArrayDeque;
 
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 public class Canvas extends JLabel implements ImageObserver
 	{
 	private static final long serialVersionUID = 1L;
-	private BufferedImage raster;
-	private BufferedImage cache;
+	private BufferedImage raster, cache, grid;
+	public ImageAction active;
+	public JComponent container;
 
-	public ArrayList<ImageAction> acts;
+	public ArrayDeque<ImageAction> acts;
 	public int zoom;
-	public boolean drawGrid = true;
-	public boolean invertGrid = true;
+	public boolean isGridDrawn = true;
+	public final boolean invertGrid = true;
 
 	public Canvas(BufferedImage image)
 		{
 		setOpaque(true);
 		raster = image;
-		acts = new ArrayList<ImageAction>();
+		acts = new ArrayDeque<ImageAction>();
 		redrawCache();
-		zoom = 1;
+		setZoom(8);
 		}
 
 	public void setImage(BufferedImage image)
@@ -91,6 +93,60 @@ public class Canvas extends JLabel implements ImageObserver
 			act.paint(g);
 		}
 
+	public void redrawGrid()
+		{
+		int cw = cache.getWidth() * zoom;
+		int ch = cache.getHeight() * zoom;
+
+		grid = new BufferedImage(cw,ch,BufferedImage.TYPE_INT_ARGB);
+		Graphics g = grid.getGraphics();
+		paintGrid(g);
+		}
+
+	public void paintGrid(Graphics g)
+		{
+		int cw = cache.getWidth() * zoom;
+		int ch = cache.getHeight() * zoom;
+
+		g.setColor(invertGrid ? Color.WHITE : Color.GRAY);
+
+		for (int y = 0; y <= ch; y += zoom)
+			g.drawLine(0,y,cw,y);
+		for (int x = 0; x <= cw; x += zoom)
+			g.drawLine(x,0,x,ch);
+		}
+
+	public void setZoom(int zoom)
+		{
+		this.zoom = zoom;
+		if (zoom >= 8) redrawGrid();
+		}
+
+	public void zoomIn()
+		{
+		if (zoom < 32)
+			{
+			zoom *= 2;
+			redrawGrid();
+			repaint();
+			}
+		}
+
+	public void zoomOut()
+		{
+		if (zoom > 1)
+			{
+			zoom /= 2;
+			redrawGrid();
+			repaint();
+			}
+		}
+
+	public int getZoom()
+		{
+		return zoom;
+		}
+
 	@Override
 	public void paint(Graphics g)
 		{
@@ -99,24 +155,19 @@ public class Canvas extends JLabel implements ImageObserver
 
 		g.drawImage(raster,0,0,raster.getWidth() * zoom,raster.getHeight() * zoom,null);
 		g.drawImage(cache,0,0,cw,ch,null);
+		BufferedImage activeImg = new BufferedImage(cache.getWidth(),cache.getHeight(),BufferedImage.TYPE_INT_ARGB);
+		if (active != null) active.paint(activeImg.getGraphics());
+		g.drawImage(activeImg,0,0,cw,ch,null);
 
-		if (drawGrid && zoom >= 8)
+		if (isGridDrawn && zoom >= 8)
 			{
-			if (invertGrid)
-				{
-				g.setXORMode(Color.BLACK);
-				g.setColor(Color.WHITE);
-				}
-			else
-				g.setColor(Color.GRAY);
-
-			for (int y = 0; y <= ch; y += zoom)
-				g.drawLine(0,y,cw,y);
-			for (int x = 0; x <= cw; x += zoom)
-				g.drawLine(x,0,x,ch);
-
+			if (invertGrid) g.setXORMode(Color.BLACK);
+			g.drawImage(grid,0,0,null);
 			if (invertGrid) g.setPaintMode();
 			}
+
 		g.clipRect(0,0,cw,ch);
+
+		container.updateUI();
 		}
 	}

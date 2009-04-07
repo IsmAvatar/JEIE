@@ -21,37 +21,13 @@ package org.jeie;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
+import java.awt.Point;
 
-/*
- * Note to subclassers:
- * Your responsibility aside from painting your action is
- * handling the mouse events for your action. For your
- * convenience, the relevant mouse events are already
- * implemented, you just need to override them where needed.
- * Don't bother calling the super method for them,
- * because they are all empty.
- */
-
-public abstract class ImageAction extends MouseAdapter implements MouseMotionListener
+public interface ImageAction
 	{
-//	protected Jeie j;
+	public void paint(Graphics g);
 
-	/** Provided so subclasses don't bitch */
-//	protected ImageAction()
-//		{
-//		}
-
-//	public ImageAction(Jeie j)
-//		{
-//		this.j = j;
-//		}
-
-	public abstract void paint(Graphics g);
-
-	public static class Resize extends ImageAction
+	public static class Resize implements ImageAction
 		{
 		public int w, h;
 
@@ -63,38 +39,37 @@ public abstract class ImageAction extends MouseAdapter implements MouseMotionLis
 			}
 		}
 
-	public static class Line extends ImageAction
+	public static class LineAction implements ImageAction
 		{
 		public Color c;
-		public int x, y, w, h;
+		public Point p1, p2;
+
+		public LineAction(Point p, Color c)
+			{
+			this.c = c;
+			p1 = p;
+			p2 = p;
+			}
 
 		@Override
 		public void paint(Graphics g)
 			{
 			g.setColor(c);
-			g.drawLine(x,y,x + w,y + h);
+			g.drawLine(p1.x,p1.y,p2.x,p2.y);
 			}
 		}
 
-	public static class Point extends ImageAction
+	//TODO: Store multiple points per PointAction to prevent cache flooding
+	public static class PointAction implements ImageAction
 		{
 		public Color c;
-		public int x, y;
+		public Point p;
 
 		@Override
 		public void paint(Graphics g)
 			{
 			g.setColor(c);
-			g.drawLine(x,y,x,y);
+			g.drawLine(p.x,p.y,p.x,p.y);
 			}
-		}
-
-	//Java 1.5 only: MouseAdapter does not implement these
-	public void mouseDragged(MouseEvent e)
-		{
-		}
-
-	public void mouseMoved(MouseEvent e)
-		{
 		}
 	}

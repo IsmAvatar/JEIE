@@ -34,33 +34,35 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
 public class Jeie implements ActionListener
 	{
-	public JFrame f;
-	public Canvas canvas;
-	public JButton bUndo, bGrid, bZoomIn, bZoomOut;
+	private JFrame f;
+	private JButton bUndo, bZoomIn, bZoomOut;
+	private JToggleButton bGrid;
 	private JScrollPane scroll;
 
-	public JMenuBar menuBar;
-	public JMenu effectsMenu;
+	public Canvas canvas;
+	private JMenuBar menuBar;
+	private JToolBar toolBar;
 
 	public Jeie(BufferedImage image)
 		{
 		if (image == null) image = createBufferedImage(new Dimension(32,32));
+		canvas = new Canvas(image);
+		scroll = new JScrollPane(canvas);
+		canvas.container = scroll;
 
 		f = new JFrame("Easy Image Editor");
 		f.setJMenuBar(makeMenuBar());
 		JPanel p = new JPanel(new BorderLayout());
 		f.setContentPane(p);
 		p.add(makeToolBar(),BorderLayout.WEST);
-		canvas = new Canvas(image);
-		scroll = new JScrollPane(canvas);
 		scroll.getVerticalScrollBar().setUnitIncrement(10);
 		scroll.getHorizontalScrollBar().setUnitIncrement(10);
 		p.add(scroll,BorderLayout.CENTER);
@@ -79,15 +81,21 @@ public class Jeie implements ActionListener
 
 	public JToolBar makeToolBar()
 		{
-		JToolBar tool = new JToolBar(JToolBar.VERTICAL);
-		tool.setLayout(new GridLayout(0,2));
+		toolBar = new JToolBar(JToolBar.VERTICAL);
+		toolBar.setLayout(new GridLayout(0,2));
 
-		bUndo = addButton(tool,"<-");
-		bGrid = addButton(tool,"Grid");
-		bZoomOut = addButton(tool,"-");
-		bZoomIn = addButton(tool,"+");
+		bUndo = addButton(toolBar,"<-");
 
-		return tool;
+		bGrid = new JToggleButton("Grid",true);
+		bGrid.addActionListener(this);
+		toolBar.add(bGrid);
+
+		bZoomOut = addButton(toolBar,"-");
+		bZoomIn = addButton(toolBar,"+");
+
+		new LineDrawer(toolBar,canvas);
+
+		return toolBar;
 		}
 
 	public JButton addButton(Container c, String label)
@@ -146,26 +154,18 @@ public class Jeie implements ActionListener
 			}
 		if (e.getSource() == bGrid)
 			{
-			canvas.drawGrid = !canvas.drawGrid;
+			canvas.isGridDrawn = bGrid.isSelected();
 			canvas.repaint();
 			return;
 			}
 		if (e.getSource() == bZoomIn)
 			{
-			if (canvas.zoom < 32)
-				{
-				canvas.zoom *= 2;
-				scroll.updateUI();
-				}
+			canvas.zoomIn();
 			return;
 			}
 		if (e.getSource() == bZoomOut)
 			{
-			if (canvas.zoom > 1)
-				{
-				canvas.zoom /= 2;
-				scroll.updateUI();
-				}
+			canvas.zoomOut();
 			return;
 			}
 		}
