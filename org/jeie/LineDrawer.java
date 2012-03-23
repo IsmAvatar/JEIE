@@ -100,14 +100,14 @@ public class LineDrawer implements MouseListener,MouseMotionListener
 
 	//Unused
 	public void mouseClicked(MouseEvent e)
-		{
+		{ //Unused
 		}
 
 	public void mouseEntered(MouseEvent e)
-		{
+		{ //Unused
 		}
 
 	public void mouseExited(MouseEvent e)
-		{
+		{ //Unused
 		}
 	}

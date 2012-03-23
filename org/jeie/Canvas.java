@@ -24,13 +24,12 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
 import java.util.ArrayDeque;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
-public class Canvas extends JLabel implements ImageObserver
+public class Canvas extends JLabel
 	{
 	private static final long serialVersionUID = 1L;
 	private BufferedImage raster, cache, grid;
