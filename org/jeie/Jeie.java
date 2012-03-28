@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, 2009 IsmAvatar <IsmAvatar@gmail.com>
+ * Copyright (C) 2008, 2009, 2012 IsmAvatar <IsmAvatar@gmail.com>
  * Copyright (C) 2009 Serge Humphrey <bob@bobtheblueberry.com>
  * 
  * This file is part of Jeie.
@@ -48,25 +48,29 @@ public class Jeie implements ActionListener
 	private JScrollPane scroll;
 
 	public Canvas canvas;
+	public Palette pal;
 	private JMenuBar menuBar;
 	private JToolBar toolBar;
 
 	public Jeie(BufferedImage image)
 		{
 		if (image == null) image = createBufferedImage(new Dimension(32,32));
+		pal = new Palette();
 		canvas = new Canvas(image);
 		scroll = new JScrollPane(canvas);
 		canvas.container = scroll;
 
-		f = new JFrame("Easy Image Editor");
-		f.setJMenuBar(makeMenuBar());
 		JPanel p = new JPanel(new BorderLayout());
-		f.setContentPane(p);
 		p.add(makeToolBar(),BorderLayout.WEST);
 		scroll.getVerticalScrollBar().setUnitIncrement(10);
 		scroll.getHorizontalScrollBar().setUnitIncrement(10);
 		p.add(scroll,BorderLayout.CENTER);
-		f.setMinimumSize(new Dimension(200,200));
+		p.add(pal,BorderLayout.SOUTH);
+
+		f = new JFrame("Easy Image Editor");
+		f.setJMenuBar(makeMenuBar());
+		f.setContentPane(p);
+		f.setMinimumSize(new Dimension(500,500));
 		f.pack();
 		f.setLocationRelativeTo(null);
 		f.setVisible(true);
@@ -84,16 +88,16 @@ public class Jeie implements ActionListener
 		toolBar = new JToolBar(JToolBar.VERTICAL);
 		toolBar.setLayout(new GridLayout(0,2));
 
-		bUndo = addButton(toolBar,"<-");
+		bUndo = addButton(toolBar,"Undo");
 
 		bGrid = new JToggleButton("Grid",true);
 		bGrid.addActionListener(this);
 		toolBar.add(bGrid);
 
-		bZoomOut = addButton(toolBar,"-");
-		bZoomIn = addButton(toolBar,"+");
+		bZoomOut = addButton(toolBar,"Z-");
+		bZoomIn = addButton(toolBar,"Z+");
 
-		new LineDrawer(toolBar,canvas);
+		new LineDrawer(toolBar,canvas,pal);
 
 		return toolBar;
 		}

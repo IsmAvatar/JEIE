@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2008, 2009, 2012 IsmAvatar <IsmAvatar@gmail.com>
+ * 
+ * This file is part of Jeie.
+ * Jeie is free software and comes with ABSOLUTELY NO WARRANTY.
+ * See LICENSE for details.
+ */
+
 package org.jeie;
 
 import java.awt.Color;
@@ -19,18 +27,20 @@ public class LineDrawer implements MouseListener,MouseMotionListener
 	ButtonGroup bg;
 
 	Canvas canvas;
+	Palette pal;
 
-	public LineDrawer(JToolBar tool, Canvas c)
+	public LineDrawer(JToolBar tool, Canvas c, Palette p)
 		{
 		canvas = c;
+		pal = p;
 		bg = new ButtonGroup();
 
-		JToggleButton b = new JToggleButton("P");
+		JToggleButton b = new JToggleButton("Pt");
 		bg.add(b);
 		tool.add(b);
 		bPoint = b.getModel();
 
-		b = new JToggleButton("L",true);
+		b = new JToggleButton("Ln",true);
 		bg.add(b);
 		tool.add(b);
 		bLine = b.getModel();
@@ -52,12 +62,10 @@ public class LineDrawer implements MouseListener,MouseMotionListener
 		ButtonModel sel = bg.getSelection();
 		if (sel == bLine)
 			{
-			ImageAction ia = canvas.active;
-			LineAction la = null;
-			if (ia instanceof LineAction) la = (LineAction) ia;
-			if (la != null) return;
-			la = new LineAction(l,Color.BLACK);
-			canvas.active = la;
+			if (canvas.active != null && canvas.active instanceof LineAction) return;
+			Color c = pal.getSelectedColor(e.getButton());
+			if (c == null) return;
+			canvas.active = new LineAction(l,c);
 			mouseTime = e.getWhen();
 			}
 		}
