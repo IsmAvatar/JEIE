@@ -122,7 +122,7 @@ public class Canvas extends JLabel
 			{
 			zoom *= 2;
 			redrawGrid();
-			repaint();
+			updateUI();
 			}
 		}
 
@@ -132,7 +132,7 @@ public class Canvas extends JLabel
 			{
 			zoom /= 2;
 			redrawGrid();
-			repaint();
+			updateUI();
 			}
 		}
 
