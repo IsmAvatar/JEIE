@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 IsmAvatar <IsmAvatar@gmail.com>
+ * Copyright (C) 2009, 2012 IsmAvatar <IsmAvatar@gmail.com>
  * Copyright (C) 2009 Serge Humphrey <bob@bobtheblueberry.com>
  * 
  * This file is part of Jeie.
@@ -35,10 +35,11 @@ import java.awt.image.RescaleOp;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-public class EffectsMenu extends JMenu
+public class EffectsMenu extends JMenu implements ActionListener
 	{
 	private static final long serialVersionUID = 1L;
 	public Jeie jeie;
+	JMenuItem blur, value, invert, fade, colorize;
 
 	public class Blur implements ImageAction
 		{
@@ -142,55 +143,54 @@ public class EffectsMenu extends JMenu
 		this.jeie = jeie;
 
 		//	TODO: Menu Icons
-		JMenuItem item;
 
-		item = new JMenuItem("Blur");
-		item.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-					{
-					Integer integer = IntegerDialog.getInteger("Blur amount (1-9)",1,9,3,3);
-					if (integer != null) applyAction(new Blur(integer * 2 + 2));
-					}
-			});
-		add(item);
+		blur = new JMenuItem("Blur");
+		blur.addActionListener(this);
+		add(blur);
 
-		item = new JMenuItem("Value");
-		item.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-					{
-					Integer integer = IntegerDialog.getInteger("Value",-10,10,0,5);
-					if (integer != null) applyAction(new Value((integer + 10) / 10.0f));
-					}
-			});
-		add(item);
+		value = new JMenuItem("Value");
+		value.addActionListener(this);
+		add(value);
 
-		item = new JMenuItem("Invert");
-		item.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-					{
-					applyAction(new Invert());
-					}
-			});
-		add(item);
+		invert = new JMenuItem("Invert");
+		invert.addActionListener(this);
+		add(invert);
 
-		item = new JMenuItem("Fade to Black");
-		item.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-					{
-					Integer integer = IntegerDialog.getInteger("Fade amount (0-256)",0,256,128,64);
-					if (integer != null) applyAction(new Fade(Color.BLACK,((float) integer) / 256.0f));
-					}
-			});
-		add(item);
+		fade = new JMenuItem("Fade to Black");
+		fade.addActionListener(this);
+		add(fade);
 
 		addSeparator();
 
-		item = new JMenuItem("Colorize");
-		item.setEnabled(false);
-		add(item);
+		colorize = new JMenuItem("Colorize");
+		colorize.setEnabled(false);
+		add(colorize);
+		}
+
+	public void actionPerformed(ActionEvent e)
+		{
+		if (e.getSource() == blur)
+			{
+			Integer integer = IntegerDialog.getInteger("Blur amount (1-9)",1,9,3,3);
+			if (integer != null) applyAction(new Blur(integer * 2 + 2));
+			return;
+			}
+		if (e.getSource() == value)
+			{
+			Integer integer = IntegerDialog.getInteger("Value",-10,10,0,5);
+			if (integer != null) applyAction(new Value((integer + 10) / 10.0f));
+			return;
+			}
+		if (e.getSource() == invert)
+			{
+			applyAction(new Invert());
+			return;
+			}
+		if (e.getSource() == fade)
+			{
+			Integer integer = IntegerDialog.getInteger("Fade amount (0-256)",0,256,128,64);
+			if (integer != null) applyAction(new Fade(Color.BLACK,((float) integer) / 256.0f));
+			return;
+			}
 		}
 	}
