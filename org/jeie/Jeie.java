@@ -148,8 +148,14 @@ public class Jeie implements ActionListener
 
 	class ToolDelegate extends MouseAdapter
 		{
-		Tool tool;
+		protected Tool tool;
 
+		public void setTool(Tool t)
+			{
+			if (tool != null) tool.finish(canvas,pal);
+			tool = t;
+			}
+		
 		MouseEvent refactor(MouseEvent e)
 			{
 			int x = e.getX() / canvas.getZoom();
@@ -218,8 +224,7 @@ public class Jeie implements ActionListener
 		{
 		if (e.getSource() instanceof ToolButton)
 			{
-			ToolButton tb = (ToolButton) e.getSource();
-			del.tool = tb.tool;
+			del.setTool(((ToolButton) e.getSource()).tool);
 			return;
 			}
 		if (e.getSource() == bUndo)
