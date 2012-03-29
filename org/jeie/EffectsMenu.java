@@ -134,7 +134,6 @@ public class EffectsMenu extends JMenu
 		Canvas c = jeie.canvas;
 		c.acts.add(act);
 		c.redrawCache();
-		c.repaint();
 		}
 
 	public EffectsMenu(Jeie jeie)

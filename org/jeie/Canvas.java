@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, 2009 IsmAvatar <IsmAvatar@gmail.com>
+ * Copyright (C) 2008, 2009, 2012 IsmAvatar <IsmAvatar@gmail.com>
  * 
  * This file is part of Jeie.
  * 
@@ -26,7 +26,6 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayDeque;
 
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 public class Canvas extends JLabel
@@ -34,10 +33,9 @@ public class Canvas extends JLabel
 	private static final long serialVersionUID = 1L;
 	private BufferedImage raster, cache, grid;
 	public ImageAction active;
-	public JComponent container;
 
 	public ArrayDeque<ImageAction> acts;
-	public int zoom;
+	private int zoom = 1;
 	public boolean isGridDrawn = true;
 	public final boolean invertGrid = true;
 
@@ -46,8 +44,7 @@ public class Canvas extends JLabel
 		setOpaque(true);
 		raster = image;
 		acts = new ArrayDeque<ImageAction>();
-		redrawCache();
-		setZoom(1);
+		cache = new BufferedImage(raster.getWidth(),raster.getHeight(),BufferedImage.TYPE_INT_ARGB);
 		}
 
 	public void setImage(BufferedImage image)
@@ -55,9 +52,6 @@ public class Canvas extends JLabel
 		raster = image;
 		acts.clear();
 		redrawCache();
-		//XXX: necessary?
-		updateUI();
-		repaint();
 		}
 
 	public BufferedImage getRenderImage()
@@ -90,6 +84,7 @@ public class Canvas extends JLabel
 		Graphics g = cache.getGraphics();
 		for (ImageAction act : acts)
 			act.paint(g);
+		repaint();
 		}
 
 	public void redrawGrid()
@@ -149,12 +144,15 @@ public class Canvas extends JLabel
 	@Override
 	public void paint(Graphics g)
 		{
+		super.paint(g);
+
 		int cw = cache.getWidth() * zoom;
 		int ch = cache.getHeight() * zoom;
 
 		g.drawImage(raster,0,0,raster.getWidth() * zoom,raster.getHeight() * zoom,null);
 		g.drawImage(cache,0,0,cw,ch,null);
-		BufferedImage activeImg = new BufferedImage(cache.getWidth(),cache.getHeight(),BufferedImage.TYPE_INT_ARGB);
+		BufferedImage activeImg = new BufferedImage(cache.getWidth(),cache.getHeight(),
+				BufferedImage.TYPE_INT_ARGB);
 		if (active != null) active.paint(activeImg.getGraphics());
 		g.drawImage(activeImg,0,0,cw,ch,null);
 
@@ -166,7 +164,5 @@ public class Canvas extends JLabel
 			}
 
 		g.clipRect(0,0,cw,ch);
-
-		container.updateUI();
 		}
 	}

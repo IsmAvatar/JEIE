@@ -22,16 +22,22 @@ package org.jeie;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
@@ -49,16 +55,21 @@ public class Jeie implements ActionListener
 
 	public Canvas canvas;
 	public Palette pal;
+	public ToolDelegate del;
 	private JMenuBar menuBar;
 	private JToolBar toolBar;
 
 	public Jeie(BufferedImage image)
 		{
-		if (image == null) image = createBufferedImage(new Dimension(32,32));
+		if (image == null) image = createBufferedImage(32,32);
 		pal = new Palette();
 		canvas = new Canvas(image);
 		scroll = new JScrollPane(canvas);
-		canvas.container = scroll;
+
+		del = new ToolDelegate();
+		canvas.addMouseListener(del);
+		canvas.addMouseMotionListener(del);
+		canvas.addMouseWheelListener(del);
 
 		JPanel p = new JPanel(new BorderLayout());
 		p.add(makeToolBar(),BorderLayout.WEST);
@@ -88,26 +99,100 @@ public class Jeie implements ActionListener
 		toolBar = new JToolBar(JToolBar.VERTICAL);
 		toolBar.setLayout(new GridLayout(0,2));
 
-		bUndo = addButton(toolBar,"Undo");
+		bUndo = setupButton(toolBar,new JButton("Undo"));
+		bGrid = setupButton(toolBar,new JToggleButton("Grid",true));
 
-		bGrid = new JToggleButton("Grid",true);
-		bGrid.addActionListener(this);
-		toolBar.add(bGrid);
+		bZoomOut = setupButton(toolBar,new JButton("Z-"));
+		bZoomIn = setupButton(toolBar,new JButton("Z+"));
 
-		bZoomOut = addButton(toolBar,"Z-");
-		bZoomIn = addButton(toolBar,"Z+");
+		ButtonGroup bg = new ButtonGroup();
+		ToolButton tb = setupButton(toolBar,new ToolButton("Ln",bg,new LineDrawer()));
 
-		new LineDrawer(toolBar,canvas,pal);
+		//select our default button
+		tb.doClick();
 
 		return toolBar;
 		}
 
-	public JButton addButton(Container c, String label)
+	public <K extends AbstractButton>K setupButton(Container c, K b)
 		{
-		JButton b = new JButton(label);
-		b.addActionListener(this);
 		c.add(b);
+		b.addActionListener(this);
 		return b;
+		}
+
+	class ToolButton extends JToggleButton
+		{
+		private static final long serialVersionUID = 1L;
+
+		public final Tool tool;
+
+		public ToolButton(String label, ButtonGroup bg, Tool t, boolean sel)
+			{
+			super(label,sel);
+			tool = t;
+			bg.add(this);
+			}
+
+		public ToolButton(String label, ButtonGroup bg, Tool t)
+			{
+			this(label,bg,t,false);
+			}
+		}
+
+	class ToolDelegate extends MouseAdapter
+		{
+		Tool tool;
+
+		MouseEvent refactor(MouseEvent e)
+			{
+			int x = e.getX() / canvas.getZoom();
+			int y = e.getY() / canvas.getZoom();
+			return new MouseEvent((Component) e.getSource(),e.getID(),e.getWhen(),e.getModifiers(),x,y,
+					e.getClickCount(),e.isPopupTrigger(),e.getButton());
+			}
+
+		public void mousePressed(MouseEvent e)
+			{
+			if (tool != null) tool.mousePress(refactor(e),canvas,pal);
+			}
+
+		public void mouseReleased(MouseEvent e)
+			{
+			if (tool != null) tool.mouseRelease(refactor(e),canvas,pal);
+			}
+
+		public void mouseDragged(MouseEvent e)
+			{
+			if (tool != null) tool.mouseMove(refactor(e),canvas,pal,true);
+			}
+
+		public void mouseMoved(MouseEvent e)
+			{
+			if (tool != null) tool.mouseMove(refactor(e),canvas,pal,false);
+			}
+
+		public void mouseWheelMoved(MouseWheelEvent e)
+			{
+			if (e.isControlDown())
+				{
+				int rot = e.getWheelRotation();
+				if (rot < 0)
+					canvas.zoomIn();
+				else if (rot > 0) canvas.zoomOut();
+				}
+			}
+		}
+
+	public static interface Tool
+		{
+		void mousePress(MouseEvent e, Canvas c, Palette p);
+
+		void mouseRelease(MouseEvent e, Canvas c, Palette p);
+
+		void mouseMove(MouseEvent e, Canvas c, Palette p, boolean drag);
+
+		void finish(Canvas c, Palette p);
 		}
 
 	public static void main(String[] args)
@@ -125,16 +210,6 @@ public class Jeie implements ActionListener
 		j.f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		}
 
-	public static BufferedImage createBufferedImage(Dimension size)
-		{
-		if (size == null) size = new Dimension(32,32);
-		BufferedImage image = new BufferedImage(size.width,size.height,BufferedImage.TYPE_INT_ARGB);
-		Graphics g = image.getGraphics();
-		g.setColor(Color.WHITE);
-		g.fillRect(0,0,32,32);
-		return image;
-		}
-
 	public static BufferedImage createBufferedImage(int w, int h)
 		{
 		BufferedImage image = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
@@ -146,13 +221,18 @@ public class Jeie implements ActionListener
 
 	public void actionPerformed(ActionEvent e)
 		{
+		if (e.getSource() instanceof ToolButton)
+			{
+			ToolButton tb = (ToolButton) e.getSource();
+			del.tool = tb.tool;
+			return;
+			}
 		if (e.getSource() == bUndo)
 			{
 			if (!canvas.acts.isEmpty())
 				{
-				canvas.acts.remove(canvas.acts.size() - 1);
+				canvas.acts.removeLast();
 				canvas.redrawCache();
-				canvas.repaint();
 				}
 			return;
 			}

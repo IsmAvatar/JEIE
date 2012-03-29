@@ -9,101 +9,66 @@
 package org.jeie;
 
 import java.awt.Color;
-import java.awt.Point;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-
-import javax.swing.ButtonGroup;
-import javax.swing.ButtonModel;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
 
 import org.jeie.ImageAction.LineAction;
+import org.jeie.Jeie.Tool;
 
-public class LineDrawer implements MouseListener,MouseMotionListener
+public class LineDrawer implements Tool
 	{
-	ButtonModel bPoint, bLine;
-	ButtonGroup bg;
-
-	Canvas canvas;
-	Palette pal;
-
-	public LineDrawer(JToolBar tool, Canvas c, Palette p)
-		{
-		canvas = c;
-		pal = p;
-		bg = new ButtonGroup();
-
-		JToggleButton b = new JToggleButton("Pt");
-		bg.add(b);
-		tool.add(b);
-		bPoint = b.getModel();
-
-		b = new JToggleButton("Ln",true);
-		bg.add(b);
-		tool.add(b);
-		bLine = b.getModel();
-
-		c.addMouseListener(this);
-		c.addMouseMotionListener(this);
-		}
-
-	///////////
-	// Mouse //
-	///////////
-
 	long mouseTime;
+	LineAction active;
+	int button;
 
-	public void mousePressed(MouseEvent e)
+	public void mousePress(MouseEvent e, Canvas canvas, Palette p)
 		{
-		Point p = e.getPoint();
-		Point l = new Point(p.x / canvas.zoom,p.y / canvas.zoom);
-		ButtonModel sel = bg.getSelection();
-		if (sel == bLine)
+		if (active != null)
 			{
-			if (canvas.active != null && canvas.active instanceof LineAction) return;
-			Color c = pal.getSelectedColor(e.getButton());
-			if (c == null) return;
-			canvas.active = new LineAction(l,c);
-			mouseTime = e.getWhen();
+			if (e.getButton() == button)
+				finish(canvas,p);
+			else
+				cancel(canvas);
+			return;
 			}
+		Color col = p.getSelectedColor(e.getButton());
+		if (col == null) return;
+		button = e.getButton();
+		mouseTime = e.getWhen();
+		canvas.active = active = new LineAction(e.getPoint(),col);
+		canvas.repaint();
 		}
 
-	public void mouseReleased(MouseEvent e)
+	public void mouseRelease(MouseEvent e, Canvas canvas, Palette pal)
 		{
 		if (e.getWhen() - mouseTime < 200) return;
-		Point p = e.getPoint();
-		Point l = new Point(p.x / canvas.zoom,p.y / canvas.zoom);
-		ButtonModel sel = bg.getSelection();
-		if (sel == bLine)
+
+		if (active != null) active.p2 = e.getPoint();
+		finish(canvas,pal);
+		}
+
+	public void mouseMove(MouseEvent e, Canvas canvas, Palette p, boolean drag)
+		{
+		if (active != null)
 			{
-			ImageAction ia = canvas.active;
-			LineAction la = null;
-			if (ia instanceof LineAction) la = (LineAction) ia;
-			if (la != null)
-				{
-				la.p2 = l;
-				canvas.acts.add(la);
-				canvas.active = null;
-				canvas.redrawCache();
-				}
+			active.p2 = e.getPoint();
+			canvas.repaint();
 			}
 		}
 
-	public void mouseDragged(MouseEvent e)
+	public void finish(Canvas canvas, Palette p)
 		{
-		mouseMoved(e);
+		if (active != null)
+			{
+			canvas.acts.add(active);
+			canvas.active = active = null;
+			canvas.redrawCache();
+			}
 		}
 
-	public void mouseMoved(MouseEvent e)
+	public void cancel(Canvas canvas)
 		{
-		ImageAction ia = canvas.active;
-		if (ia instanceof LineAction)
-			{
-			Point p = e.getPoint();
-			((LineAction) ia).p2 = new Point(p.x / canvas.zoom,p.y / canvas.zoom);
-			}
+		canvas.active = active = null;
+		canvas.repaint();
 		}
 
 	//Unused
