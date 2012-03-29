@@ -46,6 +46,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
+import org.jeie.Tool.FillTool;
+import org.jeie.Tool.LineTool;
+import org.jeie.Tool.PointTool;
+
 public class Jeie implements ActionListener
 	{
 	private JFrame f;
@@ -61,7 +65,7 @@ public class Jeie implements ActionListener
 
 	public Jeie(BufferedImage image)
 		{
-		if (image == null) image = createBufferedImage(32,32);
+		if (image == null) image = createWhiteBufferedImage(32,32);
 		pal = new Palette();
 		canvas = new Canvas(image);
 		scroll = new JScrollPane(canvas);
@@ -106,7 +110,9 @@ public class Jeie implements ActionListener
 		bZoomIn = setupButton(toolBar,new JButton("Z+"));
 
 		ButtonGroup bg = new ButtonGroup();
-		ToolButton tb = setupButton(toolBar,new ToolButton("Ln",bg,new LineDrawer()));
+		setupButton(toolBar,new ToolButton("Pt",bg,new PointTool()));
+		ToolButton tb = setupButton(toolBar,new ToolButton("Ln",bg,new LineTool()));
+		setupButton(toolBar,new ToolButton("Fill",bg,new FillTool()));
 
 		//select our default button
 		tb.doClick();
@@ -184,17 +190,6 @@ public class Jeie implements ActionListener
 			}
 		}
 
-	public static interface Tool
-		{
-		void mousePress(MouseEvent e, Canvas c, Palette p);
-
-		void mouseRelease(MouseEvent e, Canvas c, Palette p);
-
-		void mouseMove(MouseEvent e, Canvas c, Palette p, boolean drag);
-
-		void finish(Canvas c, Palette p);
-		}
-
 	public static void main(String[] args)
 		{
 		BufferedImage bi = null;
@@ -210,7 +205,7 @@ public class Jeie implements ActionListener
 		j.f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		}
 
-	public static BufferedImage createBufferedImage(int w, int h)
+	public static BufferedImage createWhiteBufferedImage(int w, int h)
 		{
 		BufferedImage image = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
 		Graphics g = image.getGraphics();

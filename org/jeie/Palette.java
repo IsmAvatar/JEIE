@@ -41,17 +41,45 @@ public class Palette extends JPanel
 		right = c;
 		}
 
+	public Color getLeft()
+		{
+		return left;
+		}
+
+	public Color getRight()
+		{
+		return right;
+		}
+
 	public void setSelectedColor(int button, Color c)
 		{
-		if (button == MouseEvent.BUTTON1) setLeft(c);
-		if (button == MouseEvent.BUTTON3) setRight(c);
+		switch (button)
+			{
+			case MouseEvent.BUTTON1:
+				setLeft(c);
+				return;
+			case MouseEvent.BUTTON3:
+				setRight(c);
+				return;
+			default:
+				if ((button & (MouseEvent.BUTTON1_MASK | MouseEvent.BUTTON1_DOWN_MASK)) != 0) setLeft(c);
+				if ((button & (MouseEvent.BUTTON3_MASK | MouseEvent.BUTTON3_DOWN_MASK)) != 0) setRight(c);
+			}
 		}
 
 	public Color getSelectedColor(int button)
 		{
-		if (button == MouseEvent.BUTTON1) return left;
-		if (button == MouseEvent.BUTTON3) return right;
-		return null;
+		switch (button)
+			{
+			case MouseEvent.BUTTON1:
+				return left;
+			case MouseEvent.BUTTON3:
+				return right;
+			default:
+				if ((button & (MouseEvent.BUTTON1_MASK | MouseEvent.BUTTON1_DOWN_MASK)) != 0) return left;
+				if ((button & (MouseEvent.BUTTON3_MASK | MouseEvent.BUTTON3_DOWN_MASK)) != 0) return right;
+				return null;
+			}
 		}
 
 	class WellPalette extends JPanel
