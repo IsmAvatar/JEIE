@@ -32,8 +32,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -56,7 +56,7 @@ import org.jeie.Tool.LineTool;
 import org.jeie.Tool.PointTool;
 import org.jeie.Tool.RectangleTool;
 
-public class Jeie implements ActionListener,WindowListener
+public class Jeie implements ActionListener
 	{
 	private JFrame frame;
 	private JButton bUndo, bZoomIn, bZoomOut;
@@ -95,7 +95,17 @@ public class Jeie implements ActionListener,WindowListener
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
-		frame.addWindowListener(this);
+		frame.addWindowListener(new WindowAdapter()
+			{
+				public void windowClosing(WindowEvent e)
+					{
+					if (canvas.acts.isEmpty()) System.exit(0);
+					int c = JOptionPane.showConfirmDialog(frame,"OMG DO U WANT TO SAVE?");
+					if (c == JOptionPane.CANCEL_OPTION) return;
+					if (c == JOptionPane.OK_OPTION) doSave();
+					System.exit(0);
+					}
+			});
 		}
 
 	public JMenuBar makeMenuBar()
@@ -157,21 +167,12 @@ public class Jeie implements ActionListener,WindowListener
 			}
 		}
 
-	// LGM code
-	private static ImageIcon getIcon(String name)
+	public static ImageIcon getIcon(String name)
 		{
-		String filename = name.toLowerCase() + ".png";
-		String location = "org/jeie/icons/actions/" + filename;
-		ImageIcon ico = new ImageIcon(location);
-		if (ico.getIconWidth() == -1)
-			{
-			URL url = Jeie.class.getClassLoader().getResource(location);
-			if (url != null)
-				{
-				ico = new ImageIcon(url);
-				}
-			}
-		return ico;
+		String location = "org/jeie/icons/actions/" + name + ".png";
+		URL url = Jeie.class.getClassLoader().getResource(location);
+		if (url == null) return new ImageIcon(location);
+		return new ImageIcon(url);
 		}
 
 	class ToolDelegate extends MouseAdapter
@@ -285,65 +286,9 @@ public class Jeie implements ActionListener,WindowListener
 			}
 		}
 
-	public void windowClosing(WindowEvent e)
-		{
-		if (canvas.acts.isEmpty())
-			{
-			//TODO: this is annoying as hell, have an option to enable/disable it
-			/*
-			int c = JOptionPane.showConfirmDialog(frame,"Do you really want to quit?",
-					"Really Quit, Really?",JOptionPane.YES_NO_OPTION);
-			if (c == JOptionPane.YES_OPTION)
-				{*/
-			frame.dispose();
-			//	}
-			return;
-			}
-		int c = JOptionPane.showConfirmDialog(frame,"OMG DO U WANT TO SAVE?","Confirm",
-				JOptionPane.YES_NO_CANCEL_OPTION);
-		if (c == JOptionPane.CANCEL_OPTION)
-			{
-			return;
-			}
-		else if (c == JOptionPane.OK_OPTION)
-			{
-			doSave();
-			frame.dispose();
-			}
-		else if (c == JOptionPane.NO_OPTION)
-			{
-			frame.dispose();
-			}
-
-		}
-
 	private void doSave()
 		{
 		// TODO Auto-generated method stub
 
-		}
-
-	public void windowOpened(WindowEvent e)
-		{
-		}
-
-	public void windowClosed(WindowEvent e)
-		{
-		}
-
-	public void windowIconified(WindowEvent e)
-		{
-		}
-
-	public void windowDeiconified(WindowEvent e)
-		{
-		}
-
-	public void windowActivated(WindowEvent e)
-		{
-		}
-
-	public void windowDeactivated(WindowEvent e)
-		{
 		}
 	}

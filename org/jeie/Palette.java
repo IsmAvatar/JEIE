@@ -18,6 +18,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.JColorChooser;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.border.BevelBorder;
@@ -27,8 +28,8 @@ public class Palette extends JPanel
 	private static final long serialVersionUID = 1L;
 
 	private Color left = Color.BLACK, right = Color.WHITE;
-  private CurrentColor cur;
-  
+	private CurrentColor cur;
+
 	public Palette()
 		{
 		super();
@@ -90,11 +91,11 @@ public class Palette extends JPanel
 			}
 		}
 
-	class WellPalette extends JPanel
+	protected class WellPalette extends JPanel
 		{
 		private static final long serialVersionUID = 1L;
 
-		WellPalette()
+		public WellPalette()
 			{
 			super(new GridLayout(2,0));
 
@@ -120,7 +121,7 @@ public class Palette extends JPanel
 			}
 		}
 
-	class Well extends JPanel
+	protected class Well extends JPanel
 		{
 		private static final long serialVersionUID = 1L;
 
@@ -156,22 +157,25 @@ public class Palette extends JPanel
 			}
 		}
 
-	class CurrentColor extends JPanel
+	protected class CurrentColor extends JLabel
 		{
 		private static final long serialVersionUID = 6026758209604170064L;
 
 		public CurrentColor()
 			{
+			super();
 			setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 			setBackground(Color.WHITE);
 			setPreferredSize(new Dimension(48,48));
 			}
-		public void paint(Graphics g) {
+
+		public void paint(Graphics g)
+			{
 			super.paint(g);
 			g.setColor(right);
 			int s = 20;
 			int f1 = 8;
-			int f2 = f1 + (int)(s * 0.6);
+			int f2 = f1 + (int) (s * 0.6);
 			g.fillRect(f2,f2,s,s);
 			g.setColor(Color.BLACK);
 			g.drawRect(f2,f2,s,s);
@@ -179,6 +183,6 @@ public class Palette extends JPanel
 			g.fillRect(f1,f1,s,s);
 			g.setColor(Color.BLACK);
 			g.drawRect(f1,f1,s,s);
-		}
+			}
 		}
 	}
