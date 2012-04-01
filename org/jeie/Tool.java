@@ -137,17 +137,13 @@ public interface Tool
 
 		public void mouseMove(MouseEvent e, Canvas canvas, Palette p, boolean drag)
 			{
-			if (active != null)
+			if (active != null && !active.p2.equals(e.getPoint()))
 				{
-				Point op = active.p2;
-				if (!op.equals(e.getPoint()))
-					{
-					active.p2 = e.getPoint();
-					Rectangle r = new Rectangle(op);
-					r.add(active.p1);
-					r.add(active.p2);
-					canvas.repaint(r);
-					}
+				Rectangle r = new Rectangle(active.p2); //previous value
+				active.p2 = e.getPoint();
+				r.add(active.p1);
+				r.add(active.p2);
+				canvas.repaint(r);
 				}
 			}
 		}
@@ -177,6 +173,7 @@ public interface Tool
 			if (active != null && isValid(e,c,null))
 				{
 				Point pt = e.getPoint();
+				if (!active.pts.isEmpty() && active.pts.getLast().equals(pt)) return;
 				Rectangle r = new Rectangle(pt);
 				if (!active.pts.isEmpty()) r.add(active.pts.getLast());
 				active.add(pt);
@@ -224,17 +221,13 @@ public interface Tool
 
 		public void mouseMove(MouseEvent e, Canvas canvas, Palette p, boolean drag)
 			{
-			if (active != null)
+			if (active != null && !active.p2.equals(e.getPoint()))
 				{
-				Point op = active.p2;
-				if (!op.equals(e.getPoint()))
-					{
-					active.p2 = e.getPoint();
-					Rectangle r = new Rectangle(op);
-					r.add(active.p1);
-					r.add(active.p2);
-					canvas.repaint(r);
-					}
+				Rectangle r = new Rectangle(active.p2); //previous value
+				active.p2 = e.getPoint();
+				r.add(active.p1);
+				r.add(active.p2);
+				canvas.repaint(r);
 				}
 			}
 		}
