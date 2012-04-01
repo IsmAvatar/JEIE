@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008, 2009, 2012 IsmAvatar <IsmAvatar@gmail.com>
- * Copyright (C) 2009 Serge Humphrey <bob@bobtheblueberry.com>
+ * Copyright (C) 2009, 2012 Serge Humphrey <bobtheblueberry@gmail.com>
  * 
  * This file is part of Jeie.
  * 
@@ -48,7 +48,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
@@ -117,10 +116,10 @@ public class Jeie implements ActionListener,WindowListener
 		bZoomOut = setupButton(toolBar,new JButton(getIcon("zoom-out")));
 		bZoomIn = setupButton(toolBar,new JButton(getIcon("zoom-in")));
 		ButtonGroup bg = new ButtonGroup();
-		setupButton(toolBar,new ToolButton("Pt",bg,new PointTool()));
-		ToolButton tb = setupButton(toolBar,new ToolButton("Ln",bg,new LineTool()));
-		setupButton(toolBar,new ToolButton("Rect",bg,new RectangleTool()));
-		setupButton(toolBar,new ToolButton("Fill",bg,new FillTool()));
+		setupButton(toolBar,new ToolButton(getIcon("pencil"),bg,new PointTool()));
+		ToolButton tb = setupButton(toolBar,new ToolButton(getIcon("line"),bg,new LineTool()));
+		setupButton(toolBar,new ToolButton(getIcon("rect"),bg,new RectangleTool()));
+		setupButton(toolBar,new ToolButton(getIcon("color-fill"),bg,new FillTool()));
 
 		// select our default button
 		tb.doClick();
@@ -141,16 +140,20 @@ public class Jeie implements ActionListener,WindowListener
 
 		public final Tool tool;
 
-		public ToolButton(String label, ButtonGroup bg, Tool t, boolean sel)
+		public ToolButton(String label, ImageIcon ico, ButtonGroup bg, Tool t, boolean sel)
 			{
-			super(label,sel);
+			super(label,ico,sel);
 			tool = t;
 			bg.add(this);
 			}
 
 		public ToolButton(String label, ButtonGroup bg, Tool t)
 			{
-			this(label,bg,t,false);
+			this(label,null,bg,t,false);
+			}
+		public ToolButton(ImageIcon ico, ButtonGroup bg, Tool t)
+			{
+			this(null, ico,bg,t,false);
 			}
 		}
 

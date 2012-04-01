@@ -4,9 +4,7 @@ This directory contains the following icons (.png extension omitted):
    actions/
      accept cancel colorize copy cut
      new next open paste previous redo save
-     save-as sound-play sound-stop undo
-   restree/
-     gm group group-open info
+     save-as undo  color-fill
  Copyright 2003-2004 David Vignoni
 
  Stock icons for OpenOffice.org:
