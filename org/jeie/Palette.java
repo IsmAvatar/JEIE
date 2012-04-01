@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2012 IsmAvatar <IsmAvatar@gmail.com>
+ * Copyright (C) 2012 Serge Humphrey <bobtheblueberry@gmail.com>
  * 
  * This file is part of Jeie.
  * Jeie is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -11,12 +12,14 @@ package org.jeie;
 import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.JColorChooser;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.border.BevelBorder;
 
 public class Palette extends JPanel
@@ -24,21 +27,26 @@ public class Palette extends JPanel
 	private static final long serialVersionUID = 1L;
 
 	private Color left = Color.BLACK, right = Color.WHITE;
-
+  private CurrentColor cur;
+  
 	public Palette()
 		{
 		super();
+		add(cur = new CurrentColor());
+		add(new JSeparator(JSeparator.VERTICAL));
 		add(new WellPalette());
 		}
 
 	public void setLeft(Color c)
 		{
 		left = c;
+		cur.repaint();
 		}
 
 	public void setRight(Color c)
 		{
 		right = c;
+		cur.repaint();
 		}
 
 	public Color getLeft()
@@ -146,5 +154,31 @@ public class Palette extends JPanel
 				}
 			super.processMouseEvent(e); //for listeners, probably
 			}
+		}
+
+	class CurrentColor extends JPanel
+		{
+		private static final long serialVersionUID = 6026758209604170064L;
+
+		public CurrentColor()
+			{
+			setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+			setBackground(Color.WHITE);
+			setPreferredSize(new Dimension(48,48));
+			}
+		public void paint(Graphics g) {
+			super.paint(g);
+			g.setColor(right);
+			int s = 20;
+			int f1 = 8;
+			int f2 = f1 + (int)(s * 0.6);
+			g.fillRect(f2,f2,s,s);
+			g.setColor(Color.BLACK);
+			g.drawRect(f2,f2,s,s);
+			g.setColor(left);
+			g.fillRect(f1,f1,s,s);
+			g.setColor(Color.BLACK);
+			g.drawRect(f1,f1,s,s);
+		}
 		}
 	}
