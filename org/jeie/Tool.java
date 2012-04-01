@@ -10,6 +10,7 @@ package org.jeie;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 
 import org.jeie.ImageAction.FillAction;
@@ -136,8 +137,15 @@ public interface Tool
 			{
 			if (active != null)
 				{
-				active.p2 = e.getPoint();
-				canvas.repaint();
+				Point op = active.p2;
+				if (!op.equals(e.getPoint()))
+					{
+					active.p2 = e.getPoint();
+					Rectangle r = new Rectangle(op);
+					r.add(active.p1);
+					r.add(active.p2);
+					canvas.repaint(r);
+					}
 				}
 			}
 		}
@@ -166,8 +174,11 @@ public interface Tool
 			{
 			if (active != null && isValid(e,c,null))
 				{
-				active.add(e.getPoint());
-				c.repaint();
+				Point pt = e.getPoint();
+				Rectangle r = new Rectangle(pt);
+				if (!active.pts.isEmpty()) r.add(active.pts.getLast());
+				active.add(pt);
+				c.repaint(r);
 				}
 			}
 		}

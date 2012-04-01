@@ -198,6 +198,9 @@ public class Jeie implements ActionListener
 
 	public static void main(String[] args)
 		{
+		//java6u10 regression causes graphical xor to be very slow
+		System.setProperty("sun.java2d.d3d","false"); //$NON-NLS-1$ //$NON-NLS-2$
+
 		BufferedImage bi = null;
 		try
 			{

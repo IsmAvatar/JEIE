@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayDeque;
 
@@ -141,6 +142,15 @@ public class Canvas extends JLabel
 		return zoom;
 		}
 
+	public void repaint(Rectangle r)
+		{
+		r.x *= zoom;
+		r.y *= zoom;
+		r.width = (r.width + 1) * zoom;
+		r.height = (r.height + 1) * zoom;
+		super.repaint(r);
+		}
+
 	@Override
 	public void paint(Graphics g)
 		{
@@ -151,10 +161,13 @@ public class Canvas extends JLabel
 
 		g.drawImage(raster,0,0,raster.getWidth() * zoom,raster.getHeight() * zoom,null);
 		g.drawImage(cache,0,0,cw,ch,null);
-		BufferedImage activeImg = new BufferedImage(cache.getWidth(),cache.getHeight(),
-				BufferedImage.TYPE_INT_ARGB);
-		if (active != null) active.paint(activeImg.getGraphics());
-		g.drawImage(activeImg,0,0,cw,ch,null);
+		if (active != null)
+			{
+			BufferedImage activeImg = new BufferedImage(cache.getWidth(),cache.getHeight(),
+					BufferedImage.TYPE_INT_ARGB);
+			active.paint(activeImg.getGraphics());
+			g.drawImage(activeImg,0,0,cw,ch,null);
+			}
 
 		if (isGridDrawn && zoom >= 8)
 			{
