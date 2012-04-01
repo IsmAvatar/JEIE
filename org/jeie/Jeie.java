@@ -49,6 +49,7 @@ import javax.swing.JToolBar;
 import org.jeie.Tool.FillTool;
 import org.jeie.Tool.LineTool;
 import org.jeie.Tool.PointTool;
+import org.jeie.Tool.RectangleTool;
 
 public class Jeie implements ActionListener
 	{
@@ -112,6 +113,7 @@ public class Jeie implements ActionListener
 		ButtonGroup bg = new ButtonGroup();
 		setupButton(toolBar,new ToolButton("Pt",bg,new PointTool()));
 		ToolButton tb = setupButton(toolBar,new ToolButton("Ln",bg,new LineTool()));
+		setupButton(toolBar,new ToolButton("Rect",bg,new RectangleTool()));
 		setupButton(toolBar,new ToolButton("Fill",bg,new FillTool()));
 
 		//select our default button
@@ -155,7 +157,7 @@ public class Jeie implements ActionListener
 			if (tool != null) tool.finish(canvas,pal);
 			tool = t;
 			}
-		
+
 		MouseEvent refactor(MouseEvent e)
 			{
 			int x = e.getX() / canvas.getZoom();

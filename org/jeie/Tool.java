@@ -8,6 +8,7 @@
 
 package org.jeie;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -16,6 +17,7 @@ import java.awt.event.MouseEvent;
 import org.jeie.ImageAction.FillAction;
 import org.jeie.ImageAction.LineAction;
 import org.jeie.ImageAction.PointAction;
+import org.jeie.ImageAction.RectangleAction;
 
 public interface Tool
 	{
@@ -179,6 +181,60 @@ public interface Tool
 				if (!active.pts.isEmpty()) r.add(active.pts.getLast());
 				active.add(pt);
 				c.repaint(r);
+				}
+			}
+		}
+
+	public static class RectangleTool extends GenericTool<RectangleAction>
+		{
+		long mouseTime;
+		int button;
+
+		public void mousePress(MouseEvent e, Canvas canvas, Palette p)
+			{
+			if (active != null)
+				{
+				if (e.getButton() == button)
+					finish(canvas,p);
+				else
+					cancel(canvas);
+				return;
+				}
+			if (!isValid(e,canvas,p)) return;
+			button = e.getButton();
+			mouseTime = e.getWhen();
+			Color c1 = p.getLeft();
+			Color c2 = p.getRight();
+			if (button != MouseEvent.BUTTON1)
+				{ //lol, shut up
+				c1 = c2;
+				c2 = p.getLeft();
+				}
+			canvas.active = active = new RectangleAction(e.getPoint(),c1,c2);
+			canvas.repaint();
+			}
+
+		public void mouseRelease(MouseEvent e, Canvas canvas, Palette pal)
+			{
+			if (e.getWhen() - mouseTime < 200) return;
+
+			if (active != null) active.p2 = e.getPoint();
+			finish(canvas,pal);
+			}
+
+		public void mouseMove(MouseEvent e, Canvas canvas, Palette p, boolean drag)
+			{
+			if (active != null)
+				{
+				Point op = active.p2;
+				if (!op.equals(e.getPoint()))
+					{
+					active.p2 = e.getPoint();
+					Rectangle r = new Rectangle(op);
+					r.add(active.p1);
+					r.add(active.p2);
+					canvas.repaint(r);
+					}
 				}
 			}
 		}

@@ -22,6 +22,7 @@ package org.jeie;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayDeque;
 import java.util.HashSet;
@@ -56,6 +57,33 @@ public interface ImageAction
 			{
 			g.setClip(0,0,w,h);
 			g.clipRect(0,0,w,h);
+			}
+		}
+
+	public static class RectangleAction implements ImageAction
+		{
+		public Color out, in;
+		public Point p1, p2;
+
+		public RectangleAction(Point p, Color out, Color in)
+			{
+			this.out = out;
+			this.in = in;
+			p1 = p;
+			p2 = p;
+			}
+
+		public void paint(Graphics g)
+			{
+			Rectangle r = new Rectangle(p1);
+			r.add(p2);
+			g.setColor(out);
+			g.drawRect(r.x,r.y,r.width,r.height);
+			if (in != null)
+				{
+				g.setColor(in);
+				g.fillRect(r.x + 1,r.y + 1,r.width - 1,r.height - 1);
+				}
 			}
 		}
 
