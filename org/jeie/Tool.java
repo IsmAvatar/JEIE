@@ -185,8 +185,6 @@ public interface Tool
 
 	public static class FillTool extends GenericTool<FillAction>
 		{
-		FillAction active;
-
 		public void mousePress(MouseEvent e, Canvas c, Palette p)
 			{
 			if (active != null)
