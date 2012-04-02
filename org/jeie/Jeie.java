@@ -44,7 +44,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -65,6 +67,7 @@ public class Jeie implements ActionListener
 	private JMenuBar menuBar;
 	private JToolBar toolBar;
 	private JPanel toolPanel;
+	public final String TITLE = "Easy Image Editor ";
 
 	public Jeie(BufferedImage image)
 		{
@@ -82,10 +85,11 @@ public class Jeie implements ActionListener
 		p.add(scroll,BorderLayout.CENTER);
 		p.add(pal,BorderLayout.SOUTH);
 
-		frame = new JFrame("Easy Image Editor");
+		frame = new JFrame();
 		frame.setJMenuBar(makeMenuBar());
 		frame.setContentPane(p);
 		frame.setMinimumSize(new Dimension(500,500));
+		updateTitle();
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
@@ -93,18 +97,69 @@ public class Jeie implements ActionListener
 			{
 				public void windowClosing(WindowEvent e)
 					{
-					if (canvas.acts.isEmpty()) System.exit(0);
-					int c = JOptionPane.showConfirmDialog(frame,"OMG DO U WANT TO SAVE?");
-					if (c == JOptionPane.CANCEL_OPTION) return;
-					if (c == JOptionPane.OK_OPTION) doSave();
-					System.exit(0);
+					doClose();
 					}
 			});
+		}
+
+	public void updateTitle()
+		{
+		if (file == null)
+			frame.setTitle(TITLE + "<untitled>");
+		else
+			frame.setTitle(TITLE + file.getName());
 		}
 
 	public JMenuBar makeMenuBar()
 		{
 		menuBar = new JMenuBar();
+		JMenu fm = new JMenu("File");
+		JMenuItem newImg = new JMenuItem("New",getIcon("new"));
+		newImg.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+					{
+					doNew();
+					}
+			});
+		fm.add(newImg);
+		JMenuItem open = new JMenuItem("Open",getIcon("open"));
+		open.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+					{
+					doOpen();
+					}
+			});
+		fm.add(open);
+		JMenuItem save = new JMenuItem("Save",getIcon("save"));
+		save.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+					{
+					doSave(false);
+					}
+			});
+		fm.add(save);
+		JMenuItem saveAs = new JMenuItem("Save As",getIcon("save-as"));
+		saveAs.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+					{
+					doSave(true);
+					}
+			});
+		fm.add(saveAs);
+		JMenuItem exit = new JMenuItem("Exit",getIcon("cancel"));
+		exit.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+					{
+					doClose();
+					}
+			});
+		fm.add(exit);
+		menuBar.add(fm);
 		menuBar.add(new EffectsMenu(this));
 		return menuBar;
 		}
@@ -253,23 +308,89 @@ public class Jeie implements ActionListener
 			}
 		}
 
-	private boolean doSave()
+	public boolean hasChanged()
 		{
-		if (file == null)
+		return !canvas.acts.isEmpty();
+		}
+
+	public boolean doNew()
+		{
+		if (!checkSave()) return false;
+		//TODO: Ask for sizes
+		file = null;
+		BufferedImage img = createWhiteBufferedImage(120,120);
+		canvas.setImage(img);
+		scroll.updateUI();
+		updateTitle();
+		return true;
+		}
+
+	public void doClose()
+		{
+		if (!hasChanged()) System.exit(0);
+		int c = JOptionPane.showConfirmDialog(frame,"OMG DO U WANT TO SAVE?");
+		if (c == JOptionPane.CANCEL_OPTION) return;
+		if (c == JOptionPane.OK_OPTION) doSave(false);
+		System.exit(0);
+		}
+
+	/**
+	 * @return false if the action was canceled
+	 */
+	public boolean checkSave()
+		{
+		if (hasChanged())
 			{
-			file = getFile(true);
-			if (file == null) return false;
+			int c = JOptionPane.showConfirmDialog(frame,
+					"Image has been modified. Would you like to save first?");
+			if (c == JOptionPane.CANCEL_OPTION) return false;
+			if (c == JOptionPane.OK_OPTION) doSave(false);
+			}
+		return true;
+		}
+
+	public boolean doOpen()
+		{
+		if (!checkSave()) return false;
+		File f = getFile(false);
+		if (f == null) return false;
+		try
+			{
+			BufferedImage img = ImageIO.read(f);
+			canvas.setImage(img);
+			file = f;
+			scroll.updateUI();
+			updateTitle();
+			return true;
+			}
+		catch (IOException e)
+			{
+			JOptionPane.showMessageDialog(frame,"Cannot load file \"" + f.getPath() + "\"","Error",
+					JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+			}
+		return false;
+		}
+
+	public boolean doSave(boolean saveAs)
+		{
+		File f = file;
+		if (saveAs || file == null)
+			{
+			f = getFile(true);
+			if (f == null) return false;
 			// just use PNG..
-			String name = file.getName().toLowerCase();
+			String name = f.getName().toLowerCase();
 			if (!name.endsWith(".png"))
 				{
 				if (name.contains(".")) name = name.substring(0,name.lastIndexOf('.'));
-				file = new File(file.getParentFile(),name + ".png");
+				f = new File(f.getParentFile(),name + ".png");
 				}
 			}
 		try
 			{
-			ImageIO.write(canvas.getRenderImage(),"PNG",file);
+			ImageIO.write(canvas.getRenderImage(),"PNG",f);
+			file = f;
 			return true;
 			}
 		catch (IOException e)
@@ -282,10 +403,9 @@ public class Jeie implements ActionListener
 
 	private File getFile(final boolean save)
 		{
-		JFileChooser fc = (file != null) ? new JFileChooser(file.getParent()) : new JFileChooser();
+		final JFileChooser fc = new JFileChooser((file != null) ? file.getParent() : null);
 		fc.setFileFilter(new FileFilter()
 			{
-
 				@Override
 				public String getDescription()
 					{
@@ -312,6 +432,18 @@ public class Jeie implements ActionListener
 		else
 			result = fc.showOpenDialog(frame);
 		if (result != JFileChooser.APPROVE_OPTION) return null;
-		return fc.getSelectedFile();
+		File f = fc.getSelectedFile();
+		if (f == null || !save || !f.exists())
+			return f;
+		else
+			{
+			int o = JOptionPane.showConfirmDialog(fc,"File " + f.getName() + " already exists. Replace?");
+			if (o == JOptionPane.YES_OPTION)
+				return f;
+			else if (o == JOptionPane.NO_OPTION)
+				return getFile(save);
+			else
+				return null;
+			}
 		}
 	}
