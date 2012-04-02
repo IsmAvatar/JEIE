@@ -26,7 +26,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -40,7 +39,6 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
-import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -51,11 +49,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
-import org.jeie.Tool.FillTool;
-import org.jeie.Tool.LineTool;
-import org.jeie.Tool.PointTool;
-import org.jeie.Tool.RectangleTool;
-
 public class Jeie implements ActionListener
 	{
 	private JFrame frame;
@@ -65,9 +58,9 @@ public class Jeie implements ActionListener
 
 	public Canvas canvas;
 	public Palette pal;
-	public ToolDelegate del;
 	private JMenuBar menuBar;
 	private JToolBar toolBar;
+	private JPanel toolPanel;
 
 	public Jeie(BufferedImage image)
 		{
@@ -75,14 +68,11 @@ public class Jeie implements ActionListener
 		pal = new Palette();
 		canvas = new Canvas(image);
 		scroll = new JScrollPane(canvas);
-
-		del = new ToolDelegate();
-		canvas.addMouseListener(del);
-		canvas.addMouseMotionListener(del);
-		canvas.addMouseWheelListener(del);
+		toolPanel = new ToolPanel(new ToolDelegate(canvas));
 
 		JPanel p = new JPanel(new BorderLayout());
-		p.add(makeToolBar(),BorderLayout.WEST);
+		p.add(makeToolBar(),BorderLayout.NORTH);
+		p.add(toolPanel,BorderLayout.WEST);
 		scroll.getVerticalScrollBar().setUnitIncrement(10);
 		scroll.getHorizontalScrollBar().setUnitIncrement(10);
 		p.add(scroll,BorderLayout.CENTER);
@@ -117,54 +107,23 @@ public class Jeie implements ActionListener
 
 	public JToolBar makeToolBar()
 		{
-		toolBar = new JToolBar(JToolBar.VERTICAL);
-		toolBar.setLayout(new GridLayout(0,2));
+		toolBar = new JToolBar();
+		toolBar.setFloatable(false);
 
-		bUndo = setupButton(toolBar,new JButton("Undo",getIcon("undo")));
-		bGrid = setupButton(toolBar,new JToggleButton("Grid",true));
+		bUndo = addButton(toolBar,new JButton("Undo",getIcon("undo")));
+		bGrid = addButton(toolBar,new JToggleButton("Grid",true));
 
-		bZoomOut = setupButton(toolBar,new JButton(getIcon("zoom-out")));
-		bZoomIn = setupButton(toolBar,new JButton(getIcon("zoom-in")));
-		ButtonGroup bg = new ButtonGroup();
-		setupButton(toolBar,new ToolButton(getIcon("pencil"),bg,new PointTool()));
-		ToolButton tb = setupButton(toolBar,new ToolButton(getIcon("line"),bg,new LineTool()));
-		setupButton(toolBar,new ToolButton(getIcon("rect"),bg,new RectangleTool()));
-		setupButton(toolBar,new ToolButton(getIcon("color-fill"),bg,new FillTool()));
-
-		// select our default button
-		tb.doClick();
+		bZoomOut = addButton(toolBar,new JButton(getIcon("zoom-out")));
+		bZoomIn = addButton(toolBar,new JButton(getIcon("zoom-in")));
 
 		return toolBar;
 		}
 
-	public <K extends AbstractButton>K setupButton(Container c, K b)
+	public <K extends AbstractButton>K addButton(Container c, K b)
 		{
 		c.add(b);
 		b.addActionListener(this);
 		return b;
-		}
-
-	class ToolButton extends JToggleButton
-		{
-		private static final long serialVersionUID = 1L;
-
-		public final Tool tool;
-
-		public ToolButton(String label, ImageIcon ico, ButtonGroup bg, Tool t, boolean sel)
-			{
-			super(label,ico,sel);
-			tool = t;
-			bg.add(this);
-			}
-
-		public ToolButton(String label, ButtonGroup bg, Tool t)
-			{
-			this(label,null,bg,t,false);
-			}
-		public ToolButton(ImageIcon ico, ButtonGroup bg, Tool t)
-			{
-			this(null, ico,bg,t,false);
-			}
 		}
 
 	public static ImageIcon getIcon(String name)
@@ -175,9 +134,18 @@ public class Jeie implements ActionListener
 		return new ImageIcon(url);
 		}
 
-	class ToolDelegate extends MouseAdapter
+	protected class ToolDelegate extends MouseAdapter
 		{
 		protected Tool tool;
+		protected Canvas canvas;
+
+		public ToolDelegate(Canvas canvas)
+			{
+			this.canvas = canvas;
+			canvas.addMouseListener(this);
+			canvas.addMouseMotionListener(this);
+			canvas.addMouseWheelListener(this);
+			}
 
 		public void setTool(Tool t)
 			{
@@ -185,7 +153,7 @@ public class Jeie implements ActionListener
 			tool = t;
 			}
 
-		MouseEvent refactor(MouseEvent e)
+		protected MouseEvent refactor(MouseEvent e)
 			{
 			int x = e.getX() / canvas.getZoom();
 			int y = e.getY() / canvas.getZoom();
@@ -254,11 +222,6 @@ public class Jeie implements ActionListener
 
 	public void actionPerformed(ActionEvent e)
 		{
-		if (e.getSource() instanceof ToolButton)
-			{
-			del.setTool(((ToolButton) e.getSource()).tool);
-			return;
-			}
 		if (e.getSource() == bUndo)
 			{
 			if (!canvas.acts.isEmpty())
