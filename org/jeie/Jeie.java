@@ -34,6 +34,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
@@ -41,6 +42,7 @@ import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
@@ -48,6 +50,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.filechooser.FileFilter;
 
 public class Jeie implements ActionListener
 	{
@@ -56,6 +59,7 @@ public class Jeie implements ActionListener
 	private JToggleButton bGrid;
 	private JScrollPane scroll;
 
+	public File file;
 	public Canvas canvas;
 	public Palette pal;
 	private JMenuBar menuBar;
@@ -249,9 +253,65 @@ public class Jeie implements ActionListener
 			}
 		}
 
-	private void doSave()
+	private boolean doSave()
 		{
-		// TODO Auto-generated method stub
+		if (file == null)
+			{
+			file = getFile(true);
+			if (file == null) return false;
+			// just use PNG..
+			String name = file.getName().toLowerCase();
+			if (!name.endsWith(".png"))
+				{
+				if (name.contains(".")) name = name.substring(0,name.lastIndexOf('.'));
+				file = new File(file.getParentFile(),name + ".png");
+				}
+			}
+		try
+			{
+			ImageIO.write(canvas.getRenderImage(),"PNG",file);
+			return true;
+			}
+		catch (IOException e)
+			{
+			e.printStackTrace();
+			}
 
+		return false;
+		}
+
+	private File getFile(final boolean save)
+		{
+		JFileChooser fc = (file != null) ? new JFileChooser(file.getParent()) : new JFileChooser();
+		fc.setFileFilter(new FileFilter()
+			{
+
+				@Override
+				public String getDescription()
+					{
+					return "Image Files";
+					}
+
+				@Override
+				public boolean accept(File f)
+					{
+					String[] filters;
+					if (save)
+						filters = ImageIO.getWriterFileSuffixes();
+					else
+						filters = ImageIO.getReaderFileSuffixes();
+					String name = f.getName().toLowerCase();
+					for (String s : filters)
+						if (name.endsWith(s.toLowerCase())) return true;
+					return false;
+					}
+			});
+		int result;
+		if (save)
+			result = fc.showSaveDialog(frame);
+		else
+			result = fc.showOpenDialog(frame);
+		if (result != JFileChooser.APPROVE_OPTION) return null;
+		return fc.getSelectedFile();
 		}
 	}

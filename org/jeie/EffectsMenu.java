@@ -172,7 +172,7 @@ public class EffectsMenu extends JMenu implements ActionListener
 		if (e.getSource() == blur)
 			{
 			Integer integer = IntegerDialog.getInteger("Blur amount (1-9)",1,9,3,3);
-			if (integer != null) applyAction(new Blur(integer * 2 + 2));
+			if (integer != null) applyAction(new Blur(integer));
 			return;
 			}
 		if (e.getSource() == value)
