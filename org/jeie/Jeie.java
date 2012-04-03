@@ -114,54 +114,23 @@ public class Jeie implements ActionListener
 		{
 		menuBar = new JMenuBar();
 		JMenu fm = new JMenu("File");
-		JMenuItem newImg = new JMenuItem("New",getIcon("new"));
-		newImg.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-					{
-					doNew();
-					}
-			});
-		fm.add(newImg);
-		JMenuItem open = new JMenuItem("Open",getIcon("open"));
-		open.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-					{
-					doOpen();
-					}
-			});
-		fm.add(open);
-		JMenuItem save = new JMenuItem("Save",getIcon("save"));
-		save.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-					{
-					doSave(false);
-					}
-			});
-		fm.add(save);
-		JMenuItem saveAs = new JMenuItem("Save As",getIcon("save-as"));
-		saveAs.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-					{
-					doSave(true);
-					}
-			});
-		fm.add(saveAs);
-		JMenuItem exit = new JMenuItem("Exit",getIcon("cancel"));
-		exit.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-					{
-					doClose();
-					}
-			});
-		fm.add(exit);
 		menuBar.add(fm);
+		addMenuItem(fm,"New",getIcon("new"));
+		addMenuItem(fm,"Open",getIcon("open"));
+		addMenuItem(fm,"Save",getIcon("save"));
+		addMenuItem(fm,"Save As",getIcon("save-as"));
+		addMenuItem(fm,"Exit",getIcon("cancel"));
+
 		menuBar.add(new EffectsMenu(this));
 		return menuBar;
+		}
+
+	public void addMenuItem(JMenu menu, String name, ImageIcon icon)
+		{
+		JMenuItem mi = new JMenuItem(name,icon);
+		mi.setActionCommand(name);
+		mi.addActionListener(this);
+		menu.add(mi);
 		}
 
 	public JToolBar makeToolBar()
@@ -306,6 +275,32 @@ public class Jeie implements ActionListener
 			canvas.zoomOut();
 			return;
 			}
+		String act = e.getActionCommand();
+		if (act.equals("New"))
+			{
+			doNew();
+			return;
+			}
+		if (act.equals("Open"))
+			{
+			doOpen();
+			return;
+			}
+		if (act.equals("Save"))
+			{
+			doSave(false);
+			return;
+			}
+		if (act.equals("Save As"))
+			{
+			doSave(true);
+			return;
+			}
+		if (act.equals("Exit"))
+			{
+			doClose();
+			return;
+			}
 		}
 
 	public boolean hasChanged()
@@ -433,17 +428,10 @@ public class Jeie implements ActionListener
 			result = fc.showOpenDialog(frame);
 		if (result != JFileChooser.APPROVE_OPTION) return null;
 		File f = fc.getSelectedFile();
-		if (f == null || !save || !f.exists())
-			return f;
-		else
-			{
-			int o = JOptionPane.showConfirmDialog(fc,"File " + f.getName() + " already exists. Replace?");
-			if (o == JOptionPane.YES_OPTION)
-				return f;
-			else if (o == JOptionPane.NO_OPTION)
-				return getFile(save);
-			else
-				return null;
-			}
+		if (f == null || !save || !f.exists()) return f;
+		int o = JOptionPane.showConfirmDialog(fc,"File " + f.getName() + " already exists. Replace?");
+		if (o == JOptionPane.YES_OPTION) return f;
+		if (o == JOptionPane.NO_OPTION) return getFile(save);
+		return null;
 		}
 	}
