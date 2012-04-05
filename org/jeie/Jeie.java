@@ -410,6 +410,8 @@ public class Jeie implements ActionListener
 				@Override
 				public boolean accept(File f)
 					{
+					if (f.isDirectory()) return true;
+
 					String[] filters;
 					if (save)
 						filters = ImageIO.getWriterFileSuffixes();
