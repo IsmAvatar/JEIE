@@ -14,8 +14,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
@@ -31,27 +34,40 @@ public class ToolPanel extends JPanel implements ActionListener
 	protected ToolDelegate del;
 	protected JPanel toolGrid;
 	protected ButtonGroup bg = new ButtonGroup();
+	protected JPanel toolOptions = new JPanel();
+
+	AbstractButton defTool;
 
 	public ToolPanel(ToolDelegate del)
 		{
 		super();
 		this.del = del;
+		BoxLayout layout = new BoxLayout(this,BoxLayout.PAGE_AXIS);
+		this.setLayout(layout);
 
-		add(toolGrid = new JPanel(new GridLayout(0,2)));
-
-		AbstractButton sel;
+		toolGrid = new JPanel(new GridLayout(0,2));
 
 		addButton(new ToolButton(Jeie.getIcon("pencil"),"Pencil - draws freehand strokes",
 				new PointTool()));
-		sel = addButton(new ToolButton(Jeie.getIcon("line"),"Line - draws a straight line",
+		defTool = addButton(new ToolButton(Jeie.getIcon("line"),"Line - draws a straight line",
 				new LineTool()));
 		addButton(new ToolButton(Jeie.getIcon("rect"),"Rect - draws a filled rectangle",
 				new RectangleTool()));
 		addButton(new ToolButton(Jeie.getIcon("color-fill"),"Fill - flood-fills a region",
 				new FillTool()));
 
-		// select our default button
-		sel.doClick();
+		toolOptions.setBorder(BorderFactory.createLoweredBevelBorder());
+		toolOptions.setMaximumSize(toolGrid.getPreferredSize());
+		toolGrid.setMaximumSize(toolGrid.getPreferredSize());
+
+		add(toolGrid);
+		add(toolOptions);
+		add(new JPanel());
+		}
+
+	public void selectDefault()
+		{
+		defTool.doClick();
 		}
 
 	public <K extends AbstractButton>K addButton(K b)
@@ -86,5 +102,14 @@ public class ToolPanel extends JPanel implements ActionListener
 		{
 		del.setTool(((ToolButton) e.getSource()).tool);
 		return;
+		}
+
+	JComponent curOpt = null;
+	public void showOptions(Tool tool)
+		{
+		if (curOpt != null)
+			toolOptions.remove(curOpt);
+		toolOptions.add(curOpt = tool.getOptionsComponent());
+		toolOptions.updateUI();
 		}
 	}
