@@ -19,16 +19,19 @@
 
 package org.jeie;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.awt.image.BufferedImage;
-import java.util.ArrayDeque;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
+
+import org.jeie.Algorithm.EdgeDetect;
+import org.jeie.Algorithm.FloodFill;
+import org.jeie.OptionComponent.FillOptions.FillType;
 
 public interface ImageAction
 	{
@@ -77,8 +80,11 @@ public interface ImageAction
 			{
 			Rectangle r = new Rectangle(p1);
 			r.add(p2);
-			g.setColor(out);
-			g.drawRect(r.x,r.y,r.width,r.height);
+			if (out != null)
+				{
+				g.setColor(out);
+				g.drawRect(r.x,r.y,r.width,r.height);
+				}
 			if (in != null)
 				{
 				g.setColor(in);
@@ -91,18 +97,24 @@ public interface ImageAction
 		{
 		public Color c;
 		public Point p1, p2;
+		public int diameter;
 
-		public LineAction(Point p, Color c)
+		public LineAction(Point p, Color c, int diam)
 			{
 			this.c = c;
 			p1 = p;
 			p2 = p;
+			diameter = diam;
 			}
 
 		public void paint(Graphics g)
 			{
 			g.setColor(c);
-			g.drawLine(p1.x,p1.y,p2.x,p2.y);
+			Graphics2D g2d = (Graphics2D) g;
+			Stroke s = g2d.getStroke();
+			g2d.setStroke(new BasicStroke(diameter));//diameter>2?diameter:diameter/2));
+			g2d.drawLine(p1.x,p1.y,p2.x,p2.y);
+			g2d.setStroke(s);
 			}
 		}
 
@@ -191,15 +203,18 @@ public interface ImageAction
 		{
 		Point origin;
 		int threshold;
-		Color c;
+		Color c1, c2;
 		BufferedImage source, myCache;
 		FloodFill floodFill;
+		EdgeDetect floodEdge = null;
 
-		public FillAction(BufferedImage source, Point origin, Color c, int threshold)
+		public FillAction(BufferedImage source, Point origin, Color c1, Color c2, int threshold,
+				FillType fillType)
 			{
 			this.source = source;
 			this.origin = origin;
-			this.c = c;
+			this.c1 = c1;
+			this.c2 = c2;
 			this.threshold = threshold;
 			}
 
@@ -207,13 +222,28 @@ public interface ImageAction
 			{
 			if (floodFill != null) return myCache;
 			floodFill = new FloodFill(source,origin,threshold);
+			floodEdge = null;
 
 			int w = floodFill.maxX - floodFill.minX + 1;
 			int h = floodFill.maxY - floodFill.minY + 1;
 
-			int rgb = c.getRGB();
+			int rgb = c1.getRGB();
 			myCache = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
-			for (Point p : floodFill.set)
+			if (c1.equals(c2))
+				{
+				for (Point p : floodFill.set)
+					myCache.setRGB(p.x - floodFill.minX,p.y - floodFill.minY,rgb);
+				return myCache;
+				}
+
+			floodEdge = new EdgeDetect(floodFill);
+			if (c2 != null)
+				{
+				int rgb2 = c2.getRGB();
+				for (Point p : floodFill.set)
+					myCache.setRGB(p.x - floodFill.minX,p.y - floodFill.minY,rgb2);
+				}
+			for (Point p : floodEdge.set)
 				myCache.setRGB(p.x - floodFill.minX,p.y - floodFill.minY,rgb);
 			return myCache;
 			}
@@ -227,67 +257,6 @@ public interface ImageAction
 		public void paint(Graphics g)
 			{
 			g.drawImage(getCache(),floodFill.minX,floodFill.minY,null);
-			}
-		}
-
-	class FloodFill
-		{
-		//input
-		BufferedImage source;
-		int targetRGB;
-		int threshold;
-
-		//output
-		public Set<Point> set = new HashSet<Point>();
-		public int minX = Integer.MAX_VALUE, minY = minX, maxX = 0, maxY = 0;
-
-		FloodFill(BufferedImage source, Point p, int threshold)
-			{
-			this.source = source;
-			this.threshold = threshold;
-			if (p.x < 0 || p.y < 0 || p.x >= source.getWidth() || p.y >= source.getHeight()) return;
-			targetRGB = source.getRGB(p.x,p.y);
-			floodFill(p);
-			}
-
-		protected void floodFill(Point start)
-			{
-			Queue<Point> q = new ArrayDeque<Point>();
-			if (!needsFill(start)) return;
-			q.add(start);
-			while (!q.isEmpty())
-				{
-				Point n = q.remove();
-				if (!needsFill(n)) continue;
-				Point w = new Point(n), e = new Point(n);
-				do
-					w.x--;
-				while (needsFill(w));
-				do
-					e.x++;
-				while (needsFill(e));
-
-				w.x++;
-				if (w.x < minX) minX = w.x;
-				if (e.x - 1 > maxX) maxX = e.x - 1;
-				if (n.y < minY) minY = n.y;
-				if (n.y > maxY) maxY = n.y;
-
-				for (int x = w.x; x < e.x; x++)
-					{
-					set.add(new Point(x,n.y));
-					if (needsFill(new Point(x,n.y - 1))) q.add(new Point(x,n.y - 1));
-					if (needsFill(new Point(x,n.y + 1))) q.add(new Point(x,n.y + 1));
-					}
-				}
-			}
-
-		protected boolean needsFill(Point p)
-			{
-			if (p.x < 0 || p.y < 0 || p.x >= source.getWidth() || p.y >= source.getHeight())
-				return false;
-			if (set.contains(p)) return false;
-			return source.getRGB(p.x,p.y) == targetRGB;
 			}
 		}
 	}
