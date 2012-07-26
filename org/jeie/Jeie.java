@@ -52,6 +52,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
 public class Jeie implements ActionListener
@@ -66,7 +67,7 @@ public class Jeie implements ActionListener
 	public Palette pal;
 	private JMenuBar menuBar;
 	private JToolBar toolBar;
-	private JPanel toolPanel;
+	private ToolPanel toolPanel;
 	public final String TITLE = "Easy Image Editor ";
 
 	public Jeie(BufferedImage image)
@@ -76,6 +77,7 @@ public class Jeie implements ActionListener
 		canvas = new Canvas(image);
 		scroll = new JScrollPane(canvas);
 		toolPanel = new ToolPanel(new ToolDelegate(canvas));
+		toolPanel.selectDefault();
 
 		JPanel p = new JPanel(new BorderLayout());
 		p.add(makeToolBar(),BorderLayout.NORTH);
@@ -179,6 +181,8 @@ public class Jeie implements ActionListener
 			{
 			if (tool != null) tool.finish(canvas,pal);
 			tool = t;
+			if (toolPanel != null)
+				toolPanel.showOptions(tool);
 			}
 
 		protected MouseEvent refactor(MouseEvent e)
@@ -225,6 +229,7 @@ public class Jeie implements ActionListener
 		{
 		// java6u10 regression causes graphical xor to be very slow
 		System.setProperty("sun.java2d.d3d","false"); //$NON-NLS-1$ //$NON-NLS-2$
+		UIManager.put("swing.boldMetal", false); //$NON-NLS-1$
 
 		BufferedImage bi = null;
 		try
