@@ -21,6 +21,7 @@ package org.jeie;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -31,6 +32,7 @@ import java.util.LinkedList;
 
 import org.jeie.Algorithm.EdgeDetect;
 import org.jeie.Algorithm.FloodFill;
+import org.jeie.Canvas.RenderMode;
 import org.jeie.OptionComponent.FillOptions.FillType;
 
 public interface ImageAction
@@ -67,9 +69,11 @@ public interface ImageAction
 		{
 		public Color out, in;
 		public Point p1, p2;
+		public Canvas canvas;
 
-		public RectangleAction(Point p, Color out, Color in)
+		public RectangleAction(Canvas canvas, Point p, Color out, Color in)
 			{
+			this.canvas = canvas;
 			this.out = out;
 			this.in = in;
 			p1 = p;
@@ -83,12 +87,28 @@ public interface ImageAction
 			if (out != null)
 				{
 				g.setColor(out);
-				g.drawRect(r.x,r.y,r.width,r.height);
+				if (canvas.renderMode != RenderMode.TILED)
+					g.drawRect(r.x,r.y,r.width,r.height);
+				else
+					{
+					Dimension img = canvas.getImageSize();
+					for (int dx = 0; r.x + r.width - dx >= 0; dx += img.width)
+						for (int dy = 0; r.y + r.height - dy >= 0; dy += img.height)
+							g.drawRect(r.x - dx,r.y - dy,r.width,r.height);
+					}
 				}
 			if (in != null)
 				{
 				g.setColor(in);
-				g.fillRect(r.x + 1,r.y + 1,r.width - 1,r.height - 1);
+				if (canvas.renderMode != RenderMode.TILED)
+					g.fillRect(r.x + 1,r.y + 1,r.width - 1,r.height - 1);
+				else
+					{
+					Dimension img = canvas.getImageSize();
+					for (int dx = 0; r.x + r.width - dx >= 0; dx += img.width)
+						for (int dy = 0; r.y + r.height - dy >= 0; dy += img.height)
+							g.fillRect(r.x - dx + 1,r.y - dy + 1,r.width - 1,r.height - 1);
+					}
 				}
 			}
 		}
@@ -98,10 +118,12 @@ public interface ImageAction
 		public Color c;
 		public Point p1, p2;
 		public int diameter;
+		Canvas canvas;
 
-		public LineAction(Point p, Color c, int diam)
+		public LineAction(Canvas canvas, Point p, Color c, int diam)
 			{
 			this.c = c;
+			this.canvas = canvas;
 			p1 = p;
 			p2 = p;
 			diameter = diam;
@@ -113,7 +135,15 @@ public interface ImageAction
 			Graphics2D g2d = (Graphics2D) g;
 			Stroke s = g2d.getStroke();
 			g2d.setStroke(new BasicStroke(diameter));//diameter>2?diameter:diameter/2));
-			g2d.drawLine(p1.x,p1.y,p2.x,p2.y);
+			if (canvas.renderMode != RenderMode.TILED)
+				g2d.drawLine(p1.x,p1.y,p2.x,p2.y);
+			else
+				{
+				Dimension img = canvas.getImageSize();
+				for (int dx = 0; p2.x - dx >= 0 || p1.x - dx >= 0; dx += img.width)
+					for (int dy = 0; p2.y - dy >= 0 || p1.y - dy >= 0; dy += img.height)
+						g2d.drawLine(p1.x - dx,p1.y - dy,p2.x - dx,p2.y - dy);
+				}
 			g2d.setStroke(s);
 			}
 		}
@@ -122,14 +152,16 @@ public interface ImageAction
 		{
 		static final int MAX_FREE_POINTS = 64;
 
+		public Canvas canvas;
 		public Color c;
 		LinkedList<Point> pts = new LinkedList<Point>();
 		BufferedImage cache;
 		int cacheX, cacheY;
 		int minX = Integer.MAX_VALUE, minY = minX, maxX = 0, maxY = 0;
 
-		public PointAction(Color c)
+		public PointAction(Canvas canvas, Color c)
 			{
+			this.canvas = canvas;
 			this.c = c;
 			}
 
@@ -152,14 +184,7 @@ public interface ImageAction
 
 			BufferedImage newCache = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
 			Graphics g = newCache.createGraphics();
-			if (cache != null) g.drawImage(cache,cacheX - newMinX,cacheY - newMinY,null);
-			g.setColor(c);
-			Point prevPoint = pts.getFirst();
-			for (Point p : pts)
-				{
-				g.drawLine(prevPoint.x - newMinX,prevPoint.y - newMinY,p.x - newMinX,p.y - newMinY);
-				prevPoint = p;
-				}
+			paint(g,-newMinX,-newMinY);
 
 			//reset our vars
 			cache = newCache;
@@ -179,7 +204,9 @@ public interface ImageAction
 			if (pts.add(p))
 				{
 				if (p.x < minX) minX = p.x;
+				else if (p.x > canvas.imageWidth()) minX = Math.min(minX,0);
 				if (p.y < minY) minY = p.y;
+				else if (p.y > canvas.imageHeight()) minY = Math.min(minY,0);
 				if (p.x > maxX) maxX = p.x;
 				if (p.y > maxY) maxY = p.y;
 				if (pts.size() > MAX_FREE_POINTS) toCache();
@@ -188,13 +215,34 @@ public interface ImageAction
 
 		public void paint(Graphics g)
 			{
-			if (cache != null) g.drawImage(cache,cacheX,cacheY,null);
+			paint(g,0,0);
+			}
+
+		public void paint(Graphics g, int shiftX, int shiftY)
+			{
+			if (cache != null) g.drawImage(cache,cacheX + shiftX,cacheY + shiftY,null);
 			g.setColor(c);
 			Point prevPoint = pts.getFirst();
-			for (Point p : pts)
+			if (canvas.renderMode != RenderMode.TILED)
+				for (Point p : pts)
+					{
+					g.drawLine(prevPoint.x + shiftX,prevPoint.y + shiftY,p.x + shiftX,p.y + shiftY);
+					prevPoint = p;
+					}
+			else
 				{
-				g.drawLine(prevPoint.x,prevPoint.y,p.x,p.y);
-				prevPoint = p;
+				Dimension img = canvas.getImageSize();
+				for (int dx = 0; dx <= maxX + shiftX; dx += img.width)
+					for (int dy = 0; dy <= maxY + shiftY; dy += img.height)
+						{
+						for (Point p : pts)
+							{
+							g.drawLine(prevPoint.x + shiftX - dx,prevPoint.y + shiftY - dy,p.x + shiftX - dx,p.y
+									+ shiftY - dy);
+							prevPoint = p;
+							}
+						prevPoint = pts.getFirst();
+						}
 				}
 			}
 		}
@@ -204,24 +252,26 @@ public interface ImageAction
 		Point origin;
 		int threshold;
 		Color c1, c2;
+		Canvas canvas;
 		BufferedImage source, myCache;
 		FloodFill floodFill;
 		EdgeDetect floodEdge = null;
 
-		public FillAction(BufferedImage source, Point origin, Color c1, Color c2, int threshold,
-				FillType fillType)
+		public FillAction(Canvas canv, BufferedImage source, Point origin, Color c1, Color c2,
+				int threshold, FillType fillType)
 			{
 			this.source = source;
 			this.origin = origin;
 			this.c1 = c1;
 			this.c2 = c2;
 			this.threshold = threshold;
+			this.canvas = canv;
 			}
 
 		protected BufferedImage getCache()
 			{
 			if (floodFill != null) return myCache;
-			floodFill = new FloodFill(source,origin,threshold);
+			floodFill = new FloodFill(canvas,source,origin,threshold);
 			floodEdge = null;
 
 			int w = floodFill.maxX - floodFill.minX + 1;
@@ -236,7 +286,7 @@ public interface ImageAction
 				return myCache;
 				}
 
-			floodEdge = new EdgeDetect(floodFill);
+			floodEdge = new EdgeDetect(floodFill,canvas);
 			if (c2 != null)
 				{
 				int rgb2 = c2.getRGB();

@@ -105,10 +105,10 @@ public class ToolPanel extends JPanel implements ActionListener
 		}
 
 	JComponent curOpt = null;
+
 	public void showOptions(Tool tool)
 		{
-		if (curOpt != null)
-			toolOptions.remove(curOpt);
+		if (curOpt != null) toolOptions.remove(curOpt);
 		toolOptions.add(curOpt = tool.getOptionsComponent());
 		toolOptions.updateUI();
 		}

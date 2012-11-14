@@ -40,6 +40,18 @@ public class Canvas extends JLabel
 	public boolean isGridDrawn = true;
 	public final boolean invertGrid = true;
 
+	public enum RenderMode
+		{
+		/** The standard paint-esque display; just draw the canvas. */
+		NORMAL,
+		/** Draw the canvas EVERYWHERE. */
+		TILED,
+		/** Draw the canvas, then draw it at 1/2 precision, then 1/4 precision. */
+		SCALED
+		}
+
+	public RenderMode renderMode = RenderMode.NORMAL;
+
 	public Canvas(BufferedImage image)
 		{
 		setOpaque(true);
@@ -72,11 +84,28 @@ public class Canvas extends JLabel
 		{
 		return new Dimension(raster.getWidth(),raster.getHeight());
 		}
+	public int imageWidth()
+		{
+		return raster.getWidth();
+		}
+	public int imageHeight()
+		{
+		return raster.getHeight();
+		}
 
 	@Override
 	public Dimension getPreferredSize()
 		{
-		return new Dimension(cache.getWidth() * zoom + 1,cache.getHeight() * zoom + 1);
+		switch (renderMode)
+			{
+			case NORMAL:
+			default:
+				return new Dimension(cache.getWidth() * zoom + 1,cache.getHeight() * zoom + 1);
+			case SCALED:
+				return new Dimension((cache.getWidth() * zoom + 1) * 7 / 4,cache.getHeight() * zoom + 1);
+			case TILED:
+				return new Dimension((cache.getWidth() * zoom + 1) * 4,(cache.getHeight() * zoom + 1) * 4);
+			}
 		}
 
 	public void redrawCache()
@@ -144,10 +173,14 @@ public class Canvas extends JLabel
 
 	public void repaint(Rectangle r)
 		{
-		r.x *= zoom;
-		r.y *= zoom;
-		r.width = (r.width + 1) * zoom;
-		r.height = (r.height + 1) * zoom;
+		if (renderMode != RenderMode.TILED) {
+			r.x *= zoom;
+			r.y *= zoom;
+			r.width = (r.width + 1) * zoom;
+			r.height = (r.height + 1) * zoom;
+		}
+		else
+		  r = new Rectangle(0,0,getWidth(),getHeight());
 		super.repaint(r);
 		}
 
@@ -159,14 +192,33 @@ public class Canvas extends JLabel
 		int cw = cache.getWidth() * zoom;
 		int ch = cache.getHeight() * zoom;
 
-		g.drawImage(raster,0,0,raster.getWidth() * zoom,raster.getHeight() * zoom,null);
-		g.drawImage(cache,0,0,cw,ch,null);
+		if (renderMode == RenderMode.NORMAL)
+			{
+			g.drawImage(raster,0,0,raster.getWidth() * zoom,raster.getHeight() * zoom,null);
+			g.drawImage(cache,0,0,cw,ch,null);
+			}
+		else if (renderMode == RenderMode.TILED)
+			{
+			for (int i = 0; i < getWidth(); i += cw)
+				for (int j = 0; j < getHeight(); j += ch)
+					{
+					g.drawImage(raster,i,j,raster.getWidth() * zoom,raster.getHeight() * zoom,null);
+					g.drawImage(cache,i,j,cw,ch,null);
+					}
+			}
+
 		if (active != null)
 			{
 			BufferedImage activeImg = new BufferedImage(cache.getWidth(),cache.getHeight(),
 					BufferedImage.TYPE_INT_ARGB);
 			active.paint(activeImg.getGraphics());
-			g.drawImage(activeImg,0,0,cw,ch,null);
+			if (renderMode == RenderMode.NORMAL)
+			  g.drawImage(activeImg,0,0,cw,ch,null);
+			else if (renderMode == RenderMode.TILED) {
+			  for (int i = 0; i < 4 || i < getWidth(); i += cw)
+			  	for (int j = 0; j < 4 || j < getHeight(); j += ch)
+			  		g.drawImage(activeImg,i,j,cw,ch,null);
+			}
 			}
 
 		if (isGridDrawn && zoom >= 8)
