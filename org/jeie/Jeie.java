@@ -55,6 +55,8 @@ import javax.swing.JToolBar;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
+import org.jeie.Canvas.RenderMode;
+
 public class Jeie implements ActionListener
 	{
 	private JFrame frame;
@@ -123,6 +125,10 @@ public class Jeie implements ActionListener
 		addMenuItem(fm,"Save As",getIcon("save-as"));
 		addMenuItem(fm,"Exit",getIcon("cancel"));
 
+		JMenu vm = new JMenu("View");
+		menuBar.add(vm);
+		addMenuItem(vm,"Tiled",getIcon("grid"));
+
 		menuBar.add(new EffectsMenu(this));
 		return menuBar;
 		}
@@ -181,8 +187,7 @@ public class Jeie implements ActionListener
 			{
 			if (tool != null) tool.finish(canvas,pal);
 			tool = t;
-			if (toolPanel != null)
-				toolPanel.showOptions(tool);
+			if (toolPanel != null) toolPanel.showOptions(tool);
 			}
 
 		protected MouseEvent refactor(MouseEvent e)
@@ -229,7 +234,7 @@ public class Jeie implements ActionListener
 		{
 		// java6u10 regression causes graphical xor to be very slow
 		System.setProperty("sun.java2d.d3d","false"); //$NON-NLS-1$ //$NON-NLS-2$
-		UIManager.put("swing.boldMetal", false); //$NON-NLS-1$
+		UIManager.put("swing.boldMetal",false); //$NON-NLS-1$
 
 		BufferedImage bi = null;
 		try
@@ -305,6 +310,12 @@ public class Jeie implements ActionListener
 			{
 			doClose();
 			return;
+			}
+		if (act.equals("Tiled"))
+			{
+			canvas.renderMode = (canvas.renderMode != RenderMode.TILED) ? RenderMode.TILED
+					: RenderMode.NORMAL;
+			canvas.repaint();
 			}
 		}
 

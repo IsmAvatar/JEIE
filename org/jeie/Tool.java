@@ -22,6 +22,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.jeie.Canvas.RenderMode;
 import org.jeie.ImageAction.FillAction;
 import org.jeie.ImageAction.LineAction;
 import org.jeie.ImageAction.PointAction;
@@ -146,10 +147,10 @@ public interface Tool
 					cancel(canvas);
 				return;
 				}
-			if (!isValid(e,canvas,p)) return;
+			if (!isValid(e,canvas,p) && canvas.renderMode != RenderMode.TILED) return;
 			button = e.getButton();
 			mouseTime = e.getWhen();
-			canvas.active = active = new LineAction(e.getPoint(),p.getSelectedColor(button),diameter);
+			canvas.active = active = new LineAction(canvas, e.getPoint(),p.getSelectedColor(button),diameter);
 			canvas.repaint();
 			}
 
@@ -211,8 +212,8 @@ public interface Tool
 				cancel(c);
 				return;
 				}
-			if (!isValid(e,c,p)) return;
-			c.active = active = new PointAction(p.getSelectedColor(e.getButton()));
+			if (!isValid(e,c,p) && c.renderMode != RenderMode.TILED) return;
+			c.active = active = new PointAction(c, p.getSelectedColor(e.getButton()));
 			active.add(e.getPoint());
 			c.repaint();
 			}
@@ -224,7 +225,7 @@ public interface Tool
 
 		public void mouseMove(MouseEvent e, Canvas c, Palette p, boolean drag)
 			{
-			if (active != null && isValid(e,c,null))
+			if (active != null)
 				{
 				Point pt = e.getPoint();
 				if (!active.pts.isEmpty() && active.pts.getLast().equals(pt)) return;
@@ -266,13 +267,13 @@ public interface Tool
 			switch (type)
 				{
 				case OUTLINE:
-					canvas.active = active = new RectangleAction(e.getPoint(),c1,null);
+					canvas.active = active = new RectangleAction(canvas, e.getPoint(),c1,null);
 					break;
 				case BOTH:
-					canvas.active = active = new RectangleAction(e.getPoint(),c1,c2);
+					canvas.active = active = new RectangleAction(canvas, e.getPoint(),c1,c2);
 					break;
 				case FILL:
-					canvas.active = active = new RectangleAction(e.getPoint(),c1,c1);
+					canvas.active = active = new RectangleAction(canvas, e.getPoint(),c1,c1);
 					break;
 				}
 			canvas.repaint();
@@ -328,7 +329,17 @@ public interface Tool
 				cancel(c);
 				return;
 				}
-			if (!isValid(e,c,p)) return;
+			
+			Point fp;
+			if (!isValid(e,c,p)) {
+			  if (c.renderMode != RenderMode.TILED) return;
+			  fp = e.getPoint();
+			  fp.x = (fp.x + c.imageWidth()) % c.imageWidth();
+			  fp.y = (fp.y + c.imageHeight()) % c.imageHeight();
+			  System.out.println(fp.x + ", " + fp.y);
+			  System.out.println(c.imageWidth() + ", " + c.imageHeight());
+			}
+			else fp = e.getPoint();
 
 			Color c1 = p.getLeft();
 			Color c2 = p.getRight();
@@ -340,13 +351,13 @@ public interface Tool
 			switch (type)
 				{
 				case OUTLINE:
-					c.active = active = new FillAction(c.getRenderImage(),e.getPoint(),c1,null,0,type);
+					c.active = active = new FillAction(c, c.getRenderImage(),fp,c1,null,0,type);
 					break;
 				case BOTH:
-					c.active = active = new FillAction(c.getRenderImage(),e.getPoint(),c1,c2,0,type);
+					c.active = active = new FillAction(c, c.getRenderImage(),fp,c1,c2,0,type);
 					break;
 				case FILL:
-					c.active = active = new FillAction(c.getRenderImage(),e.getPoint(),c1,c1,0,type);
+					c.active = active = new FillAction(c, c.getRenderImage(),fp,c1,c1,0,type);
 					break;
 				}
 
