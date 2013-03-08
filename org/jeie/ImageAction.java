@@ -113,6 +113,54 @@ public interface ImageAction
 			}
 		}
 
+	public static class OvalAction implements ImageAction
+		{
+		public Color out, in;
+		public Point p1, p2;
+		public Canvas canvas;
+
+		public OvalAction(Canvas canvas, Point p, Color out, Color in)
+			{
+			this.canvas = canvas;
+			this.out = out;
+			this.in = in;
+			p1 = p;
+			p2 = p;
+			}
+
+		public void paint(Graphics g)
+			{
+			Rectangle r = new Rectangle(p1);
+			r.add(p2);
+			if (in != null)
+				{
+				g.setColor(in);
+				if (canvas.renderMode != RenderMode.TILED)
+					g.fillOval(r.x,r.y,r.width,r.height);
+				else
+					{
+					Dimension img = canvas.getImageSize();
+					for (int dx = 0; r.x + r.width - dx >= 0; dx += img.width)
+						for (int dy = 0; r.y + r.height - dy >= 0; dy += img.height)
+							g.fillOval(r.x - dx,r.y - dy,r.width,r.height);
+					}
+				}
+			if (out != null)
+				{
+				g.setColor(out);
+				if (canvas.renderMode != RenderMode.TILED)
+					g.drawOval(r.x,r.y,r.width,r.height);
+				else
+					{
+					Dimension img = canvas.getImageSize();
+					for (int dx = 0; r.x + r.width - dx >= 0; dx += img.width)
+						for (int dy = 0; r.y + r.height - dy >= 0; dy += img.height)
+							g.drawOval(r.x - dx,r.y - dy,r.width,r.height);
+					}
+				}
+			}
+		}
+
 	public static class LineAction implements ImageAction
 		{
 		public Color c;

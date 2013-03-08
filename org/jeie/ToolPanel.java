@@ -27,6 +27,8 @@ import org.jeie.Tool.FillTool;
 import org.jeie.Tool.LineTool;
 import org.jeie.Tool.PointTool;
 import org.jeie.Tool.RectangleTool;
+import org.jeie.Tool.OvalTool;
+import org.jeie.Tool.ColorPickerTool;
 
 public class ToolPanel extends JPanel implements ActionListener
 	{
@@ -51,10 +53,14 @@ public class ToolPanel extends JPanel implements ActionListener
 				new PointTool()));
 		defTool = addButton(new ToolButton(Jeie.getIcon("line"),"Line - draws a straight line",
 				new LineTool()));
-		addButton(new ToolButton(Jeie.getIcon("rect"),"Rect - draws a filled rectangle",
+		addButton(new ToolButton(Jeie.getIcon("rect"),"Rect - draws a rectangle",
 				new RectangleTool()));
+		addButton(new ToolButton(Jeie.getIcon("oval"),"Oval - draws an oval",
+				new OvalTool()));
 		addButton(new ToolButton(Jeie.getIcon("color-fill"),"Fill - flood-fills a region",
 				new FillTool()));
+		addButton(new ToolButton(Jeie.getIcon("color-picker"),"Color Picker - get the color at a point",
+				new ColorPickerTool()));
 
 		toolOptions.setBorder(BorderFactory.createLoweredBevelBorder());
 		toolOptions.setMaximumSize(toolGrid.getPreferredSize());
