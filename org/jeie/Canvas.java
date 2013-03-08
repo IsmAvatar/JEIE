@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayDeque;
@@ -170,6 +171,17 @@ public class Canvas extends JLabel
 		{
 		return zoom;
 		}
+	
+	public Color getColorAt(Point p) {
+		BufferedImage temp = new BufferedImage(raster.getWidth(), raster.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		Graphics g = temp.getGraphics();
+		g.drawImage(raster, 0, 0, null);
+		g.drawImage(cache, 0, 0, null);
+		Color c = new Color(temp.getRGB((int) p.getX(), (int) p.getY()), true);
+		g.dispose();
+		
+		return c;
+	}
 
 	public void repaint(Rectangle r)
 		{

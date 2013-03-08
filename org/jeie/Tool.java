@@ -11,6 +11,7 @@ package org.jeie;
 import static org.jeie.OptionComponent.emptyPanel;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -27,6 +28,7 @@ import org.jeie.ImageAction.FillAction;
 import org.jeie.ImageAction.LineAction;
 import org.jeie.ImageAction.PointAction;
 import org.jeie.ImageAction.RectangleAction;
+import org.jeie.ImageAction.OvalAction;
 import org.jeie.OptionComponent.FillOptions;
 import org.jeie.OptionComponent.FillOptions.FillType;
 import org.jeie.OptionComponent.SizeOptions;
@@ -317,6 +319,88 @@ public interface Tool
 			type = fills.getFillType();
 			}
 		}
+	
+
+	public static class OvalTool extends GenericTool<OvalAction> implements
+			ListSelectionListener
+		{
+		long mouseTime;
+		int button;
+		FillType type = FillType.OUTLINE;
+
+		public void mousePress(MouseEvent e, Canvas canvas, Palette p)
+			{
+			if (active != null)
+				{
+				if (e.getButton() == button)
+					finish(canvas,p);
+				else
+					cancel(canvas);
+				return;
+				}
+			if (!isValid(e,canvas,p)) return;
+			button = e.getButton();
+			mouseTime = e.getWhen();
+			Color c1 = p.getLeft();
+			Color c2 = p.getRight();
+			if (button != MouseEvent.BUTTON1)
+				{ //lol, shut up
+				c1 = c2;
+				c2 = p.getLeft();
+				}
+			switch (type)
+				{
+				case OUTLINE:
+					canvas.active = active = new OvalAction(canvas, e.getPoint(),c1,null);
+					break;
+				case BOTH:
+					canvas.active = active = new OvalAction(canvas, e.getPoint(),c1,c2);
+					break;
+				case FILL:
+					canvas.active = active = new OvalAction(canvas, e.getPoint(),c1,c1);
+					break;
+				}
+			canvas.repaint();
+			}
+
+		public void mouseRelease(MouseEvent e, Canvas canvas, Palette pal)
+			{
+			if (e.getWhen() - mouseTime < 200) return;
+
+			if (active != null) active.p2 = e.getPoint();
+			finish(canvas,pal);
+			}
+
+		public void mouseMove(MouseEvent e, Canvas canvas, Palette p, boolean drag)
+			{
+			if (active != null && !active.p2.equals(e.getPoint()))
+				{
+				Rectangle r = new Rectangle(active.p2); //previous value
+				active.p2 = e.getPoint();
+				r.add(active.p1);
+				r.add(active.p2);
+				canvas.repaint(r);
+				}
+			}
+
+		private static final FillOptions fills = new FillOptions();
+
+		@Override
+		public JComponent getOptionsComponent()
+			{
+			return fills;
+			}
+
+		public OvalTool()
+			{
+			fills.addListSelectionListener(this);
+			}
+
+		public void valueChanged(ListSelectionEvent e)
+			{
+			type = fills.getFillType();
+			}
+		}
 
 	public static class FillTool extends GenericTool<FillAction> implements ListSelectionListener
 		{
@@ -391,6 +475,55 @@ public interface Tool
 		public void valueChanged(ListSelectionEvent e)
 			{
 			type = fills.getFillType();
+			}
+		}
+
+	public static class ColorPickerTool extends GenericTool<ImageAction>
+		{
+			//Necessary for dragging as dragging gives no button by default.
+			private int button;
+
+		public void mousePress(MouseEvent e, Canvas c, Palette p)
+			{
+			button = e.getButton();
+			
+			Point cp;
+			if (!isValid(e,c,p)) {
+			  if (c.renderMode != RenderMode.TILED) return;
+			  cp = e.getPoint();
+			  cp.x = (cp.x + c.imageWidth()) % c.imageWidth();
+			  cp.y = (cp.y + c.imageHeight()) % c.imageHeight();
+			  System.out.println(cp.x + ", " + cp.y);
+			  System.out.println(c.imageWidth() + ", " + c.imageHeight());
+			}
+			else cp = e.getPoint();
+			if (e.getButton() == MouseEvent.BUTTON1)
+				p.setLeft(c.getColorAt(cp));
+			else if (e.getButton() == MouseEvent.BUTTON3)
+				p.setRight(c.getColorAt(cp));
+			
+			}
+
+		public void mouseRelease(MouseEvent e, Canvas c, Palette p)
+			{ //Unused
+			}
+
+		public void mouseMove(MouseEvent e, Canvas c, Palette p, boolean drag)
+			{ if (drag)
+					mousePress(new MouseEvent((Component) e.getSource(),e.getID(),e.getWhen(),e.getModifiers(),e.getX(),e.getY(),
+							e.getClickCount(),e.isPopupTrigger(),button), c, p);
+			}
+
+		private static final FillOptions fills = new FillOptions();
+
+		@Override
+		public JComponent getOptionsComponent()
+			{
+			return fills;
+			}
+
+		public ColorPickerTool()
+			{
 			}
 		}
 	}
