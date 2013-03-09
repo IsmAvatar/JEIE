@@ -129,6 +129,7 @@ public class Jeie implements ActionListener
 		menuBar.add(vm);
 		addMenuItem(vm,"Tiled",getIcon("grid"));
 
+		menuBar.add(new TransformMenu(this));
 		menuBar.add(new EffectsMenu(this));
 		return menuBar;
 		}

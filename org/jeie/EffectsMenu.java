@@ -168,29 +168,29 @@ public class EffectsMenu extends JMenu implements ActionListener
 
 		//	TODO: Menu Icons
 
-		blur = new JMenuItem("Blur");
+		blur = new JMenuItem("Blur", Jeie.getIcon("blur"));
 		blur.addActionListener(this);
 		add(blur);
 		
-		saturation = new JMenuItem("Saturation");
+		saturation = new JMenuItem("Saturation", Jeie.getIcon("saturation"));
 		saturation.addActionListener(this);
 		add(saturation);
 
-		value = new JMenuItem("Value");
+		value = new JMenuItem("Value", Jeie.getIcon("value"));
 		value.addActionListener(this);
 		add(value);
 
-		invert = new JMenuItem("Invert");
+		invert = new JMenuItem("Invert", Jeie.getIcon("invert"));
 		invert.addActionListener(this);
 		add(invert);
 
-		fade = new JMenuItem("Fade to Black");
+		fade = new JMenuItem("Fade to Black", Jeie.getIcon("fade"));
 		fade.addActionListener(this);
 		add(fade);
 
 		addSeparator();
 
-		colorize = new JMenuItem("Colorize");
+		colorize = new JMenuItem("Colorize", Jeie.getIcon("colorize"));
 		colorize.setEnabled(false);
 		add(colorize);
 		}
