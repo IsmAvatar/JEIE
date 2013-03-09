@@ -39,6 +39,10 @@ public class Canvas extends JLabel
 	public ArrayDeque<ImageAction> acts;
 	private int zoom = 1;
 	public boolean isGridDrawn = true;
+	public boolean usesCheckeredBackground = true;
+	public Color transBack1 = Color.white;
+	public Color transBack2 = Color.lightGray;
+	public Dimension trSize = new Dimension(8, 8);
 	public final boolean invertGrid = true;
 
 	public enum RenderMode
@@ -173,15 +177,31 @@ public class Canvas extends JLabel
 		}
 	
 	public Color getColorAt(Point p) {
-		BufferedImage temp = new BufferedImage(raster.getWidth(), raster.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		Graphics g = temp.getGraphics();
-		g.drawImage(raster, 0, 0, null);
-		g.drawImage(cache, 0, 0, null);
-		Color c = new Color(temp.getRGB((int) p.getX(), (int) p.getY()), true);
-		g.dispose();
-		
-		return c;
+		return new Color(getRenderImage().getRGB((int) p.getX(), (int) p.getY()), true);
 	}
+	
+	public void drawTransparentBackground(Graphics g)
+		{
+		int tW = (int) trSize.getWidth();
+		int tH = (int) trSize.getHeight();
+		int fullW, fullH;
+		if (renderMode == RenderMode.TILED)
+			{
+			fullW = getWidth();
+			fullH = getHeight();
+			}
+		else
+			{
+			fullW = raster.getWidth() * zoom;
+			fullH = raster.getHeight() * zoom;
+			}
+		g.setColor(transBack1);
+		g.fillRect(0, 0, fullW, fullH);
+		g.setColor(transBack2);
+		for (int x = 0; x < Math.ceil((double) fullW / tW); x += 1)
+			for (int y = (x + 1) % 2; y < Math.ceil((double) fullH / tH); y += 2)
+				g.fillRect(x * tW, y * tH, Math.min(tW, fullW - x * tW), Math.min(tH, fullH - y * tH));
+		}
 
 	public void repaint(Rectangle r)
 		{
@@ -204,6 +224,8 @@ public class Canvas extends JLabel
 		int cw = cache.getWidth() * zoom;
 		int ch = cache.getHeight() * zoom;
 
+		drawTransparentBackground(g);
+	
 		if (renderMode == RenderMode.NORMAL)
 			{
 			g.drawImage(raster,0,0,raster.getWidth() * zoom,raster.getHeight() * zoom,null);

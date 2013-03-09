@@ -26,9 +26,12 @@ import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.ConvolveOp;
+import java.awt.image.FilteredImageSource;
 import java.awt.image.Kernel;
 import java.awt.image.RescaleOp;
 
@@ -39,7 +42,7 @@ public class EffectsMenu extends JMenu implements ActionListener
 	{
 	private static final long serialVersionUID = 1L;
 	public Jeie jeie;
-	JMenuItem blur, value, invert, fade, colorize;
+	JMenuItem blur, value, invert, fade, colorize, saturation;
 
 	public class Blur implements ImageAction
 		{
@@ -130,6 +133,27 @@ public class EffectsMenu extends JMenu implements ActionListener
 			}
 		}
 
+	public class Saturation implements ImageAction
+		{
+		public int amount;
+
+		public Saturation(int amt)
+			{
+			amount = amt;
+			}
+
+		public void paint(Graphics g)
+			{
+			Canvas c = jeie.canvas;
+
+			SaturationFilter filter = new SaturationFilter(amount / 100f);
+			FilteredImageSource filteredSrc = new FilteredImageSource(c.getRenderImage().getSource(), filter);
+			
+			Image image = Toolkit.getDefaultToolkit().createImage(filteredSrc);
+			g.drawImage(image, 0, 0, null);
+			}
+		}
+
 	public void applyAction(ImageAction act)
 		{
 		Canvas c = jeie.canvas;
@@ -147,6 +171,10 @@ public class EffectsMenu extends JMenu implements ActionListener
 		blur = new JMenuItem("Blur");
 		blur.addActionListener(this);
 		add(blur);
+		
+		saturation = new JMenuItem("Saturation");
+		saturation.addActionListener(this);
+		add(saturation);
 
 		value = new JMenuItem("Value");
 		value.addActionListener(this);
@@ -173,6 +201,12 @@ public class EffectsMenu extends JMenu implements ActionListener
 			{
 			Integer integer = IntegerDialog.getInteger("Blur amount (1-9)",1,9,3,3);
 			if (integer != null) applyAction(new Blur(integer));
+			return;
+			}
+		if (e.getSource() == saturation)
+			{
+			Integer integer = IntegerDialog.getInteger("Saturation",0,200,100,50);
+			if (integer != null) applyAction(new Saturation(integer));
 			return;
 			}
 		if (e.getSource() == value)
