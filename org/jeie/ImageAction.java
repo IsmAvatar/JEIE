@@ -35,9 +35,11 @@ import org.jeie.Algorithm.FloodFill;
 import org.jeie.Canvas.RenderMode;
 import org.jeie.OptionComponent.FillOptions.FillType;
 
-public interface ImageAction
+public abstract class ImageAction
 	{
-	public void paint(Graphics g);
+	public boolean copiesRaster = false;
+	
+	public abstract void paint(Graphics g);
 
 	/**
 	 * A Heavy-weight Image Action is an Image Action that depends on
@@ -49,12 +51,12 @@ public interface ImageAction
 	 * undesirable results, and should potentially be given the option to
 	 * destroy or even manually update later heavy-weight image actions.
 	 */
-	public static interface HeavyImageAction extends ImageAction
+	public static abstract class HeavyImageAction extends ImageAction
 		{
-		public void recalculate(BufferedImage source);
+		public abstract void recalculate(BufferedImage source);
 		}
 
-	public static class Resize implements ImageAction
+	public static class Resize extends ImageAction
 		{
 		public int w, h;
 
@@ -65,7 +67,7 @@ public interface ImageAction
 			}
 		}
 
-	public static class RectangleAction implements ImageAction
+	public static class RectangleAction extends ImageAction
 		{
 		public Color out, in;
 		public Point p1, p2;
@@ -113,7 +115,7 @@ public interface ImageAction
 			}
 		}
 
-	public static class OvalAction implements ImageAction
+	public static class OvalAction extends ImageAction
 		{
 		public Color out, in;
 		public Point p1, p2;
@@ -161,7 +163,7 @@ public interface ImageAction
 			}
 		}
 
-	public static class LineAction implements ImageAction
+	public static class LineAction extends ImageAction
 		{
 		public Color c;
 		public Point p1, p2;
@@ -196,7 +198,7 @@ public interface ImageAction
 			}
 		}
 
-	public static class PointAction implements ImageAction
+	public static class PointAction extends ImageAction
 		{
 		static final int MAX_FREE_POINTS = 64;
 
@@ -295,7 +297,7 @@ public interface ImageAction
 			}
 		}
 
-	public static class FillAction implements HeavyImageAction
+	public static class FillAction extends HeavyImageAction
 		{
 		Point origin;
 		int threshold;

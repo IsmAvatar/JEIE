@@ -44,13 +44,14 @@ public class EffectsMenu extends JMenu implements ActionListener
 	public Jeie jeie;
 	JMenuItem blur, value, invert, fade, colorize, saturation;
 
-	public class Blur implements ImageAction
+	public class Blur extends ImageAction
 		{
 		public int amount;
 
 		public Blur(int amt)
 			{
 			amount = amt;
+			copiesRaster = true;
 			}
 
 		public void paint(Graphics g)
@@ -72,13 +73,14 @@ public class EffectsMenu extends JMenu implements ActionListener
 			}
 		}
 
-	public class Value implements ImageAction
+	public class Value extends ImageAction
 		{
 		public float amount;
 
 		public Value(float amt)
 			{
 			amount = amt;
+			copiesRaster = true;
 			}
 
 		public void paint(Graphics g)
@@ -92,8 +94,13 @@ public class EffectsMenu extends JMenu implements ActionListener
 			}
 		}
 
-	public class Invert implements ImageAction
+	public class Invert extends ImageAction
 		{
+		public Invert()
+			{
+			copiesRaster = true;
+			}
+		
 		public void paint(Graphics g)
 			{
 			Canvas c = jeie.canvas;
@@ -105,7 +112,7 @@ public class EffectsMenu extends JMenu implements ActionListener
 			}
 		}
 
-	public class Fade implements ImageAction
+	public class Fade extends ImageAction
 		{
 		public Color fadeTo;
 		public float amount;
@@ -133,13 +140,14 @@ public class EffectsMenu extends JMenu implements ActionListener
 			}
 		}
 
-	public class Saturation implements ImageAction
+	public class Saturation extends ImageAction
 		{
 		public int amount;
 
 		public Saturation(int amt)
 			{
 			amount = amt;
+			copiesRaster = true;
 			}
 
 		public void paint(Graphics g)

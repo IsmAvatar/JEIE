@@ -37,7 +37,7 @@ public class Canvas extends JLabel
 	public ImageAction active;
 
 	public ArrayDeque<ImageAction> acts;
-	private int zoom = 1;
+	private int zoom = 1, curAct;
 	public boolean isGridDrawn = true;
 	public boolean usesCheckeredBackground = true;
 	public Color transBack1 = Color.white;
@@ -77,8 +77,9 @@ public class Canvas extends JLabel
 		BufferedImage img = new BufferedImage(raster.getWidth(),raster.getHeight(),
 				BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = img.createGraphics();
-
-		g.drawImage(raster,0,0,null);
+		
+		if (shouldDrawRaster())
+			g.drawImage(raster,0,0,null);
 		g.drawImage(cache,0,0,null);
 
 		g.dispose();
@@ -117,8 +118,12 @@ public class Canvas extends JLabel
 		{
 		cache = new BufferedImage(raster.getWidth(),raster.getHeight(),BufferedImage.TYPE_INT_ARGB);
 		Graphics g = cache.getGraphics();
+		curAct = 0;
 		for (ImageAction act : acts)
+			{
 			act.paint(g);
+			curAct++;
+			}
 		repaint();
 		}
 
@@ -202,6 +207,23 @@ public class Canvas extends JLabel
 			for (int y = (x + 1) % 2; y < Math.ceil((double) fullH / tH); y += 2)
 				g.fillRect(x * tW, y * tH, Math.min(tW, fullW - x * tW), Math.min(tH, fullH - y * tH));
 		}
+	
+	public boolean shouldDrawRaster()
+		{
+		int i = 0;
+		for (ImageAction a : acts)
+			{
+			if (i >= curAct)
+				break;
+			
+			if (a.copiesRaster)
+				return false;
+			
+			i++;
+			}
+		
+		return true;
+		}
 
 	public void repaint(Rectangle r)
 		{
@@ -225,10 +247,12 @@ public class Canvas extends JLabel
 		int ch = cache.getHeight() * zoom;
 
 		drawTransparentBackground(g);
-	
+		boolean drawRaster = shouldDrawRaster();
+		
 		if (renderMode == RenderMode.NORMAL)
 			{
-			g.drawImage(raster,0,0,raster.getWidth() * zoom,raster.getHeight() * zoom,null);
+			if (drawRaster)
+				g.drawImage(raster,0,0,raster.getWidth() * zoom,raster.getHeight() * zoom,null);
 			g.drawImage(cache,0,0,cw,ch,null);
 			}
 		else if (renderMode == RenderMode.TILED)
@@ -236,7 +260,8 @@ public class Canvas extends JLabel
 			for (int i = 0; i < getWidth(); i += cw)
 				for (int j = 0; j < getHeight(); j += ch)
 					{
-					g.drawImage(raster,i,j,raster.getWidth() * zoom,raster.getHeight() * zoom,null);
+					if (drawRaster)
+						g.drawImage(raster,i,j,raster.getWidth() * zoom,raster.getHeight() * zoom,null);
 					g.drawImage(cache,i,j,cw,ch,null);
 					}
 			}

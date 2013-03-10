@@ -20,13 +20,14 @@ public class TransformMenu extends JMenu implements ActionListener
 	public Jeie jeie;
 	JMenuItem rotate, flipH, flipV, zoom;
 
-	public class Rotate implements ImageAction
+	public class Rotate extends ImageAction
 		{
 		public int angle;
 
 		public Rotate(int ang)
 			{
 			angle = ang;
+			copiesRaster = true;
 			}
 
 		public void paint(Graphics g)
@@ -42,13 +43,14 @@ public class TransformMenu extends JMenu implements ActionListener
 			}
 		}
 	
-	public class Zoom implements ImageAction
+	public class Zoom extends ImageAction
 		{
 		public int amount;
 	
 		public Zoom(int amt)
 			{
 			amount = amt;
+			copiesRaster = true;
 			}
 	
 		public void paint(Graphics g)
@@ -66,8 +68,13 @@ public class TransformMenu extends JMenu implements ActionListener
 			}
 		}
 	
-	public class FlipH implements ImageAction
+	public class FlipH extends ImageAction
 		{
+		public FlipH()
+			{
+			copiesRaster = true;
+			}
+		
 		public void paint(Graphics g)
 			{
 			Canvas c = jeie.canvas;
@@ -81,8 +88,13 @@ public class TransformMenu extends JMenu implements ActionListener
 			}
 		}
 	
-	public class FlipV implements ImageAction
+	public class FlipV extends ImageAction
 		{
+		public FlipV()
+			{
+			copiesRaster = true;
+			}
+		
 		public void paint(Graphics g)
 			{
 			Canvas c = jeie.canvas;
