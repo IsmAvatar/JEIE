@@ -44,6 +44,7 @@ public class Canvas extends JLabel
 	public Color transBack2 = Color.lightGray;
 	public Dimension trSize = new Dimension(8, 8);
 	public final boolean invertGrid = true;
+	private Dimension prevSize;
 
 	public enum RenderMode
 		{
@@ -63,6 +64,7 @@ public class Canvas extends JLabel
 		raster = image;
 		acts = new ArrayDeque<ImageAction>();
 		cache = new BufferedImage(raster.getWidth(),raster.getHeight(),BufferedImage.TYPE_INT_ARGB);
+		prevSize = getSize();
 		}
 
 	public void setImage(BufferedImage image)
@@ -129,8 +131,17 @@ public class Canvas extends JLabel
 
 	public void redrawGrid()
 		{
-		int cw = cache.getWidth() * zoom;
-		int ch = cache.getHeight() * zoom;
+		int cw, ch;
+		if (renderMode == RenderMode.TILED)
+			{
+			cw = getWidth();
+			ch = getHeight();
+			}
+		else
+			{
+			cw = cache.getWidth() * zoom;
+			ch = cache.getHeight() * zoom;
+			}
 
 		grid = new BufferedImage(cw,ch,BufferedImage.TYPE_INT_ARGB);
 		Graphics g = grid.getGraphics();
@@ -139,8 +150,17 @@ public class Canvas extends JLabel
 
 	public void paintGrid(Graphics g)
 		{
-		int cw = cache.getWidth() * zoom;
-		int ch = cache.getHeight() * zoom;
+		int cw, ch;
+		if (renderMode == RenderMode.TILED)
+			{
+			cw = getWidth();
+			ch = getHeight();
+			}
+		else
+			{
+			cw = cache.getWidth() * zoom;
+			ch = cache.getHeight() * zoom;
+			}
 
 		g.setColor(invertGrid ? Color.WHITE : Color.GRAY);
 
@@ -242,7 +262,12 @@ public class Canvas extends JLabel
 	public void paint(Graphics g)
 		{
 		super.paint(g);
-
+		
+		if (!getSize().equals(prevSize))
+			{
+			redrawGrid();
+			prevSize = getSize();
+			}
 		int cw = cache.getWidth() * zoom;
 		int ch = cache.getHeight() * zoom;
 
