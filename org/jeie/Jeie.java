@@ -60,7 +60,7 @@ import org.jeie.Canvas.RenderMode;
 public class Jeie implements ActionListener
 	{
 	private JFrame frame;
-	private JButton bUndo, bZoomIn, bZoomOut;
+	private JButton bUndo, bRedo, bZoomIn, bZoomOut;
 	private JToggleButton bGrid;
 	private JScrollPane scroll;
 
@@ -148,6 +148,7 @@ public class Jeie implements ActionListener
 		toolBar.setFloatable(false);
 
 		bUndo = addButton(toolBar,new JButton("Undo",getIcon("undo")));
+		bRedo = addButton(toolBar,new JButton("Redo",getIcon("redo")));
 		bGrid = addButton(toolBar,new JToggleButton("Grid",true));
 
 		bZoomOut = addButton(toolBar,new JButton(getIcon("zoom-out")));
@@ -265,7 +266,16 @@ public class Jeie implements ActionListener
 			{
 			if (!canvas.acts.isEmpty())
 				{
-				canvas.acts.removeLast();
+				canvas.redoActs.addFirst(canvas.acts.removeLast());
+				canvas.redrawCache();
+				}
+			return;
+			}
+		if (e.getSource() == bRedo)
+			{
+			if (!canvas.redoActs.isEmpty())
+				{
+				canvas.acts.add(canvas.redoActs.removeFirst());
 				canvas.redrawCache();
 				}
 			return;

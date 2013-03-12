@@ -13,11 +13,14 @@ import static org.jeie.OptionComponent.emptyPanel;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -29,9 +32,11 @@ import org.jeie.ImageAction.LineAction;
 import org.jeie.ImageAction.PointAction;
 import org.jeie.ImageAction.RectangleAction;
 import org.jeie.ImageAction.OvalAction;
+import org.jeie.ImageAction.TextAction;
 import org.jeie.OptionComponent.FillOptions;
 import org.jeie.OptionComponent.FillOptions.FillType;
 import org.jeie.OptionComponent.SizeOptions;
+import org.jeie.OptionComponent.TextOptions;
 
 public interface Tool
 	{
@@ -91,6 +96,7 @@ public interface Tool
 			if (active == null) return;
 			c.acts.add(active);
 			c.active = active = null;
+			c.redoActs.clear();
 			c.redrawCache();
 			}
 
@@ -514,16 +520,55 @@ public interface Tool
 							e.getClickCount(),e.isPopupTrigger(),button), c, p);
 			}
 
-		private static final FillOptions fills = new FillOptions();
-
-		@Override
 		public JComponent getOptionsComponent()
 			{
-			return fills;
+			return emptyPanel;
+			}
+		}
+
+	public static class TextTool extends GenericTool<ImageAction>
+		{
+		public void mousePress(MouseEvent e, Canvas c, Palette p)
+			{
+			Color col;
+			if (e.getButton() == MouseEvent.BUTTON1)
+				col = p.getLeft();
+			else if (e.getButton() == MouseEvent.BUTTON3)
+				col = p.getRight();
+			else
+				return;
+			
+			Point cp;
+			if (!isValid(e,c,p)) {
+			  if (c.renderMode != RenderMode.TILED) return;
+			  cp = e.getPoint();
+			  cp.x = (cp.x + c.imageWidth()) % c.imageWidth();
+			  cp.y = (cp.y + c.imageHeight()) % c.imageHeight();
+			}
+			else cp = e.getPoint();
+			
+			String text = JOptionPane.showInputDialog("Text");
+			
+			if (text == null)
+				return;
+
+			c.active = active = new TextAction(c, cp, col, opts.font, text, opts.halign, opts.valign);
+			finish(c,p);
 			}
 
-		public ColorPickerTool()
+		public void mouseRelease(MouseEvent e, Canvas c, Palette p)
+			{ //Unused
+			}
+
+		public void mouseMove(MouseEvent e, Canvas c, Palette p, boolean drag)
+			{ //Unused
+			}
+
+		private static final TextOptions opts = new TextOptions();
+
+		public JComponent getOptionsComponent()
 			{
+			return opts;
 			}
 		}
 	}

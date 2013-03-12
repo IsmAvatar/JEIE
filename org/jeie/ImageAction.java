@@ -22,6 +22,8 @@ package org.jeie;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -66,6 +68,60 @@ public abstract class ImageAction
 			g.clipRect(0,0,w,h);
 			}
 		}
+	
+	public static class TextAction extends ImageAction
+	{
+	public Color color;
+	public Font font;
+	public Point p;
+	public Canvas canvas;
+	public String text;
+	public OptionComponent.TextOptions.Alignment halign, valign;
+	
+	public TextAction(Canvas canvas, Point p, Color col, Font f, String t, OptionComponent.TextOptions.Alignment h, OptionComponent.TextOptions.Alignment v)
+		{
+		this.canvas = canvas;
+		this.p = p;
+		color = col;
+		font = f;
+		text = t;
+		halign = h;
+		valign = v;
+		}
+	
+	public void paint(Graphics g)
+		{
+		int x = (int) p.getX();
+		int y = (int) p.getY();
+		FontMetrics metrics = g.getFontMetrics(font);
+		
+		int w = metrics.stringWidth(text);
+		int h = metrics.getHeight();
+		
+		if (halign == OptionComponent.TextOptions.Alignment.CENTER)
+			x -= w / 2;
+		else if (halign == OptionComponent.TextOptions.Alignment.RIGHT)
+			x -= w;
+		
+		if (valign == OptionComponent.TextOptions.Alignment.MIDDLE)
+			y += h / 2;
+		else if (valign == OptionComponent.TextOptions.Alignment.TOP)
+			y += h;
+		
+		g.setFont(font);
+		g.setColor(color);
+		
+		if (canvas.renderMode != RenderMode.TILED)
+			g.drawString(text,x,y);
+		else
+			{
+			Dimension img = canvas.getImageSize();
+			for (int dx = 0; x + w - dx >= 0; dx += img.width)
+				for (int dy = 0; y + h - dy >= 0; dy += img.height)
+					g.drawString(text,x - dx,y - dy);
+			}
+		}
+	}
 
 	public static class RectangleAction extends ImageAction
 		{

@@ -36,7 +36,7 @@ public class Canvas extends JLabel
 	private BufferedImage raster, cache, grid;
 	public ImageAction active;
 
-	public ArrayDeque<ImageAction> acts;
+	public ArrayDeque<ImageAction> acts, redoActs;
 	private int zoom = 1, curAct;
 	public boolean isGridDrawn = true;
 	public boolean usesCheckeredBackground = true;
@@ -63,6 +63,7 @@ public class Canvas extends JLabel
 		setOpaque(true);
 		raster = image;
 		acts = new ArrayDeque<ImageAction>();
+		redoActs = new ArrayDeque<ImageAction>();
 		cache = new BufferedImage(raster.getWidth(),raster.getHeight(),BufferedImage.TYPE_INT_ARGB);
 		prevSize = getSize();
 		}
@@ -71,6 +72,7 @@ public class Canvas extends JLabel
 		{
 		raster = image;
 		acts.clear();
+		redoActs.clear();
 		redrawCache();
 		}
 

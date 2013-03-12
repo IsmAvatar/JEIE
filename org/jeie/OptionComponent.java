@@ -1,13 +1,22 @@
 package org.jeie;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.URL;
 
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JToggleButton;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
@@ -72,6 +81,119 @@ public class OptionComponent
 					return;
 				}
 			}
+		}
+
+	/**
+	 * A mixed component which gives text options.
+	 */
+	public static class TextOptions extends JPanel implements ActionListener
+		{
+		private static final long serialVersionUID = 1L;
+		
+		public enum Alignment
+			{
+			LEFT,CENTER,RIGHT,TOP,MIDDLE,BOTTOM
+			}
+		
+		public Font font;
+		public Alignment halign, valign;
+		public JToggleButton left, center, right, top, middle, bottom;
+		public JButton fButton;
+		
+		public TextOptions()
+			{
+			setLayout(new BorderLayout());
+			font = new Font("Arial",Font.PLAIN,12);
+			halign = Alignment.LEFT;
+			valign = Alignment.TOP;
+			
+			add(fButton = new JButton("AaBbCc"), BorderLayout.CENTER);
+			fButton.setFont(font);
+			fButton.setToolTipText("Font");
+			
+			JPanel bottomPanel = new JPanel();
+			bottomPanel.setLayout(new GridLayout(2, 3));
+			bottomPanel.add(left = new JToggleButton(Jeie.getIcon("left"), true));
+			bottomPanel.add(center = new JToggleButton(Jeie.getIcon("center"), true));
+			bottomPanel.add(right = new JToggleButton(Jeie.getIcon("right"), true));
+			bottomPanel.add(top = new JToggleButton(Jeie.getIcon("top"), true));
+			bottomPanel.add(middle = new JToggleButton(Jeie.getIcon("middle"), true));
+			bottomPanel.add(bottom = new JToggleButton(Jeie.getIcon("bottom"), true));
+			
+			ButtonGroup g1 = new ButtonGroup();
+			g1.add(left);
+			g1.add(center);
+			g1.add(right);
+			
+			ButtonGroup g2 = new ButtonGroup();
+			g2.add(top);
+			g2.add(middle);
+			g2.add(bottom);
+			
+			add(bottomPanel, BorderLayout.SOUTH);
+			
+			left.addActionListener(this);
+			center.addActionListener(this);
+			right.addActionListener(this);
+			top.addActionListener(this);
+			middle.addActionListener(this);
+			bottom.addActionListener(this);
+			fButton.addActionListener(this);
+			
+			left.setToolTipText("Left aligned");
+			center.setToolTipText("Center aligned");
+			right.setToolTipText("Right aligned");
+			top.setToolTipText("Top aligned");
+			middle.setToolTipText("Middle aligned");
+			bottom.setToolTipText("Bottom aligned");
+			
+			setPreferredSize(new Dimension(64, 128));
+			}
+
+		public void actionPerformed(ActionEvent e)
+			{
+			if (e.getSource() == left)
+				{
+				halign = Alignment.LEFT;
+				return;
+				}
+			if (e.getSource() == center)
+				{
+				halign = Alignment.CENTER;
+				return;
+				}
+			if (e.getSource() == right)
+				{
+				halign = Alignment.RIGHT;
+				return;
+				}
+			if (e.getSource() == top)
+				{
+				valign = Alignment.TOP;
+				return;
+				}
+			if (e.getSource() == middle)
+				{
+				valign = Alignment.MIDDLE;
+				return;
+				}
+			if (e.getSource() == bottom)
+				{
+				valign = Alignment.BOTTOM;
+				return;
+				}
+			if (e.getSource() == fButton)
+				{
+				Font newFont = FontDialog.getFont(font);
+				
+				if (newFont == null)
+					return;
+				
+				font = newFont;
+				fButton.setFont(font);
+				}
+			}
+
 		}
 
 	/**

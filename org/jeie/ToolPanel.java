@@ -29,6 +29,7 @@ import org.jeie.Tool.PointTool;
 import org.jeie.Tool.RectangleTool;
 import org.jeie.Tool.OvalTool;
 import org.jeie.Tool.ColorPickerTool;
+import org.jeie.Tool.TextTool;
 
 public class ToolPanel extends JPanel implements ActionListener
 	{
@@ -61,6 +62,8 @@ public class ToolPanel extends JPanel implements ActionListener
 				new FillTool()));
 		addButton(new ToolButton(Jeie.getIcon("color-picker"),"Color Picker - get the color at a point",
 				new ColorPickerTool()));
+		addButton(new ToolButton(Jeie.getIcon("text"),"Text - Draw text",
+				new TextTool()));
 
 		toolOptions.setBorder(BorderFactory.createLoweredBevelBorder());
 		toolOptions.setMaximumSize(toolGrid.getPreferredSize());

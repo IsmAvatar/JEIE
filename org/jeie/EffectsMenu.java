@@ -166,6 +166,7 @@ public class EffectsMenu extends JMenu implements ActionListener
 		{
 		Canvas c = jeie.canvas;
 		c.acts.add(act);
+		c.redoActs.clear();
 		c.redrawCache();
 		}
 
