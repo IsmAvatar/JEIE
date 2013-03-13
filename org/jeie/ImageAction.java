@@ -26,7 +26,10 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.LinearGradientPaint;
+import java.awt.Paint;
 import java.awt.Point;
+import java.awt.RadialGradientPaint;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.image.BufferedImage;
@@ -251,6 +254,64 @@ public abstract class ImageAction
 						g2d.drawLine(p1.x - dx,p1.y - dy,p2.x - dx,p2.y - dy);
 				}
 			g2d.setStroke(s);
+			}
+		}
+
+	public static class GradientAction extends ImageAction
+		{
+		public Color c1, c2;
+		public Point p1, p2;
+		public OptionComponent.GradientOptions.GradientType type;
+		Canvas canvas;
+
+		public GradientAction(Canvas canvas, Point p, Color c1, Color c2, OptionComponent.GradientOptions.GradientType type)
+			{
+			this.c1 = c1;
+			this.c2 = c2;
+			this.canvas = canvas;
+			p1 = p;
+			p2 = p;
+			this.type = type;
+			}
+
+		public void paint(Graphics g)
+			{
+			Paint paint = null;
+			
+			if (p1.equals(p2))
+				paint = c2;
+			else
+				switch(type)
+				{
+				case LINEAR:
+					paint = new LinearGradientPaint(p1, p2, new float[] { 0f, 1f }, new Color[] { c1, c2 });
+					break;
+					
+				case MIRRORED:
+					int xDist = (p2.x - p1.x);
+					int yDist = (p2.y - p1.y);
+					Point newPoint = new Point(p1.x - xDist, p1.y - yDist);
+					paint = new LinearGradientPaint(newPoint, p2, new float[] { 0f, .5f, 1f }, new Color[] { c2, c1, c2 });
+					break;
+					
+				case RADIAL:
+					paint = new RadialGradientPaint(p1, (float) p1.distance(p2), new float[] { 0f, 1f }, new Color[] { c1, c2 });
+					break;
+				
+				case CONICAL:
+					paint = c2; //TODO: implement this.
+					break;
+					
+				case SQUARE:
+					paint = c2; //TODO: implement this.
+					break;
+				}
+			
+			Graphics2D g2d = (Graphics2D) g;
+			Paint oldPaint = g2d.getPaint();
+			g2d.setPaint(paint);
+			g2d.fillRect(0,0,canvas.getWidth(),canvas.getHeight());
+			g2d.setPaint(oldPaint);
 			}
 		}
 

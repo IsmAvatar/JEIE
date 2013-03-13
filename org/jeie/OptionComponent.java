@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
@@ -84,6 +83,68 @@ public class OptionComponent
 		}
 
 	/**
+	 * A list component which gives gradient options.
+	 */
+	public static class GradientOptions extends JList
+		{
+		private static final long serialVersionUID = 1L;
+
+		public enum GradientType
+			{
+			LINEAR, MIRRORED, RADIAL, CONICAL, SQUARE
+			}
+
+		public GradientType getFillType()
+			{
+			switch (getSelectedIndex())
+				{
+				case 0:
+					return GradientType.LINEAR;
+				case 1:
+					return GradientType.MIRRORED;
+				case 2:
+					return GradientType.RADIAL;
+				case 3:
+					return GradientType.CONICAL;
+				case 4:
+					return GradientType.SQUARE;
+				}
+			System.err.println("Invalid gradient type selection");
+			return GradientType.LINEAR;
+			}
+
+		public GradientOptions()
+			{
+			super(new ImageIcon[] { Jeie.getIcon("gradient-linear"), getBrushIcon("gradient-mirrored"),
+				getBrushIcon("gradient-radial"), getBrushIcon("gradient-conical"), getBrushIcon("gradient-square")	});
+			setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			setSelectedIndex(0);
+			}
+
+		public void select(GradientType fill)
+			{
+			switch (fill)
+				{
+				case LINEAR:
+					setSelectedIndex(0);
+					return;
+				case MIRRORED:
+					setSelectedIndex(1);
+					return;
+				case RADIAL:
+					setSelectedIndex(2);
+					return;
+				case CONICAL:
+					setSelectedIndex(3);
+					return;
+				case SQUARE:
+					setSelectedIndex(4);
+					return;
+				}
+			}
+		}
+
+	/**
 	 * A mixed component which gives text options.
 	 */
 	public static class TextOptions extends JPanel implements ActionListener
@@ -113,12 +174,12 @@ public class OptionComponent
 			
 			JPanel bottomPanel = new JPanel();
 			bottomPanel.setLayout(new GridLayout(2, 3));
-			bottomPanel.add(left = new JToggleButton(Jeie.getIcon("left"), true));
-			bottomPanel.add(center = new JToggleButton(Jeie.getIcon("center"), true));
-			bottomPanel.add(right = new JToggleButton(Jeie.getIcon("right"), true));
-			bottomPanel.add(top = new JToggleButton(Jeie.getIcon("top"), true));
-			bottomPanel.add(middle = new JToggleButton(Jeie.getIcon("middle"), true));
-			bottomPanel.add(bottom = new JToggleButton(Jeie.getIcon("bottom"), true));
+			bottomPanel.add(left = new JToggleButton(getBrushIcon("left"), true));
+			bottomPanel.add(center = new JToggleButton(getBrushIcon("center"), true));
+			bottomPanel.add(right = new JToggleButton(getBrushIcon("right"), true));
+			bottomPanel.add(top = new JToggleButton(getBrushIcon("top"), true));
+			bottomPanel.add(middle = new JToggleButton(getBrushIcon("middle"), true));
+			bottomPanel.add(bottom = new JToggleButton(getBrushIcon("bottom"), true));
 			
 			ButtonGroup g1 = new ButtonGroup();
 			g1.add(left);

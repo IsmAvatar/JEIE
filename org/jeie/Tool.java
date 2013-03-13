@@ -13,14 +13,12 @@ import static org.jeie.OptionComponent.emptyPanel;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -28,6 +26,7 @@ import javax.swing.event.ListSelectionListener;
 
 import org.jeie.Canvas.RenderMode;
 import org.jeie.ImageAction.FillAction;
+import org.jeie.ImageAction.GradientAction;
 import org.jeie.ImageAction.LineAction;
 import org.jeie.ImageAction.PointAction;
 import org.jeie.ImageAction.RectangleAction;
@@ -35,6 +34,7 @@ import org.jeie.ImageAction.OvalAction;
 import org.jeie.ImageAction.TextAction;
 import org.jeie.OptionComponent.FillOptions;
 import org.jeie.OptionComponent.FillOptions.FillType;
+import org.jeie.OptionComponent.GradientOptions;
 import org.jeie.OptionComponent.SizeOptions;
 import org.jeie.OptionComponent.TextOptions;
 
@@ -202,6 +202,77 @@ public interface Tool
 		public void stateChanged(ChangeEvent e)
 			{
 			diameter = so.getValue();
+			}
+		}
+
+	public static class GradientTool extends GenericTool<GradientAction> implements ListSelectionListener
+		{
+		long mouseTime;
+		int button;
+		GradientOptions.GradientType type;
+
+		public void mousePress(MouseEvent e, Canvas canvas, Palette p)
+			{
+			if (active != null)
+				{
+				if (e.getButton() == button)
+					finish(canvas,p);
+				else
+					cancel(canvas);
+				return;
+				}
+			button = e.getButton();
+			if (!isValid(e,canvas,p) && canvas.renderMode != RenderMode.TILED) return;
+			mouseTime = e.getWhen();
+			Color c1, c2;
+			if (button == MouseEvent.BUTTON1)
+				{
+				c1 = p.getLeft();
+				c2 = p.getRight();
+				}
+			else
+				{
+				c1 = p.getRight();
+				c2 = p.getLeft();
+				}
+			canvas.active = active = new GradientAction(canvas,e.getPoint(),c1,c2,type);
+			canvas.repaint();
+			}
+
+		public void mouseRelease(MouseEvent e, Canvas canvas, Palette pal)
+			{
+			if (e.getWhen() - mouseTime < 200) return;
+
+			if (active != null) active.p2 = e.getPoint();
+			finish(canvas,pal);
+			}
+
+		public void mouseMove(MouseEvent e, Canvas canvas, Palette p, boolean drag)
+			{
+			if (active != null && !active.p2.equals(e.getPoint()))
+				{
+				active.p2 = e.getPoint();
+				canvas.repaint();
+				}
+			}
+
+		private static final GradientOptions go = new GradientOptions();
+
+		public GradientTool()
+			{
+			go.addListSelectionListener(this);
+			type = go.getFillType();
+			}
+
+		@Override
+		public JComponent getOptionsComponent()
+			{
+			return go;
+			}
+
+		public void valueChanged(ListSelectionEvent e)
+			{
+			type = go.getFillType();
 			}
 		}
 

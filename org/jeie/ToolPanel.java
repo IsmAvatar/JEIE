@@ -30,6 +30,7 @@ import org.jeie.Tool.RectangleTool;
 import org.jeie.Tool.OvalTool;
 import org.jeie.Tool.ColorPickerTool;
 import org.jeie.Tool.TextTool;
+import org.jeie.Tool.GradientTool;
 
 public class ToolPanel extends JPanel implements ActionListener
 	{
@@ -64,6 +65,8 @@ public class ToolPanel extends JPanel implements ActionListener
 				new ColorPickerTool()));
 		addButton(new ToolButton(Jeie.getIcon("text"),"Text - Draw text",
 				new TextTool()));
+		addButton(new ToolButton(Jeie.getIcon("gradient-linear"),"Gradient - draw gradients",
+				new GradientTool()));
 
 		toolOptions.setBorder(BorderFactory.createLoweredBevelBorder());
 		toolOptions.setMaximumSize(toolGrid.getPreferredSize());
