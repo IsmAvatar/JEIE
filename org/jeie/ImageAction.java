@@ -40,11 +40,11 @@ import org.jeie.Algorithm.FloodFill;
 import org.jeie.Canvas.RenderMode;
 import org.jeie.OptionComponent.FillOptions.FillType;
 
-public abstract class ImageAction
+public interface ImageAction
 	{
-	public boolean copiesRaster = false;
+	public boolean copiesRaster();
 	
-	public abstract void paint(Graphics g);
+	public void paint(Graphics g);
 
 	/**
 	 * A Heavy-weight Image Action is an Image Action that depends on
@@ -56,12 +56,12 @@ public abstract class ImageAction
 	 * undesirable results, and should potentially be given the option to
 	 * destroy or even manually update later heavy-weight image actions.
 	 */
-	public static abstract class HeavyImageAction extends ImageAction
+	public static interface HeavyImageAction extends ImageAction
 		{
-		public abstract void recalculate(BufferedImage source);
+		public void recalculate(BufferedImage source);
 		}
 
-	public static class Resize extends ImageAction
+	public static class Resize implements ImageAction
 		{
 		public int w, h;
 
@@ -70,9 +70,14 @@ public abstract class ImageAction
 			g.setClip(0,0,w,h);
 			g.clipRect(0,0,w,h);
 			}
+		
+		public boolean copiesRaster()
+			{
+			return false;
+			}
 		}
 	
-	public static class TextAction extends ImageAction
+	public static class TextAction implements ImageAction
 	{
 	public Color color;
 	public Font font;
@@ -124,9 +129,14 @@ public abstract class ImageAction
 					g.drawString(text,x - dx,y - dy);
 			}
 		}
+	
+	public boolean copiesRaster()
+		{
+		return false;
+		}
 	}
 
-	public static class RectangleAction extends ImageAction
+	public static class RectangleAction implements ImageAction
 		{
 		public Color out, in;
 		public Point p1, p2;
@@ -172,9 +182,14 @@ public abstract class ImageAction
 					}
 				}
 			}
+		
+		public boolean copiesRaster()
+			{
+			return false;
+			}
 		}
 
-	public static class OvalAction extends ImageAction
+	public static class OvalAction implements ImageAction
 		{
 		public Color out, in;
 		public Point p1, p2;
@@ -220,9 +235,14 @@ public abstract class ImageAction
 					}
 				}
 			}
+		
+		public boolean copiesRaster()
+			{
+			return false;
+			}
 		}
 
-	public static class LineAction extends ImageAction
+	public static class LineAction implements ImageAction
 		{
 		public Color c;
 		public Point p1, p2;
@@ -255,9 +275,14 @@ public abstract class ImageAction
 				}
 			g2d.setStroke(s);
 			}
+		
+		public boolean copiesRaster()
+			{
+			return false;
+			}
 		}
 
-	public static class GradientAction extends ImageAction
+	public static class GradientAction implements ImageAction
 		{
 		public Color c1, c2;
 		public Point p1, p2;
@@ -313,9 +338,14 @@ public abstract class ImageAction
 			g2d.fillRect(0,0,canvas.getWidth(),canvas.getHeight());
 			g2d.setPaint(oldPaint);
 			}
+		
+		public boolean copiesRaster()
+			{
+			return false;
+			}
 		}
 
-	public static class PointAction extends ImageAction
+	public static class PointAction implements ImageAction
 		{
 		static final int MAX_FREE_POINTS = 64;
 
@@ -412,9 +442,14 @@ public abstract class ImageAction
 						}
 				}
 			}
+		
+		public boolean copiesRaster()
+			{
+			return false;
+			}
 		}
 
-	public static class FillAction extends HeavyImageAction
+	public static class FillAction implements HeavyImageAction
 		{
 		Point origin;
 		int threshold;
@@ -474,6 +509,11 @@ public abstract class ImageAction
 		public void paint(Graphics g)
 			{
 			g.drawImage(getCache(),floodFill.minX,floodFill.minY,null);
+			}
+		
+		public boolean copiesRaster()
+			{
+			return false;
 			}
 		}
 	}

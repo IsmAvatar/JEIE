@@ -20,14 +20,13 @@ public class TransformMenu extends JMenu implements ActionListener
 	public Jeie jeie;
 	JMenuItem rotate, flipH, flipV, zoom;
 
-	public class Rotate extends ImageAction
+	public class Rotate implements ImageAction
 		{
 		public int angle;
 
 		public Rotate(int ang)
 			{
 			angle = ang;
-			copiesRaster = true;
 			}
 
 		public void paint(Graphics g)
@@ -41,16 +40,20 @@ public class TransformMenu extends JMenu implements ActionListener
 			AffineTransformOp op = new AffineTransformOp(tr, AffineTransformOp.TYPE_BILINEAR);
 			g2.drawImage(c.getRenderImage(),op,0,0);
 			}
+		
+		public boolean copiesRaster()
+			{
+			return true;
+			}
 		}
 	
-	public class Zoom extends ImageAction
+	public class Zoom implements ImageAction
 		{
 		public int amount;
 	
 		public Zoom(int amt)
 			{
 			amount = amt;
-			copiesRaster = true;
 			}
 	
 		public void paint(Graphics g)
@@ -66,15 +69,15 @@ public class TransformMenu extends JMenu implements ActionListener
 			AffineTransformOp op = new AffineTransformOp(tr, AffineTransformOp.TYPE_BILINEAR);
 			g2.drawImage(c.getRenderImage(),op,0,0);
 			}
+		
+		public boolean copiesRaster()
+			{
+			return true;
+			}
 		}
 	
-	public class FlipH extends ImageAction
+	public class FlipH implements ImageAction
 		{
-		public FlipH()
-			{
-			copiesRaster = true;
-			}
-		
 		public void paint(Graphics g)
 			{
 			Canvas c = jeie.canvas;
@@ -86,15 +89,15 @@ public class TransformMenu extends JMenu implements ActionListener
 			AffineTransformOp op = new AffineTransformOp(tr, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
 			g2.drawImage(c.getRenderImage(),op,0,0);
 			}
+		
+		public boolean copiesRaster()
+			{
+			return true;
+			}
 		}
 	
-	public class FlipV extends ImageAction
+	public class FlipV implements ImageAction
 		{
-		public FlipV()
-			{
-			copiesRaster = true;
-			}
-		
 		public void paint(Graphics g)
 			{
 			Canvas c = jeie.canvas;
@@ -105,6 +108,11 @@ public class TransformMenu extends JMenu implements ActionListener
 			tr.translate(0, -img.getHeight());
 			AffineTransformOp op = new AffineTransformOp(tr, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
 			g2.drawImage(c.getRenderImage(),op,0,0);
+			}
+		
+		public boolean copiesRaster()
+			{
+			return true;
 			}
 		}
 

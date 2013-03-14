@@ -238,7 +238,7 @@ public class Canvas extends JLabel
 			if (i >= curAct)
 				break;
 			
-			if (a.copiesRaster)
+			if (a.copiesRaster())
 				return false;
 			
 			i++;

@@ -44,14 +44,13 @@ public class EffectsMenu extends JMenu implements ActionListener
 	public Jeie jeie;
 	JMenuItem blur, value, invert, fade, colorize, saturation;
 
-	public class Blur extends ImageAction
+	public class Blur implements ImageAction
 		{
 		public int amount;
 
 		public Blur(int amt)
 			{
 			amount = amt;
-			copiesRaster = true;
 			}
 
 		public void paint(Graphics g)
@@ -71,16 +70,20 @@ public class EffectsMenu extends JMenu implements ActionListener
 			ConvolveOp blur = new ConvolveOp(k,ConvolveOp.EDGE_NO_OP,null);
 			g2.drawImage(c.getRenderImage(),blur,0,0);
 			}
+		
+		public boolean copiesRaster()
+			{
+			return true;
+			}
 		}
 
-	public class Value extends ImageAction
+	public class Value implements ImageAction
 		{
 		public float amount;
 
 		public Value(float amt)
 			{
 			amount = amt;
-			copiesRaster = true;
 			}
 
 		public void paint(Graphics g)
@@ -92,15 +95,15 @@ public class EffectsMenu extends JMenu implements ActionListener
 			RescaleOp value = new RescaleOp(scale,offsets,null);
 			g2.drawImage(c.getRenderImage(),value,0,0);
 			}
+		
+		public boolean copiesRaster()
+			{
+			return true;
+			}
 		}
 
-	public class Invert extends ImageAction
+	public class Invert implements ImageAction
 		{
-		public Invert()
-			{
-			copiesRaster = true;
-			}
-		
 		public void paint(Graphics g)
 			{
 			Canvas c = jeie.canvas;
@@ -110,9 +113,14 @@ public class EffectsMenu extends JMenu implements ActionListener
 			RescaleOp invert = new RescaleOp(negFactors,offsets,null);
 			g2d.drawImage(c.getRenderImage(),invert,0,0);
 			}
+		
+		public boolean copiesRaster()
+			{
+			return true;
+			}
 		}
 
-	public class Fade extends ImageAction
+	public class Fade implements ImageAction
 		{
 		public Color fadeTo;
 		public float amount;
@@ -138,16 +146,20 @@ public class EffectsMenu extends JMenu implements ActionListener
 			g2d.setColor(oldCol);
 			g2d.setComposite(oldComp);
 			}
+		
+		public boolean copiesRaster()
+			{
+			return false;
+			}
 		}
 
-	public class Saturation extends ImageAction
+	public class Saturation implements ImageAction
 		{
 		public int amount;
 
 		public Saturation(int amt)
 			{
 			amount = amt;
-			copiesRaster = true;
 			}
 
 		public void paint(Graphics g)
@@ -159,6 +171,11 @@ public class EffectsMenu extends JMenu implements ActionListener
 			
 			Image image = Toolkit.getDefaultToolkit().createImage(filteredSrc);
 			g.drawImage(image, 0, 0, null);
+			}
+		
+		public boolean copiesRaster()
+			{
+			return true;
 			}
 		}
 
