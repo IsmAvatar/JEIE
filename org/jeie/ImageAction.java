@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008, 2012 IsmAvatar <IsmAvatar@gmail.com>
+ * Copyright (C) 2013 jimn346 <jds9496@gmail.com>
  * 
  * This file is part of Jeie.
  * 
@@ -22,9 +23,14 @@ package org.jeie;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.LinearGradientPaint;
+import java.awt.Paint;
 import java.awt.Point;
+import java.awt.RadialGradientPaint;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.image.BufferedImage;
@@ -37,6 +43,8 @@ import org.jeie.OptionComponent.FillOptions.FillType;
 
 public interface ImageAction
 	{
+	public boolean copiesRaster();
+	
 	public void paint(Graphics g);
 
 	/**
@@ -63,7 +71,71 @@ public interface ImageAction
 			g.setClip(0,0,w,h);
 			g.clipRect(0,0,w,h);
 			}
+		
+		public boolean copiesRaster()
+			{
+			return false;
+			}
 		}
+	
+	public static class TextAction implements ImageAction
+	{
+	public Color color;
+	public Font font;
+	public Point p;
+	public Canvas canvas;
+	public String text;
+	public OptionComponent.TextOptions.Alignment halign, valign;
+	
+	public TextAction(Canvas canvas, Point p, Color col, Font f, String t, OptionComponent.TextOptions.Alignment h, OptionComponent.TextOptions.Alignment v)
+		{
+		this.canvas = canvas;
+		this.p = p;
+		color = col;
+		font = f;
+		text = t;
+		halign = h;
+		valign = v;
+		}
+	
+	public void paint(Graphics g)
+		{
+		int x = (int) p.getX();
+		int y = (int) p.getY();
+		FontMetrics metrics = g.getFontMetrics(font);
+		
+		int w = metrics.stringWidth(text);
+		int h = metrics.getHeight();
+		
+		if (halign == OptionComponent.TextOptions.Alignment.CENTER)
+			x -= w / 2;
+		else if (halign == OptionComponent.TextOptions.Alignment.RIGHT)
+			x -= w;
+		
+		if (valign == OptionComponent.TextOptions.Alignment.MIDDLE)
+			y += h / 2;
+		else if (valign == OptionComponent.TextOptions.Alignment.TOP)
+			y += h;
+		
+		g.setFont(font);
+		g.setColor(color);
+		
+		if (canvas.renderMode != RenderMode.TILED)
+			g.drawString(text,x,y);
+		else
+			{
+			Dimension img = canvas.getImageSize();
+			for (int dx = 0; x + w - dx >= 0; dx += img.width)
+				for (int dy = 0; y + h - dy >= 0; dy += img.height)
+					g.drawString(text,x - dx,y - dy);
+			}
+		}
+	
+	public boolean copiesRaster()
+		{
+		return false;
+		}
+	}
 
 	public static class RectangleAction implements ImageAction
 		{
@@ -110,6 +182,11 @@ public interface ImageAction
 							g.fillRect(r.x - dx + 1,r.y - dy + 1,r.width - 1,r.height - 1);
 					}
 				}
+			}
+		
+		public boolean copiesRaster()
+			{
+			return false;
 			}
 		}
 
@@ -159,6 +236,11 @@ public interface ImageAction
 					}
 				}
 			}
+		
+		public boolean copiesRaster()
+			{
+			return false;
+			}
 		}
 
 	public static class LineAction implements ImageAction
@@ -193,6 +275,74 @@ public interface ImageAction
 						g2d.drawLine(p1.x - dx,p1.y - dy,p2.x - dx,p2.y - dy);
 				}
 			g2d.setStroke(s);
+			}
+		
+		public boolean copiesRaster()
+			{
+			return false;
+			}
+		}
+
+	public static class GradientAction implements ImageAction
+		{
+		public Color c1, c2;
+		public Point p1, p2;
+		public OptionComponent.GradientOptions.GradientType type;
+		Canvas canvas;
+
+		public GradientAction(Canvas canvas, Point p, Color c1, Color c2, OptionComponent.GradientOptions.GradientType type)
+			{
+			this.c1 = c1;
+			this.c2 = c2;
+			this.canvas = canvas;
+			p1 = p;
+			p2 = p;
+			this.type = type;
+			}
+
+		public void paint(Graphics g)
+			{
+			Paint paint = null;
+			
+			if (p1.equals(p2))
+				paint = c2;
+			else
+				switch(type)
+				{
+				case LINEAR:
+					paint = new LinearGradientPaint(p1, p2, new float[] { 0f, 1f }, new Color[] { c1, c2 });
+					break;
+					
+				case MIRRORED:
+					int xDist = (p2.x - p1.x);
+					int yDist = (p2.y - p1.y);
+					Point newPoint = new Point(p1.x - xDist, p1.y - yDist);
+					paint = new LinearGradientPaint(newPoint, p2, new float[] { 0f, .5f, 1f }, new Color[] { c2, c1, c2 });
+					break;
+					
+				case RADIAL:
+					paint = new RadialGradientPaint(p1, (float) p1.distance(p2), new float[] { 0f, 1f }, new Color[] { c1, c2 });
+					break;
+				
+				case CONICAL:
+					paint = c2; //TODO: implement this.
+					break;
+					
+				case SQUARE:
+					paint = c2; //TODO: implement this.
+					break;
+				}
+			
+			Graphics2D g2d = (Graphics2D) g;
+			Paint oldPaint = g2d.getPaint();
+			g2d.setPaint(paint);
+			g2d.fillRect(0,0,canvas.getWidth(),canvas.getHeight());
+			g2d.setPaint(oldPaint);
+			}
+		
+		public boolean copiesRaster()
+			{
+			return false;
 			}
 		}
 
@@ -293,6 +443,11 @@ public interface ImageAction
 						}
 				}
 			}
+		
+		public boolean copiesRaster()
+			{
+			return false;
+			}
 		}
 
 	public static class FillAction implements HeavyImageAction
@@ -355,6 +510,11 @@ public interface ImageAction
 		public void paint(Graphics g)
 			{
 			g.drawImage(getCache(),floodFill.minX,floodFill.minY,null);
+			}
+		
+		public boolean copiesRaster()
+			{
+			return false;
 			}
 		}
 	}

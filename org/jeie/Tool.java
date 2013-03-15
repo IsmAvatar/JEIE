@@ -1,9 +1,21 @@
 /*
  * Copyright (C) 2012 IsmAvatar <IsmAvatar@gmail.com>
+ * Copyright (C) 2013 jimn346 <jds9496@gmail.com>
  * 
  * This file is part of Jeie.
- * Jeie is free software and comes with ABSOLUTELY NO WARRANTY.
- * See LICENSE for details.
+ * 
+ * Jeie is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Jeie is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License (COPYING) for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.jeie;
@@ -18,6 +30,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -25,13 +38,17 @@ import javax.swing.event.ListSelectionListener;
 
 import org.jeie.Canvas.RenderMode;
 import org.jeie.ImageAction.FillAction;
+import org.jeie.ImageAction.GradientAction;
 import org.jeie.ImageAction.LineAction;
 import org.jeie.ImageAction.PointAction;
 import org.jeie.ImageAction.RectangleAction;
 import org.jeie.ImageAction.OvalAction;
+import org.jeie.ImageAction.TextAction;
 import org.jeie.OptionComponent.FillOptions;
 import org.jeie.OptionComponent.FillOptions.FillType;
+import org.jeie.OptionComponent.GradientOptions;
 import org.jeie.OptionComponent.SizeOptions;
+import org.jeie.OptionComponent.TextOptions;
 
 public interface Tool
 	{
@@ -91,6 +108,7 @@ public interface Tool
 			if (active == null) return;
 			c.acts.add(active);
 			c.active = active = null;
+			c.redoActs.clear();
 			c.redrawCache();
 			}
 
@@ -196,6 +214,77 @@ public interface Tool
 		public void stateChanged(ChangeEvent e)
 			{
 			diameter = so.getValue();
+			}
+		}
+
+	public static class GradientTool extends GenericTool<GradientAction> implements ListSelectionListener
+		{
+		long mouseTime;
+		int button;
+		GradientOptions.GradientType type;
+
+		public void mousePress(MouseEvent e, Canvas canvas, Palette p)
+			{
+			if (active != null)
+				{
+				if (e.getButton() == button)
+					finish(canvas,p);
+				else
+					cancel(canvas);
+				return;
+				}
+			button = e.getButton();
+			if (!isValid(e,canvas,p) && canvas.renderMode != RenderMode.TILED) return;
+			mouseTime = e.getWhen();
+			Color c1, c2;
+			if (button == MouseEvent.BUTTON1)
+				{
+				c1 = p.getLeft();
+				c2 = p.getRight();
+				}
+			else
+				{
+				c1 = p.getRight();
+				c2 = p.getLeft();
+				}
+			canvas.active = active = new GradientAction(canvas,e.getPoint(),c1,c2,type);
+			canvas.repaint();
+			}
+
+		public void mouseRelease(MouseEvent e, Canvas canvas, Palette pal)
+			{
+			if (e.getWhen() - mouseTime < 200) return;
+
+			if (active != null) active.p2 = e.getPoint();
+			finish(canvas,pal);
+			}
+
+		public void mouseMove(MouseEvent e, Canvas canvas, Palette p, boolean drag)
+			{
+			if (active != null && !active.p2.equals(e.getPoint()))
+				{
+				active.p2 = e.getPoint();
+				canvas.repaint();
+				}
+			}
+
+		private static final GradientOptions go = new GradientOptions();
+
+		public GradientTool()
+			{
+			go.addListSelectionListener(this);
+			type = go.getFillType();
+			}
+
+		@Override
+		public JComponent getOptionsComponent()
+			{
+			return go;
+			}
+
+		public void valueChanged(ListSelectionEvent e)
+			{
+			type = go.getFillType();
 			}
 		}
 
@@ -514,16 +603,55 @@ public interface Tool
 							e.getClickCount(),e.isPopupTrigger(),button), c, p);
 			}
 
-		private static final FillOptions fills = new FillOptions();
-
-		@Override
 		public JComponent getOptionsComponent()
 			{
-			return fills;
+			return emptyPanel;
+			}
+		}
+
+	public static class TextTool extends GenericTool<ImageAction>
+		{
+		public void mousePress(MouseEvent e, Canvas c, Palette p)
+			{
+			Color col;
+			if (e.getButton() == MouseEvent.BUTTON1)
+				col = p.getLeft();
+			else if (e.getButton() == MouseEvent.BUTTON3)
+				col = p.getRight();
+			else
+				return;
+			
+			Point cp;
+			if (!isValid(e,c,p)) {
+			  if (c.renderMode != RenderMode.TILED) return;
+			  cp = e.getPoint();
+			  cp.x = (cp.x + c.imageWidth()) % c.imageWidth();
+			  cp.y = (cp.y + c.imageHeight()) % c.imageHeight();
+			}
+			else cp = e.getPoint();
+			
+			String text = JOptionPane.showInputDialog("Text");
+			
+			if (text == null)
+				return;
+
+			c.active = active = new TextAction(c, cp, col, opts.font, text, opts.halign, opts.valign);
+			finish(c,p);
 			}
 
-		public ColorPickerTool()
+		public void mouseRelease(MouseEvent e, Canvas c, Palette p)
+			{ //Unused
+			}
+
+		public void mouseMove(MouseEvent e, Canvas c, Palette p, boolean drag)
+			{ //Unused
+			}
+
+		private static final TextOptions opts = new TextOptions();
+
+		public JComponent getOptionsComponent()
 			{
+			return opts;
 			}
 		}
 	}
