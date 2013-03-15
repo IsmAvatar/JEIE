@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2012 IsmAvatar <IsmAvatar@gmail.com>
  * Copyright (C) 2012 Serge Humphrey <bobtheblueberry@gmail.com>
+ * Copyright (C) 2013 jimn346 <jds9496@gmail.com>
  * 
  * This file is part of Jeie.
  * Jeie is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -14,7 +15,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JColorChooser;
@@ -23,7 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.border.BevelBorder;
 
-public class Palette extends JPanel
+public class Palette extends JPanel implements MouseListener
 	{
 	private static final long serialVersionUID = 1L;
 
@@ -34,6 +37,7 @@ public class Palette extends JPanel
 		{
 		super();
 		add(cur = new CurrentColor());
+		cur.addMouseListener(this);
 		add(new JSeparator(JSeparator.VERTICAL));
 		add(new WellPalette());
 		}
@@ -184,5 +188,46 @@ public class Palette extends JPanel
 			g.setColor(Color.BLACK);
 			g.drawRect(f1,f1,s,s);
 			}
+		}
+
+	public void mouseClicked(MouseEvent e)
+		{ 
+		if (e.getSource() == cur)
+			{
+			int s = 20;
+			int f1 = 8;
+			int f2 = f1 + (int) (s * 0.6);
+			Rectangle lRect = new Rectangle(f1, f1, s, s);
+			Rectangle rRect = new Rectangle(f2, f2, s, s);
+			
+			if (lRect.contains(e.getPoint()))
+				{
+				Color c = JColorChooser.showDialog(null,"Left Color",left);
+				if (c != null)
+					setLeft(c);
+				}
+			else if (rRect.contains(e.getPoint()))
+				{
+				Color c = JColorChooser.showDialog(null,"Right Color",right);
+				if (c != null)
+					setRight(c);
+				}
+			}
+		}
+
+	public void mouseEntered(MouseEvent e)
+		{ //Unused
+		}
+
+	public void mouseExited(MouseEvent e)
+		{ //Unused
+		}
+
+	public void mousePressed(MouseEvent e)
+		{ //Unused
+		}
+
+	public void mouseReleased(MouseEvent e)
+		{ //Unused
 		}
 	}

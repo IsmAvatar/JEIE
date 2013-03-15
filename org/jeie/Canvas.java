@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008, 2009, 2012 IsmAvatar <IsmAvatar@gmail.com>
+ * Copyright (C) 2013 jimn346 <jds9496@gmail.com>
  * 
  * This file is part of Jeie.
  * 
@@ -36,10 +37,15 @@ public class Canvas extends JLabel
 	private BufferedImage raster, cache, grid;
 	public ImageAction active;
 
-	public ArrayDeque<ImageAction> acts;
-	private int zoom = 1;
+	public ArrayDeque<ImageAction> acts, redoActs;
+	private int zoom = 1, curAct;
 	public boolean isGridDrawn = true;
+	public boolean usesCheckeredBackground = true;
+	public Color transBack1 = Color.white;
+	public Color transBack2 = Color.lightGray;
+	public Dimension trSize = new Dimension(8, 8);
 	public final boolean invertGrid = true;
+	private Dimension prevSize;
 
 	public enum RenderMode
 		{
@@ -58,13 +64,16 @@ public class Canvas extends JLabel
 		setOpaque(true);
 		raster = image;
 		acts = new ArrayDeque<ImageAction>();
+		redoActs = new ArrayDeque<ImageAction>();
 		cache = new BufferedImage(raster.getWidth(),raster.getHeight(),BufferedImage.TYPE_INT_ARGB);
+		prevSize = getSize();
 		}
 
 	public void setImage(BufferedImage image)
 		{
 		raster = image;
 		acts.clear();
+		redoActs.clear();
 		redrawCache();
 		}
 
@@ -73,8 +82,9 @@ public class Canvas extends JLabel
 		BufferedImage img = new BufferedImage(raster.getWidth(),raster.getHeight(),
 				BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = img.createGraphics();
-
-		g.drawImage(raster,0,0,null);
+		
+		if (shouldDrawRaster())
+			g.drawImage(raster,0,0,null);
 		g.drawImage(cache,0,0,null);
 
 		g.dispose();
@@ -113,15 +123,28 @@ public class Canvas extends JLabel
 		{
 		cache = new BufferedImage(raster.getWidth(),raster.getHeight(),BufferedImage.TYPE_INT_ARGB);
 		Graphics g = cache.getGraphics();
+		curAct = 0;
 		for (ImageAction act : acts)
+			{
 			act.paint(g);
+			curAct++;
+			}
 		repaint();
 		}
 
 	public void redrawGrid()
 		{
-		int cw = cache.getWidth() * zoom;
-		int ch = cache.getHeight() * zoom;
+		int cw, ch;
+		if (renderMode == RenderMode.TILED)
+			{
+			cw = getWidth();
+			ch = getHeight();
+			}
+		else
+			{
+			cw = cache.getWidth() * zoom;
+			ch = cache.getHeight() * zoom;
+			}
 
 		grid = new BufferedImage(cw,ch,BufferedImage.TYPE_INT_ARGB);
 		Graphics g = grid.getGraphics();
@@ -130,8 +153,17 @@ public class Canvas extends JLabel
 
 	public void paintGrid(Graphics g)
 		{
-		int cw = cache.getWidth() * zoom;
-		int ch = cache.getHeight() * zoom;
+		int cw, ch;
+		if (renderMode == RenderMode.TILED)
+			{
+			cw = getWidth();
+			ch = getHeight();
+			}
+		else
+			{
+			cw = cache.getWidth() * zoom;
+			ch = cache.getHeight() * zoom;
+			}
 
 		g.setColor(invertGrid ? Color.WHITE : Color.GRAY);
 
@@ -173,15 +205,48 @@ public class Canvas extends JLabel
 		}
 	
 	public Color getColorAt(Point p) {
-		BufferedImage temp = new BufferedImage(raster.getWidth(), raster.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		Graphics g = temp.getGraphics();
-		g.drawImage(raster, 0, 0, null);
-		g.drawImage(cache, 0, 0, null);
-		Color c = new Color(temp.getRGB((int) p.getX(), (int) p.getY()), true);
-		g.dispose();
-		
-		return c;
+		return new Color(getRenderImage().getRGB((int) p.getX(), (int) p.getY()), true);
 	}
+	
+	public void drawTransparentBackground(Graphics g)
+		{
+		int tW = (int) trSize.getWidth();
+		int tH = (int) trSize.getHeight();
+		int fullW, fullH;
+		if (renderMode == RenderMode.TILED)
+			{
+			fullW = getWidth();
+			fullH = getHeight();
+			}
+		else
+			{
+			fullW = raster.getWidth() * zoom;
+			fullH = raster.getHeight() * zoom;
+			}
+		g.setColor(transBack1);
+		g.fillRect(0, 0, fullW, fullH);
+		g.setColor(transBack2);
+		for (int x = 0; x < Math.ceil((double) fullW / tW); x += 1)
+			for (int y = (x + 1) % 2; y < Math.ceil((double) fullH / tH); y += 2)
+				g.fillRect(x * tW, y * tH, Math.min(tW, fullW - x * tW), Math.min(tH, fullH - y * tH));
+		}
+	
+	public boolean shouldDrawRaster()
+		{
+		int i = 0;
+		for (ImageAction a : acts)
+			{
+			if (i >= curAct)
+				break;
+			
+			if (a.copiesRaster())
+				return false;
+			
+			i++;
+			}
+		
+		return true;
+		}
 
 	public void repaint(Rectangle r)
 		{
@@ -200,13 +265,22 @@ public class Canvas extends JLabel
 	public void paint(Graphics g)
 		{
 		super.paint(g);
-
+		
+		if (!getSize().equals(prevSize))
+			{
+			redrawGrid();
+			prevSize = getSize();
+			}
 		int cw = cache.getWidth() * zoom;
 		int ch = cache.getHeight() * zoom;
 
+		drawTransparentBackground(g);
+		boolean drawRaster = shouldDrawRaster();
+		
 		if (renderMode == RenderMode.NORMAL)
 			{
-			g.drawImage(raster,0,0,raster.getWidth() * zoom,raster.getHeight() * zoom,null);
+			if (drawRaster)
+				g.drawImage(raster,0,0,raster.getWidth() * zoom,raster.getHeight() * zoom,null);
 			g.drawImage(cache,0,0,cw,ch,null);
 			}
 		else if (renderMode == RenderMode.TILED)
@@ -214,7 +288,8 @@ public class Canvas extends JLabel
 			for (int i = 0; i < getWidth(); i += cw)
 				for (int j = 0; j < getHeight(); j += ch)
 					{
-					g.drawImage(raster,i,j,raster.getWidth() * zoom,raster.getHeight() * zoom,null);
+					if (drawRaster)
+						g.drawImage(raster,i,j,raster.getWidth() * zoom,raster.getHeight() * zoom,null);
 					g.drawImage(cache,i,j,cw,ch,null);
 					}
 			}

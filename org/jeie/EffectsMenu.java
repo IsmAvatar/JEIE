@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2009, 2012 IsmAvatar <IsmAvatar@gmail.com>
  * Copyright (C) 2009 Serge Humphrey <bob@bobtheblueberry.com>
+ * Copyright (C) 2013 jimn346 <jds9496@gmail.com>
  * 
  * This file is part of Jeie.
  * 
@@ -26,9 +27,13 @@ import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.awt.image.ConvolveOp;
+import java.awt.image.FilteredImageSource;
 import java.awt.image.Kernel;
 import java.awt.image.RescaleOp;
 
@@ -39,7 +44,7 @@ public class EffectsMenu extends JMenu implements ActionListener
 	{
 	private static final long serialVersionUID = 1L;
 	public Jeie jeie;
-	JMenuItem blur, value, invert, fade, colorize;
+	JMenuItem blur, value, invert, fade, colorize, saturation;
 
 	public class Blur implements ImageAction
 		{
@@ -65,7 +70,19 @@ public class EffectsMenu extends JMenu implements ActionListener
 
 			Kernel k = new Kernel(amount,amount,blurKernel);
 			ConvolveOp blur = new ConvolveOp(k,ConvolveOp.EDGE_NO_OP,null);
-			g2.drawImage(c.getRenderImage(),blur,0,0);
+			
+			BufferedImage img = c.getRenderImage();
+			
+			//Clear the image.
+			g2.setBackground(new Color(0, 0, 0, 0));
+			g2.clearRect(0,0,img.getWidth(),img.getHeight());
+			
+			g2.drawImage(img,blur,0,0);
+			}
+		
+		public boolean copiesRaster()
+			{
+			return true;
 			}
 		}
 
@@ -85,7 +102,19 @@ public class EffectsMenu extends JMenu implements ActionListener
 			float[] scale = { amount,amount,amount,1.0f }; // keep alpha
 			float[] offsets = { 0.0f,0.0f,0.0f,0.0f };
 			RescaleOp value = new RescaleOp(scale,offsets,null);
-			g2.drawImage(c.getRenderImage(),value,0,0);
+			
+			BufferedImage img = c.getRenderImage();
+			
+			//Clear the image.
+			g2.setBackground(new Color(0, 0, 0, 0));
+			g2.clearRect(0,0,img.getWidth(),img.getHeight());
+			
+			g2.drawImage(img,value,0,0);
+			}
+		
+		public boolean copiesRaster()
+			{
+			return true;
 			}
 		}
 
@@ -98,7 +127,19 @@ public class EffectsMenu extends JMenu implements ActionListener
 			float[] negFactors = { -1.0f,-1.0f,-1.0f,1.0f }; // keep alpha
 			float[] offsets = { 255f,255f,255f,0.0f };
 			RescaleOp invert = new RescaleOp(negFactors,offsets,null);
-			g2d.drawImage(c.getRenderImage(),invert,0,0);
+			
+			BufferedImage img = c.getRenderImage();
+			
+			//Clear the image.
+			g2d.setBackground(new Color(0, 0, 0, 0));
+			g2d.clearRect(0,0,img.getWidth(),img.getHeight());
+			
+			g2d.drawImage(img,invert,0,0);
+			}
+		
+		public boolean copiesRaster()
+			{
+			return true;
 			}
 		}
 
@@ -128,12 +169,51 @@ public class EffectsMenu extends JMenu implements ActionListener
 			g2d.setColor(oldCol);
 			g2d.setComposite(oldComp);
 			}
+		
+		public boolean copiesRaster()
+			{
+			return false;
+			}
+		}
+
+	public class Saturation implements ImageAction
+		{
+		public int amount;
+
+		public Saturation(int amt)
+			{
+			amount = amt;
+			}
+
+		public void paint(Graphics g)
+			{
+			Canvas c = jeie.canvas;
+
+			SaturationFilter filter = new SaturationFilter(amount / 100f);
+			FilteredImageSource filteredSrc = new FilteredImageSource(c.getRenderImage().getSource(), filter);
+			
+			Image image = Toolkit.getDefaultToolkit().createImage(filteredSrc);
+			
+			Graphics2D g2 = (Graphics2D) g;
+			
+			//Clear the image.
+			g2.setBackground(new Color(0, 0, 0, 0));
+			g2.clearRect(0,0,image.getWidth(null),image.getHeight(null));
+			
+			g2.drawImage(image, 0, 0, null);
+			}
+		
+		public boolean copiesRaster()
+			{
+			return true;
+			}
 		}
 
 	public void applyAction(ImageAction act)
 		{
 		Canvas c = jeie.canvas;
 		c.acts.add(act);
+		c.redoActs.clear();
 		c.redrawCache();
 		}
 
@@ -144,25 +224,29 @@ public class EffectsMenu extends JMenu implements ActionListener
 
 		//	TODO: Menu Icons
 
-		blur = new JMenuItem("Blur");
+		blur = new JMenuItem("Blur", Jeie.getIcon("blur"));
 		blur.addActionListener(this);
 		add(blur);
+		
+		saturation = new JMenuItem("Saturation", Jeie.getIcon("saturation"));
+		saturation.addActionListener(this);
+		add(saturation);
 
-		value = new JMenuItem("Value");
+		value = new JMenuItem("Value", Jeie.getIcon("value"));
 		value.addActionListener(this);
 		add(value);
 
-		invert = new JMenuItem("Invert");
+		invert = new JMenuItem("Invert", Jeie.getIcon("invert"));
 		invert.addActionListener(this);
 		add(invert);
 
-		fade = new JMenuItem("Fade to Black");
+		fade = new JMenuItem("Fade to Black", Jeie.getIcon("fade"));
 		fade.addActionListener(this);
 		add(fade);
 
 		addSeparator();
 
-		colorize = new JMenuItem("Colorize");
+		colorize = new JMenuItem("Colorize", Jeie.getIcon("colorize"));
 		colorize.setEnabled(false);
 		add(colorize);
 		}
@@ -173,6 +257,12 @@ public class EffectsMenu extends JMenu implements ActionListener
 			{
 			Integer integer = IntegerDialog.getInteger("Blur amount (1-9)",1,9,3,3);
 			if (integer != null) applyAction(new Blur(integer));
+			return;
+			}
+		if (e.getSource() == saturation)
+			{
+			Integer integer = IntegerDialog.getInteger("Saturation",0,200,100,50);
+			if (integer != null) applyAction(new Saturation(integer));
 			return;
 			}
 		if (e.getSource() == value)
