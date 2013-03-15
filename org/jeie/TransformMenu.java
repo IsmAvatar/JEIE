@@ -1,5 +1,6 @@
 package org.jeie;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
@@ -35,10 +36,15 @@ public class TransformMenu extends JMenu implements ActionListener
 			BufferedImage img = c.getRenderImage();
 			
 			Graphics2D g2 = (Graphics2D) g;
+			
+			//Clear the image.
+			g2.setBackground(new Color(0, 0, 0, 0));
+			g2.clearRect(0,0,img.getWidth(),img.getHeight());
+			
 			AffineTransform tr = new AffineTransform();
 			tr.rotate(angle / 180D * Math.PI, img.getWidth() / 2f,img.getHeight() / 2f);
 			AffineTransformOp op = new AffineTransformOp(tr, AffineTransformOp.TYPE_BILINEAR);
-			g2.drawImage(c.getRenderImage(),op,0,0);
+			g2.drawImage(img,op,0,0);
 			}
 		
 		public boolean copiesRaster()
@@ -63,11 +69,16 @@ public class TransformMenu extends JMenu implements ActionListener
 			float z = amount / 100f;
 			
 			Graphics2D g2 = (Graphics2D) g;
+			
+			//Clear the image.
+			g2.setBackground(new Color(0, 0, 0, 0));
+			g2.clearRect(0,0,img.getWidth(),img.getHeight());
+			
 			AffineTransform tr = new AffineTransform();
 			tr.translate(img.getWidth() * (1 - z) / 2,img.getHeight() * (1 - z) / 2);
 			tr.scale(z, z);
 			AffineTransformOp op = new AffineTransformOp(tr, AffineTransformOp.TYPE_BILINEAR);
-			g2.drawImage(c.getRenderImage(),op,0,0);
+			g2.drawImage(img,op,0,0);
 			}
 		
 		public boolean copiesRaster()
@@ -84,10 +95,15 @@ public class TransformMenu extends JMenu implements ActionListener
 			BufferedImage img = c.getRenderImage();
 			
 			Graphics2D g2 = (Graphics2D) g;
+			
+			//Clear the image.
+			g2.setBackground(new Color(0, 0, 0, 0));
+			g2.clearRect(0,0,img.getWidth(),img.getHeight());
+			
 			AffineTransform tr = AffineTransform.getScaleInstance(-1, 1);
 			tr.translate(-img.getWidth(), 0);
 			AffineTransformOp op = new AffineTransformOp(tr, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-			g2.drawImage(c.getRenderImage(),op,0,0);
+			g2.drawImage(img,op,0,0);
 			}
 		
 		public boolean copiesRaster()
@@ -104,10 +120,15 @@ public class TransformMenu extends JMenu implements ActionListener
 			BufferedImage img = c.getRenderImage();
 			
 			Graphics2D g2 = (Graphics2D) g;
+			
+			//Clear the image.
+			g2.setBackground(new Color(0, 0, 0, 0));
+			g2.clearRect(0,0,img.getWidth(),img.getHeight());
+			
 			AffineTransform tr = AffineTransform.getScaleInstance(1, -1);
 			tr.translate(0, -img.getHeight());
 			AffineTransformOp op = new AffineTransformOp(tr, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-			g2.drawImage(c.getRenderImage(),op,0,0);
+			g2.drawImage(img,op,0,0);
 			}
 		
 		public boolean copiesRaster()

@@ -30,6 +30,7 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.awt.image.ConvolveOp;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.Kernel;
@@ -68,7 +69,14 @@ public class EffectsMenu extends JMenu implements ActionListener
 
 			Kernel k = new Kernel(amount,amount,blurKernel);
 			ConvolveOp blur = new ConvolveOp(k,ConvolveOp.EDGE_NO_OP,null);
-			g2.drawImage(c.getRenderImage(),blur,0,0);
+			
+			BufferedImage img = c.getRenderImage();
+			
+			//Clear the image.
+			g2.setBackground(new Color(0, 0, 0, 0));
+			g2.clearRect(0,0,img.getWidth(),img.getHeight());
+			
+			g2.drawImage(img,blur,0,0);
 			}
 		
 		public boolean copiesRaster()
@@ -93,7 +101,14 @@ public class EffectsMenu extends JMenu implements ActionListener
 			float[] scale = { amount,amount,amount,1.0f }; // keep alpha
 			float[] offsets = { 0.0f,0.0f,0.0f,0.0f };
 			RescaleOp value = new RescaleOp(scale,offsets,null);
-			g2.drawImage(c.getRenderImage(),value,0,0);
+			
+			BufferedImage img = c.getRenderImage();
+			
+			//Clear the image.
+			g2.setBackground(new Color(0, 0, 0, 0));
+			g2.clearRect(0,0,img.getWidth(),img.getHeight());
+			
+			g2.drawImage(img,value,0,0);
 			}
 		
 		public boolean copiesRaster()
@@ -111,7 +126,14 @@ public class EffectsMenu extends JMenu implements ActionListener
 			float[] negFactors = { -1.0f,-1.0f,-1.0f,1.0f }; // keep alpha
 			float[] offsets = { 255f,255f,255f,0.0f };
 			RescaleOp invert = new RescaleOp(negFactors,offsets,null);
-			g2d.drawImage(c.getRenderImage(),invert,0,0);
+			
+			BufferedImage img = c.getRenderImage();
+			
+			//Clear the image.
+			g2d.setBackground(new Color(0, 0, 0, 0));
+			g2d.clearRect(0,0,img.getWidth(),img.getHeight());
+			
+			g2d.drawImage(img,invert,0,0);
 			}
 		
 		public boolean copiesRaster()
@@ -170,7 +192,14 @@ public class EffectsMenu extends JMenu implements ActionListener
 			FilteredImageSource filteredSrc = new FilteredImageSource(c.getRenderImage().getSource(), filter);
 			
 			Image image = Toolkit.getDefaultToolkit().createImage(filteredSrc);
-			g.drawImage(image, 0, 0, null);
+			
+			Graphics2D g2 = (Graphics2D) g;
+			
+			//Clear the image.
+			g2.setBackground(new Color(0, 0, 0, 0));
+			g2.clearRect(0,0,image.getWidth(null),image.getHeight(null));
+			
+			g2.drawImage(image, 0, 0, null);
 			}
 		
 		public boolean copiesRaster()
