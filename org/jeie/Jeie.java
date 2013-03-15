@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2008, 2009, 2012 IsmAvatar <IsmAvatar@gmail.com>
  * Copyright (C) 2009, 2012 Serge Humphrey <bobtheblueberry@gmail.com>
+ * Copyright (C) 2013 jimn346 <jds9496@gmail.com>
  * 
  * This file is part of Jeie.
  * 
