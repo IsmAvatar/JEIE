@@ -52,7 +52,7 @@ public class OptionComponent
 	/**
 	 * A list component which gives fill options.
 	 */
-	public static class FillOptions extends JList
+	public static class FillOptions extends JList<ImageIcon>
 		{
 		private static final long serialVersionUID = 1L;
 
@@ -104,7 +104,7 @@ public class OptionComponent
 	/**
 	 * A list component which gives gradient options.
 	 */
-	public static class GradientOptions extends JList
+	public static class GradientOptions extends JList<ImageIcon>
 		{
 		private static final long serialVersionUID = 1L;
 
@@ -283,13 +283,13 @@ public class OptionComponent
 		{
 		private static final long serialVersionUID = 1L;
 
-		JList visual;
+		JList<ImageIcon> visual;
 		JSpinner spinner;
 
 		public SizeOptions()
 			{
 			setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
-			add(visual = new JList(new ImageIcon[] { getBrushIcon("line-1px"),getBrushIcon("line-2px"),
+			add(visual = new JList<ImageIcon>(new ImageIcon[] { getBrushIcon("line-1px"),getBrushIcon("line-2px"),
 					getBrushIcon("line-3px"),getBrushIcon("line-4px"),getBrushIcon("line-5px") }));
 			visual.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			add(spinner = new JSpinner(new SpinnerNumberModel(1,1,999,1)));
