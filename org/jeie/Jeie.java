@@ -2,6 +2,7 @@
  * Copyright (C) 2008, 2009, 2012 IsmAvatar <IsmAvatar@gmail.com>
  * Copyright (C) 2009, 2012 Serge Humphrey <bobtheblueberry@gmail.com>
  * Copyright (C) 2013 jimn346 <jds9496@gmail.com>
+ * Copyright (C) 2014 Robert B. Colton
  * 
  * This file is part of Jeie.
  * 
@@ -150,12 +151,23 @@ public class Jeie implements ActionListener
 		toolBar = new JToolBar();
 		toolBar.setFloatable(false);
 
-		bUndo = addButton(toolBar,new JButton("Undo",getIcon("undo")));
-		bRedo = addButton(toolBar,new JButton("Redo",getIcon("redo")));
-		bGrid = addButton(toolBar,new JToggleButton("Grid",true));
-
+		addButton(toolBar,new JButton(getIcon("new"))).setActionCommand("New");
+		addButton(toolBar,new JButton(getIcon("open"))).setActionCommand("Open");
+		addButton(toolBar,new JButton(getIcon("save"))).setActionCommand("Save");
+		
+		toolBar.addSeparator();
+		
+		bUndo = addButton(toolBar,new JButton(getIcon("undo")));
+		bRedo = addButton(toolBar,new JButton(getIcon("redo")));
+		
+		toolBar.addSeparator();
+		
 		bZoomOut = addButton(toolBar,new JButton(getIcon("zoom-out")));
 		bZoomIn = addButton(toolBar,new JButton(getIcon("zoom-in")));
+		
+		toolBar.addSeparator();
+		
+		bGrid = addButton(toolBar,new JToggleButton("Grid",true));
 
 		return toolBar;
 		}
@@ -353,7 +365,7 @@ public class Jeie implements ActionListener
 	public void doClose()
 		{
 		if (!hasChanged()) System.exit(0);
-		int c = JOptionPane.showConfirmDialog(frame,"OMG DO U WANT TO SAVE?");
+		int c = JOptionPane.showConfirmDialog(frame,"Would you like to save your changes before closing?");
 		if (c == JOptionPane.CANCEL_OPTION) return;
 		if (c == JOptionPane.OK_OPTION) doSave(false);
 		System.exit(0);
