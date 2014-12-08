@@ -53,6 +53,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
@@ -120,11 +121,11 @@ public class Jeie implements ActionListener
 		menuBar = new JMenuBar();
 		JMenu fm = new JMenu("File");
 		menuBar.add(fm);
-		addMenuItem(fm,"New",getIcon("new"));
-		addMenuItem(fm,"Open",getIcon("open"));
-		addMenuItem(fm,"Save",getIcon("save"));
-		addMenuItem(fm,"Save As",getIcon("save-as"));
-		addMenuItem(fm,"Exit",getIcon("cancel"));
+		addMenuItem(fm,"New",getIcon("new")).setAccelerator(KeyStroke.getKeyStroke("control N"));
+		addMenuItem(fm,"Open",getIcon("open")).setAccelerator(KeyStroke.getKeyStroke("control O"));
+		addMenuItem(fm,"Save",getIcon("save")).setAccelerator(KeyStroke.getKeyStroke("control S"));
+		addMenuItem(fm,"Save As",getIcon("save-as")).setAccelerator(KeyStroke.getKeyStroke("control shift S"));
+		addMenuItem(fm,"Exit",getIcon("cancel")).setAccelerator(KeyStroke.getKeyStroke("alt F4"));
 
 		JMenu vm = new JMenu("View");
 		menuBar.add(vm);
@@ -135,12 +136,13 @@ public class Jeie implements ActionListener
 		return menuBar;
 		}
 
-	public void addMenuItem(JMenu menu, String name, ImageIcon icon)
+	public JMenuItem addMenuItem(JMenu menu, String name, ImageIcon icon)
 		{
 		JMenuItem mi = new JMenuItem(name,icon);
 		mi.setActionCommand(name);
 		mi.addActionListener(this);
 		menu.add(mi);
+		return mi;
 		}
 
 	public JToolBar makeToolBar()
