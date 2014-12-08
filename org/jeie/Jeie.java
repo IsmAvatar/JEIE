@@ -167,7 +167,7 @@ public class Jeie implements ActionListener
 		
 		toolBar.addSeparator();
 		
-		bGrid = addButton(toolBar,new JToggleButton("Grid",true));
+		bGrid = addButton(toolBar,new JToggleButton(getIcon("grid")));
 
 		return toolBar;
 		}
