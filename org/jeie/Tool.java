@@ -34,21 +34,17 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 
+import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.jeie.Canvas.RenderMode;
-import org.jeie.ImageAction.FillAction;
-import org.jeie.ImageAction.GradientAction;
-import org.jeie.ImageAction.LineAction;
-import org.jeie.ImageAction.PointAction;
-import org.jeie.ImageAction.RectangleAction;
-import org.jeie.ImageAction.OvalAction;
-import org.jeie.ImageAction.TextAction;
+import org.jeie.ImageAction.*;
 import org.jeie.OptionComponent.FillOptions;
 import org.jeie.OptionComponent.FillOptions.FillType;
 import org.jeie.OptionComponent.GradientOptions;
@@ -157,6 +153,8 @@ public interface Tool
 			}
 		}
 
+	static final SizeOptions so = new SizeOptions();
+	
 	public static class LineTool extends GenericTool<LineAction> implements ChangeListener
 		{
 		long mouseTime;
@@ -203,8 +201,6 @@ public interface Tool
 				canvas.repaint(r);
 				}
 			}
-
-		private static final SizeOptions so = new SizeOptions();
 
 		public LineTool()
 			{
@@ -333,6 +329,66 @@ public interface Tool
 				}
 			}
 		}
+	
+	public static class PaintbrushTool extends GenericTool<PaintbrushAction> implements ChangeListener
+		{
+		private static JPanel op;
+		private int diameter;
+		
+		public PaintbrushTool() {
+			so.addChangeListener(this);
+		}
+		
+		@Override
+		public JComponent getOptionsComponent()
+			{
+			op = new JPanel();
+			op.setLayout(new BoxLayout(op,BoxLayout.PAGE_AXIS));
+			op.add(so);
+			return op;
+			}
+		
+		public void stateChanged(ChangeEvent e)
+			{
+			diameter = so.getValue();
+			}
+
+		public void mousePress(MouseEvent e, Canvas c, Palette p)
+			{
+			if (active != null)
+				{
+				cancel(c);
+				return;
+				}
+			if (!isValid(e,c,p) && c.renderMode != RenderMode.TILED) return;
+			c.active = active = new PaintbrushAction(c, p.getSelectedColor(e.getButton()), diameter);
+			active.add(e.getPoint());
+			c.repaint();
+			}
+
+		public void mouseRelease(MouseEvent e, Canvas c, Palette p)
+			{
+			finish(c,p);
+			}
+
+		public void mouseMove(MouseEvent e, Canvas c, Palette p, boolean drag)
+			{
+			if (active != null)
+				{
+				Point pt = e.getPoint();
+				if (!active.pts.isEmpty() && active.pts.getLast().equals(pt)) return;
+				Rectangle r = new Rectangle(pt);
+				r.x -= active.diameter << 1;
+				r.y -= active.diameter << 1;
+				r.width += active.diameter << 2;
+				r.height += active.diameter << 2;
+				if (!active.pts.isEmpty()) r.add(active.pts.getLast());
+				active.add(pt);
+				c.repaint(r);
+				}
+			}
+		
+		}
 
 	public static class RectangleTool extends GenericTool<RectangleAction> implements
 			ListSelectionListener
@@ -414,6 +470,87 @@ public interface Tool
 			type = fills.getFillType();
 			}
 		}
+	
+	public static class RoundRectangleTool extends GenericTool<RoundRectangleAction> implements
+		ListSelectionListener
+	{
+	long mouseTime;
+	int button;
+	FillType type = FillType.OUTLINE;
+	
+	public void mousePress(MouseEvent e, Canvas canvas, Palette p)
+		{
+		if (active != null)
+			{
+			if (e.getButton() == button)
+				finish(canvas,p);
+			else
+				cancel(canvas);
+			return;
+			}
+		if (!isValid(e,canvas,p)) return;
+		button = e.getButton();
+		mouseTime = e.getWhen();
+		Color c1 = p.getLeft();
+		Color c2 = p.getRight();
+		if (button != MouseEvent.BUTTON1)
+			{ //lol, shut up
+			c1 = c2;
+			c2 = p.getLeft();
+			}
+		switch (type)
+			{
+			case OUTLINE:
+				canvas.active = active = new RoundRectangleAction(canvas, e.getPoint(),c1,null);
+				break;
+			case BOTH:
+				canvas.active = active = new RoundRectangleAction(canvas, e.getPoint(),c1,c2);
+				break;
+			case FILL:
+				canvas.active = active = new RoundRectangleAction(canvas, e.getPoint(),c1,c1);
+				break;
+			}
+		canvas.repaint();
+		}
+	
+	public void mouseRelease(MouseEvent e, Canvas canvas, Palette pal)
+		{
+		if (e.getWhen() - mouseTime < 200) return;
+	
+		if (active != null) active.p2 = e.getPoint();
+		finish(canvas,pal);
+		}
+	
+	public void mouseMove(MouseEvent e, Canvas canvas, Palette p, boolean drag)
+		{
+		if (active != null && !active.p2.equals(e.getPoint()))
+			{
+			Rectangle r = new Rectangle(active.p2); //previous value
+			active.p2 = e.getPoint();
+			r.add(active.p1);
+			r.add(active.p2);
+			canvas.repaint(r);
+			}
+		}
+	
+	private static final FillOptions fills = new FillOptions();
+	
+	@Override
+	public JComponent getOptionsComponent()
+		{
+		return fills;
+		}
+	
+	public RoundRectangleTool()
+		{
+		fills.addListSelectionListener(this);
+		}
+	
+	public void valueChanged(ListSelectionEvent e)
+		{
+		type = fills.getFillType();
+		}
+	}
 	
 
 	public static class OvalTool extends GenericTool<OvalAction> implements

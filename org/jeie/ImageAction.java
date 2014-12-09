@@ -194,6 +194,59 @@ public interface ImageAction
 			return false;
 			}
 		}
+	
+	public static class RoundRectangleAction implements ImageAction
+	{
+	public Color out, in;
+	public Point p1, p2;
+	public Canvas canvas;
+
+	public RoundRectangleAction(Canvas canvas, Point p, Color out, Color in)
+		{
+		this.canvas = canvas;
+		this.out = out;
+		this.in = in;
+		p1 = p;
+		p2 = p;
+		}
+
+	public void paint(Graphics g)
+		{
+		Rectangle r = new Rectangle(p1);
+		r.add(p2);
+		if (in != null)
+			{
+			g.setColor(in);
+			if (canvas.renderMode != RenderMode.TILED)
+				g.fillRoundRect(r.x,r.y,r.width,r.height,16,16);
+			else
+				{
+				Dimension img = canvas.getImageSize();
+				for (int dx = 0; r.x + r.width - dx >= 0; dx += img.width)
+					for (int dy = 0; r.y + r.height - dy >= 0; dy += img.height)
+						g.fillRoundRect(r.x - dx,r.y - dy,r.width,r.height,16,16);
+				}
+			}
+		if (out != null)
+			{
+			g.setColor(out);
+			if (canvas.renderMode != RenderMode.TILED)
+				g.drawRoundRect(r.x,r.y,r.width,r.height,16,16);
+			else
+				{
+				Dimension img = canvas.getImageSize();
+				for (int dx = 0; r.x + r.width - dx >= 0; dx += img.width)
+					for (int dy = 0; r.y + r.height - dy >= 0; dy += img.height)
+						g.drawRoundRect(r.x - dx,r.y - dy,r.width,r.height,16,16);
+				}
+			}
+		}
+	
+	public boolean copiesRaster()
+		{
+		return false;
+		}
+	}
 
 	public static class OvalAction implements ImageAction
 		{
@@ -455,6 +508,123 @@ public interface ImageAction
 			}
 		}
 
+	public static class PaintbrushAction implements ImageAction
+	{
+	static final int MAX_FREE_POINTS = 64;
+
+	public Canvas canvas;
+	public Color c;
+	LinkedList<Point> pts = new LinkedList<Point>();
+	BufferedImage cache;
+	int cacheX, cacheY;
+	int diameter;
+	int minX = Integer.MAX_VALUE, minY = minX, maxX = 0, maxY = 0;
+
+	public PaintbrushAction(Canvas canvas, Color c, int diam)
+		{
+		this.canvas = canvas;
+		this.c = c;
+		this.diameter = diam;
+		}
+
+	protected void toCache()
+		{
+		int newMinX = minX;
+		int newMinY = minY;
+		int w = maxX - minX + 1;
+		int h = maxY - minY + 1;
+		if (cache != null)
+			{
+			newMinX = Math.min(minX,cacheX);
+			newMinY = Math.min(minY,cacheY);
+			int newMaxX = Math.max(maxX,cache.getWidth() + cacheX);
+			int newMaxY = Math.max(maxY,cache.getHeight() + cacheY);
+
+			w = newMaxX - newMinX + 1;
+			h = newMaxY - newMinY + 1;
+			}
+
+		BufferedImage newCache = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
+		Graphics g = newCache.createGraphics();
+		paint(g,-newMinX,-newMinY);
+
+		//reset our vars
+		cache = newCache;
+		cacheX = newMinX;
+		cacheY = newMinY;
+		Point p = pts.getLast();
+		pts.clear();
+		pts.add(p);
+		minX = p.x - diameter;
+		minY = p.y - diameter;
+		maxX = p.x + diameter;
+		maxY = p.y + diameter;
+		}
+
+	public void add(Point p)
+		{
+		if (pts.add(p))
+			{
+			if (p.x < minX) minX = p.x - diameter;
+			else if (p.x > canvas.imageWidth()) minX = Math.min(minX,0);
+			if (p.y < minY) minY = p.y - diameter;
+			else if (p.y > canvas.imageHeight()) minY = Math.min(minY,0);
+			if (p.x > maxX) maxX = p.x + diameter;
+			if (p.y > maxY) maxY = p.y + diameter;
+			if (pts.size() > MAX_FREE_POINTS) toCache();
+			}
+		}
+
+	public void paint(Graphics g)
+		{
+		paint(g,0,0);
+		}
+
+	public void paint(Graphics g, int shiftX, int shiftY)
+		{
+		if (cache != null) g.drawImage(cache,cacheX + shiftX,cacheY + shiftY,null);
+		g.setColor(c);
+		Point prevPoint = pts.getFirst();
+		Graphics2D g2d = (Graphics2D) g;
+		Stroke s = g2d.getStroke();
+		//Composite cmp = g2d.getComposite();
+		g2d.setStroke(new BasicStroke(diameter,                     // Line width
+        BasicStroke.CAP_ROUND,    // End-cap style
+        BasicStroke.JOIN_ROUND));
+		// for eraser
+		//g2d.setComposite(AlphaComposite.SrcIn);
+		
+		if (canvas.renderMode != RenderMode.TILED)
+			for (Point p : pts)
+				{
+				g2d.drawLine(prevPoint.x + shiftX,prevPoint.y + shiftY,p.x + shiftX,p.y + shiftY);
+				prevPoint = p;
+				}
+		else
+			{
+			Dimension img = canvas.getImageSize();
+			for (int dx = 0; dx <= maxX + shiftX; dx += img.width)
+				for (int dy = 0; dy <= maxY + shiftY; dy += img.height)
+					{
+					for (Point p : pts)
+						{
+						g2d.drawLine(prevPoint.x + shiftX - dx,prevPoint.y + shiftY - dy,p.x + shiftX - dx,p.y
+								+ shiftY - dy);
+						prevPoint = p;
+						}
+					prevPoint = pts.getFirst();
+					}
+			}
+		//g2d.setComposite(cmp);
+		g2d.setStroke(s);
+		}
+	
+	public boolean copiesRaster()
+		{
+		return false;
+		}
+	}
+	
 	public static class FillAction implements HeavyImageAction
 		{
 		Point origin;

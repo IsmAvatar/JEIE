@@ -110,6 +110,7 @@ public class Jeie implements ActionListener
 					doClose();
 					}
 			});
+		new FramePrefsHandler(frame);
 		}
 
 	public void updateTitle()

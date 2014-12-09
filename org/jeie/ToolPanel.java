@@ -40,14 +40,7 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
 import org.jeie.Jeie.ToolDelegate;
-import org.jeie.Tool.FillTool;
-import org.jeie.Tool.LineTool;
-import org.jeie.Tool.PointTool;
-import org.jeie.Tool.RectangleTool;
-import org.jeie.Tool.OvalTool;
-import org.jeie.Tool.ColorPickerTool;
-import org.jeie.Tool.TextTool;
-import org.jeie.Tool.GradientTool;
+import org.jeie.Tool.*;
 import org.jeie.resources.Resources;
 
 public class ToolPanel extends JPanel implements ActionListener
@@ -79,9 +72,12 @@ public class ToolPanel extends JPanel implements ActionListener
 		toolGrid = new JPanel(new GridLayout(0,2));
 
 		addButton(makeToolButton("PENCIL",new PointTool()));
+		addButton(makeToolButton("PAINTBRUSH",new PaintbrushTool()));
+		//addButton(makeToolButton("ERASE",new EraseTool()));
 		defTool = addButton(makeToolButton("LINE",new LineTool()));
-		addButton(makeToolButton("RECT",new RectangleTool()));
 		addButton(makeToolButton("OVAL",new OvalTool()));
+		addButton(makeToolButton("RECT",new RectangleTool()));
+		addButton(makeToolButton("ROUNDRECT",new RoundRectangleTool()));
 		addButton(makeToolButton("COLOR_FILL",new FillTool()));
 		addButton(makeToolButton("COLOR_PICKER",new ColorPickerTool()));
 		addButton(makeToolButton("TEXT",new TextTool()));
