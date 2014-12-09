@@ -35,6 +35,7 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 import org.jeie.resources.Resources;
 
@@ -178,22 +179,27 @@ public class TransformMenu extends JMenu implements ActionListener
 
 		//	TODO: Menu Icons
 		
-		flipH = new JMenuItem("Flip Horizontally", Resources.getIcon("flip-h"));
-		flipH.addActionListener(this);
+		flipH = makeMenuItem("FLIP_HORIZONTALLY");
 		add(flipH);
 		
-		flipV = new JMenuItem("Flip Vertically", Resources.getIcon("flip-v"));
-		flipV.addActionListener(this);
+		flipV = makeMenuItem("FLIP_VERTICALLY");
 		add(flipV);
 
-		rotate = new JMenuItem("Rotate", Resources.getIcon("rotate"));
-		rotate.addActionListener(this);
+		rotate = makeMenuItem("ROTATE");
 		add(rotate);
 		
-		zoom = new JMenuItem("Zoom", Resources.getIcon("zoom-in"));
-		zoom.addActionListener(this);
+		zoom = makeMenuItem("ZOOM");
 		add(zoom);
 		}
+	
+	public JMenuItem makeMenuItem(String key) {
+		JMenuItem mi = new JMenuItem(Resources.getString("TransformMenu." + key));
+		mi.setActionCommand(key);
+		mi.addActionListener(this);
+		mi.setAccelerator(KeyStroke.getKeyStroke(Resources.getKeyboardString("TransformMenu." + key)));
+		mi.setIcon(Resources.getIconForKey("TransformMenu." + key));
+		return mi;
+	}
 
 	public void actionPerformed(ActionEvent e)
 		{
