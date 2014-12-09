@@ -379,10 +379,13 @@ public class Jeie implements ActionListener
 	public void doClose()
 		{
 		if (!hasChanged()) System.exit(0);
-		int c = JOptionPane.showConfirmDialog(frame,"Would you like to save your changes before closing?");
+		int c = JOptionPane.showConfirmDialog(frame,
+				Resources.getString("Jeie.UNSAVED_MESSAGE"),
+				Resources.getString("Jeie.UNSAVED_TITLE"),
+				JOptionPane.YES_NO_CANCEL_OPTION);
 		if (c == JOptionPane.CANCEL_OPTION) return;
-		if (c == JOptionPane.OK_OPTION) doSave(false);
-		System.exit(0);
+		if (c == JOptionPane.YES_OPTION) doSave(false);
+		if (c == JOptionPane.NO_OPTION) System.exit(0);
 		}
 
 	/**

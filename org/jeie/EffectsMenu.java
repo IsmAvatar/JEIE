@@ -44,6 +44,7 @@ import java.awt.image.RescaleOp;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 import org.jeie.resources.Resources;
 
@@ -226,37 +227,41 @@ public class EffectsMenu extends JMenu implements ActionListener
 
 	public EffectsMenu(Jeie jeie)
 		{
-		super("Effects");
+		super(Resources.getString("EffectsMenu.EFFECTS"));
 		this.jeie = jeie;
 
 		//	TODO: Menu Icons
 
-		blur = new JMenuItem("Blur", Resources.getIcon("blur"));
-		blur.addActionListener(this);
+		blur = makeMenuItem("BLUR");
 		add(blur);
 		
-		saturation = new JMenuItem("Saturation", Resources.getIcon("saturation"));
-		saturation.addActionListener(this);
+		saturation = makeMenuItem("SATURATION");
 		add(saturation);
 
-		value = new JMenuItem("Value", Resources.getIcon("value"));
-		value.addActionListener(this);
+		value = makeMenuItem("VALUE");
 		add(value);
 
-		invert = new JMenuItem("Invert", Resources.getIcon("invert"));
-		invert.addActionListener(this);
+		invert = makeMenuItem("INVERT");
 		add(invert);
 
-		fade = new JMenuItem("Fade to Black", Resources.getIcon("fade"));
-		fade.addActionListener(this);
+		fade = makeMenuItem("FADE");
 		add(fade);
 
 		addSeparator();
 
-		colorize = new JMenuItem("Colorize", Resources.getIcon("colorize"));
+		colorize = makeMenuItem("COLORIZE");
 		colorize.setEnabled(false);
 		add(colorize);
 		}
+	
+	public JMenuItem makeMenuItem(String key) {
+		JMenuItem mi = new JMenuItem(Resources.getString("EffectsMenu." + key));
+		mi.setActionCommand(key);
+		mi.addActionListener(this);
+		mi.setAccelerator(KeyStroke.getKeyStroke(Resources.getKeyboardString("EffectsMenu." + key)));
+		mi.setIcon(Resources.getIconForKey("EffectsMenu." + key));
+		return mi;
+	}
 
 	public void actionPerformed(ActionEvent e)
 		{
