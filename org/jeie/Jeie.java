@@ -384,7 +384,7 @@ public class Jeie implements ActionListener
 				Resources.getString("Jeie.UNSAVED_TITLE"),
 				JOptionPane.YES_NO_CANCEL_OPTION);
 		if (c == JOptionPane.CANCEL_OPTION) return;
-		if (c == JOptionPane.YES_OPTION) doSave(false);
+		if (c == JOptionPane.YES_OPTION) if (doSave(false)) { System.exit(0); }
 		if (c == JOptionPane.NO_OPTION) System.exit(0);
 		}
 
@@ -396,9 +396,12 @@ public class Jeie implements ActionListener
 		if (hasChanged())
 			{
 			int c = JOptionPane.showConfirmDialog(frame,
-					"Image has been modified. Would you like to save first?");
+					Resources.getString("Jeie.UNSAVED_MESSAGE"),
+					Resources.getString("Jeie.UNSAVED_TITLE"),
+					JOptionPane.YES_NO_CANCEL_OPTION);
 			if (c == JOptionPane.CANCEL_OPTION) return false;
-			if (c == JOptionPane.OK_OPTION) doSave(false);
+			if (c == JOptionPane.YES_OPTION) return doSave(false);
+			if (c == JOptionPane.NO_OPTION) return true;
 			}
 		return true;
 		}

@@ -174,7 +174,7 @@ public class TransformMenu extends JMenu implements ActionListener
 
 	public TransformMenu(Jeie jeie)
 		{
-		super("Transform");
+		super(Resources.getString("TransformMenu.TRANSFORM"));
 		this.jeie = jeie;
 
 		//	TODO: Menu Icons
