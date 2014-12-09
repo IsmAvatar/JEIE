@@ -43,6 +43,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.jeie.resources.Resources;
+
 public class IntegerDialog
 	{
 	public static Integer getInteger(String text, int min, int max, int def, int tickSpacing)
@@ -50,7 +52,7 @@ public class IntegerDialog
 		final Integer[] values = new Integer[1];
 		values[0] = def;
 
-		final JDialog d = new JDialog((JFrame) null,"Input");
+		final JDialog d = new JDialog((JFrame) null,Resources.getString("IntegerDialog.INPUT"));
 		d.setModal(true);
 		d.setLayout(new BorderLayout(12,12));
 		d.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -105,7 +107,7 @@ public class IntegerDialog
 
 		Box box2 = Box.createHorizontalBox();
 		box2.add(Box.createHorizontalGlue());
-		JButton ok = new JButton("OK");
+		JButton ok = new JButton(Resources.getString("IntegerDialog.OK"));
 		ok.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -115,7 +117,7 @@ public class IntegerDialog
 			});
 		box2.add(ok);
 		box2.add(Box.createHorizontalStrut(6));
-		JButton cancel = new JButton("Cancel");
+		JButton cancel = new JButton(Resources.getString("IntegerDialog.CANCEL"));
 		cancel.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)

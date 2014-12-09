@@ -54,6 +54,7 @@ import org.jeie.OptionComponent.FillOptions.FillType;
 import org.jeie.OptionComponent.GradientOptions;
 import org.jeie.OptionComponent.SizeOptions;
 import org.jeie.OptionComponent.TextOptions;
+import org.jeie.resources.Resources;
 
 public interface Tool
 	{
@@ -635,7 +636,7 @@ public interface Tool
 			}
 			else cp = e.getPoint();
 			
-			String text = JOptionPane.showInputDialog("Text");
+			String text = JOptionPane.showInputDialog(Resources.getString("TextTool.TEXT"));
 			
 			if (text == null)
 				return;

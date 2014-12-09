@@ -199,13 +199,13 @@ public class TransformMenu extends JMenu implements ActionListener
 		String act = e.getActionCommand();
 		if (act.equals("ROTATE"))
 			{
-			Integer integer = IntegerDialog.getInteger("Rotation",0,360,0,60);
+			Integer integer = IntegerDialog.getInteger(Resources.getString("TransformMenu.ROTATION"),0,360,0,60);
 			if (integer != null) applyAction(new Rotate(integer));
 			return;
 			}
 		if (act.equalsIgnoreCase("ZOOM"))
 			{
-			Integer integer = IntegerDialog.getInteger("Zoom (%)",0,400,100,100);
+			Integer integer = IntegerDialog.getInteger(Resources.getString("TransformMenu.ZOOM_PERCENT"),0,400,100,100);
 			if (integer != null) applyAction(new Zoom(integer));
 			return;
 			}

@@ -42,6 +42,8 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.border.BevelBorder;
 
+import org.jeie.resources.Resources;
+
 public class Palette extends JPanel implements MouseListener
 	{
 	private static final long serialVersionUID = 1L;
@@ -167,7 +169,7 @@ public class Palette extends JPanel implements MouseListener
 				{
 				if (e.getClickCount() == 2)
 					{
-					Color newcol = JColorChooser.showDialog(getParent(),"Select Color",selectedColor);
+					Color newcol = JColorChooser.showDialog(getParent(),Resources.getString("Palette.SELECT_COLOR"),selectedColor);
 					if (newcol != null) setBackground(selectedColor = newcol);
 					}
 				else
@@ -218,13 +220,13 @@ public class Palette extends JPanel implements MouseListener
 			
 			if (lRect.contains(e.getPoint()))
 				{
-				Color c = JColorChooser.showDialog(null,"Left Color",left);
+				Color c = JColorChooser.showDialog(null,Resources.getString("Palette.LEFT_COLOR"),left);
 				if (c != null)
 					setLeft(c);
 				}
 			else if (rRect.contains(e.getPoint()))
 				{
-				Color c = JColorChooser.showDialog(null,"Right Color",right);
+				Color c = JColorChooser.showDialog(null,Resources.getString("Palette.RIGHT_COLOR"),right);
 				if (c != null)
 					setRight(c);
 				}

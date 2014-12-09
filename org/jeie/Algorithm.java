@@ -72,7 +72,7 @@ public class Algorithm
 					|| start.y >= source.getHeight())
 				{
 				if (c.renderMode != RenderMode.TILED) return;
-				System.out.print("what\n");
+				System.out.print("out of bounds\n");
 				start = new Point((start.x + source.getWidth()) % source.getWidth(),
 						(start.y + source.getHeight()) % source.getHeight());
 				}

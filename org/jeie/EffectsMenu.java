@@ -259,19 +259,19 @@ public class EffectsMenu extends JMenu implements ActionListener
 		String act = e.getActionCommand();
 		if (act.equals("BLUR"))
 			{
-			Integer integer = IntegerDialog.getInteger("Blur amount (1-9)",1,9,3,3);
+			Integer integer = IntegerDialog.getInteger(Resources.getString("EffectsMenu.BLUR_AMOUNT"),1,9,3,3);
 			if (integer != null) applyAction(new Blur(integer));
 			return;
 			}
 		if (act.equals("SATURATION"))
 			{
-			Integer integer = IntegerDialog.getInteger("Saturation",0,200,100,50);
+			Integer integer = IntegerDialog.getInteger(Resources.getString("EffectsMenu.SATURATION_AMOUNT"),0,200,100,50);
 			if (integer != null) applyAction(new Saturation(integer));
 			return;
 			}
 		if (act.equalsIgnoreCase("VALUE"))
 			{
-			Integer integer = IntegerDialog.getInteger("Value",-10,10,0,5);
+			Integer integer = IntegerDialog.getInteger(Resources.getString("EffectsMenu.VALUE_AMOUNT"),-10,10,0,5);
 			if (integer != null) applyAction(new Value((integer + 10) / 10.0f));
 			return;
 			}
@@ -282,7 +282,7 @@ public class EffectsMenu extends JMenu implements ActionListener
 			}
 		if (act.equals("FADE"))
 			{
-			Integer integer = IntegerDialog.getInteger("Fade amount (0-256)",0,256,128,64);
+			Integer integer = IntegerDialog.getInteger(Resources.getString("EffectsMenu.FADE_AMOUNT"),0,256,128,64);
 			if (integer != null) applyAction(new Fade(Color.BLACK,((float) integer) / 256.0f));
 			return;
 			}
