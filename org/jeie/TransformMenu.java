@@ -5,6 +5,7 @@
 * @section License
 *
 * Copyright (C) 2013 jimn346 <jds9496@gmail.com>
+* Copyright (C) 2014 Robert B. Colton
 * 
 * This file is a part of JEIE.
 *

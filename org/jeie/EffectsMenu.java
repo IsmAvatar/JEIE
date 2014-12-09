@@ -7,6 +7,7 @@
 * Copyright (C) 2009, 2012 IsmAvatar <IsmAvatar@gmail.com>
 * Copyright (C) 2009 Serge Humphrey <bob@bobtheblueberry.com>
 * Copyright (C) 2013 jimn346 <jds9496@gmail.com>
+* Copyright (C) 2014 Robert B. Colton
 * 
 * This file is a part of JEIE.
 *

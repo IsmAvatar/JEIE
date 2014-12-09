@@ -5,6 +5,7 @@
 * @section License
 *
 * Copyright (C) 2012 IsmAvatar <IsmAvatar@gmail.com>
+* Copyright (C) 2014 Robert B. Colton
 * 
 * This file is a part of JEIE.
 *
@@ -58,6 +59,15 @@ public class ToolPanel extends JPanel implements ActionListener
 	protected JPanel toolOptions = new JPanel();
 
 	AbstractButton defTool;
+	
+	public ToolButton makeToolButton(String key, Tool t) {
+		ToolButton tb = new ToolButton(Resources.getString("ToolPanel." + key), t);
+		tb.setActionCommand(key);
+		tb.addActionListener(this);
+		//tb.setAccelerator(KeyStroke.getKeyStroke(Resources.getKeyboardString("TransformMenu." + key)));
+		tb.setIcon(Resources.getIconForKey("ToolPanel." + key));
+		return tb;
+	}
 
 	public ToolPanel(ToolDelegate del)
 		{
@@ -68,22 +78,14 @@ public class ToolPanel extends JPanel implements ActionListener
 
 		toolGrid = new JPanel(new GridLayout(0,2));
 
-		addButton(new ToolButton(Resources.getIcon("pencil"),"Pencil - draws freehand strokes",
-				new PointTool()));
-		defTool = addButton(new ToolButton(Resources.getIcon("line"),"Line - draws a straight line",
-				new LineTool()));
-		addButton(new ToolButton(Resources.getIcon("rect"),"Rect - draws a rectangle",
-				new RectangleTool()));
-		addButton(new ToolButton(Resources.getIcon("oval"),"Oval - draws an oval",
-				new OvalTool()));
-		addButton(new ToolButton(Resources.getIcon("color-fill"),"Fill - flood-fills a region",
-				new FillTool()));
-		addButton(new ToolButton(Resources.getIcon("color-picker"),"Color Picker - get the color at a point",
-				new ColorPickerTool()));
-		addButton(new ToolButton(Resources.getIcon("text"),"Text - Draw text",
-				new TextTool()));
-		addButton(new ToolButton(Resources.getIcon("gradient-linear"),"Gradient - draw gradients",
-				new GradientTool()));
+		addButton(makeToolButton("PENCIL",new PointTool()));
+		defTool = addButton(makeToolButton("LINE",new LineTool()));
+		addButton(makeToolButton("RECT",new RectangleTool()));
+		addButton(makeToolButton("OVAL",new OvalTool()));
+		addButton(makeToolButton("COLOR_FILL",new FillTool()));
+		addButton(makeToolButton("COLOR_PICKER",new ColorPickerTool()));
+		addButton(makeToolButton("TEXT",new TextTool()));
+		addButton(makeToolButton("GRADIENT_LINEAR",new GradientTool()));
 
 		toolOptions.setBorder(BorderFactory.createLoweredBevelBorder());
 		toolOptions.setMaximumSize(toolGrid.getPreferredSize());
@@ -112,7 +114,17 @@ public class ToolPanel extends JPanel implements ActionListener
 		private static final long serialVersionUID = 1L;
 
 		public final Tool tool;
+		
+		public ToolButton(String tip, Tool t)
+			{
+			this(null,tip,t);
+			}
 
+		public ToolButton(Tool t)
+			{
+			this(null,null,t);
+			}
+		
 		public ToolButton(ImageIcon ico, Tool t)
 			{
 			this(ico,null,t);
