@@ -68,20 +68,17 @@ public final class Resources
 			}
 		}
 	
-	public static ImageIcon getIconForKey(String key)
+	public static ImageIcon getIconForKey(String group, String key)
 		{
-		String location = "org/jeie/icons/actions/" + IMAGE_BUNDLE.getString(key) + ".png";
+		String location = "org/jeie/icons/" + group + "/" + IMAGE_BUNDLE.getString(key) + ".png";
 		URL url = Jeie.class.getClassLoader().getResource(location);
 		if (url == null) return new ImageIcon(location);
 		return new ImageIcon(url);
 		}
 	
-	public static ImageIcon getIcon(String name)
+	public static ImageIcon getIconForKey(String key)
 		{
-		String location = "org/jeie/icons/actions/" + name + ".png";
-		URL url = Jeie.class.getClassLoader().getResource(location);
-		if (url == null) return new ImageIcon(location);
-		return new ImageIcon(url);
+			return getIconForKey("actions",key);
 		}
 	
 	}

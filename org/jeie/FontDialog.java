@@ -143,7 +143,7 @@ public class FontDialog
 		
 		String[] fontNames = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
 		
-		d = new JDialog((JFrame) null,"Font");
+		d = new JDialog((JFrame) null,Resources.getString("FontDialog.TITLE"));
 		d.setModal(true);
 		d.setLayout(new BorderLayout());
 		d.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -162,13 +162,13 @@ public class FontDialog
 		JPanel topPanel = new JPanel();
 		topPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 		
-		topPanel.add(new JLabel("Font"));
+		topPanel.add(new JLabel(Resources.getString("FontDialog.FONT")));
 		fonts = new JComboBox<String>(fontNames);
 		fonts.setSelectedItem(font.getName());
 		fonts.addActionListener(action);
 		topPanel.add(fonts);
 
-		topPanel.add(new JLabel("Size"));
+		topPanel.add(new JLabel(Resources.getString("FontDialog.SIZE")));
 		size = new JSpinner(new SpinnerNumberModel(font.getSize(),1,2000,1));
 		size.addChangeListener(change);
 		topPanel.add(size);
@@ -177,18 +177,18 @@ public class FontDialog
 		
 		JPanel stylePanel = new JPanel();
 		stylePanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-		bold = new JToggleButton(Resources.getIcon("text-bold"));
+		bold = new JToggleButton(Resources.getIconForKey("FontDialog.BOLD"));
 		bold.addActionListener(action);
 		stylePanel.add(bold);
-		italic = new JToggleButton(Resources.getIcon("text-italic"));
+		italic = new JToggleButton(Resources.getIconForKey("FontDialog.ITALIC"));
 		italic.addActionListener(action);
 		stylePanel.add(italic);
-		underlined = new JToggleButton(Resources.getIcon("text-underlined"));
+		underlined = new JToggleButton(Resources.getIconForKey("FontDialog.UNDERLINED"));
 		underlined.addActionListener(action);
 		stylePanel.add(underlined);
 		
 		gridPanel.add(stylePanel);
-		gridPanel.add(new JLabel("Preview"));
+		gridPanel.add(new JLabel(Resources.getString("FontDialog.PREVIEW")));
 		d.add(gridPanel, BorderLayout.NORTH);
 		
 		preview = new JTextArea();
@@ -199,9 +199,9 @@ public class FontDialog
 		
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-		bottomPanel.add(okButton = new JButton("OK"));
+		bottomPanel.add(okButton = new JButton(Resources.getString("FontDialog.OK")));
 		okButton.addActionListener(action);
-		bottomPanel.add(cancelButton = new JButton("Cancel"));
+		bottomPanel.add(cancelButton = new JButton(Resources.getString("FontDialog.CANCEL")));
 		cancelButton.addActionListener(action);
 		d.add(bottomPanel, BorderLayout.SOUTH);
 
