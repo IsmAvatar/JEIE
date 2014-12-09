@@ -38,7 +38,6 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
@@ -59,6 +58,7 @@ import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
 import org.jeie.Canvas.RenderMode;
+import org.jeie.resources.Resources;
 
 public class Jeie implements ActionListener
 	{
@@ -122,15 +122,15 @@ public class Jeie implements ActionListener
 		menuBar = new JMenuBar();
 		JMenu fm = new JMenu("File");
 		menuBar.add(fm);
-		addMenuItem(fm,"New",getIcon("new")).setAccelerator(KeyStroke.getKeyStroke("control N"));
-		addMenuItem(fm,"Open",getIcon("open")).setAccelerator(KeyStroke.getKeyStroke("control O"));
-		addMenuItem(fm,"Save",getIcon("save")).setAccelerator(KeyStroke.getKeyStroke("control S"));
-		addMenuItem(fm,"Save As",getIcon("save-as")).setAccelerator(KeyStroke.getKeyStroke("control shift S"));
-		addMenuItem(fm,"Exit",getIcon("cancel")).setAccelerator(KeyStroke.getKeyStroke("alt F4"));
+		addMenuItem(fm,"New",Resources.getIcon("new")).setAccelerator(KeyStroke.getKeyStroke("control N"));
+		addMenuItem(fm,"Open",Resources.getIcon("open")).setAccelerator(KeyStroke.getKeyStroke("control O"));
+		addMenuItem(fm,"Save",Resources.getIcon("save")).setAccelerator(KeyStroke.getKeyStroke("control S"));
+		addMenuItem(fm,"Save As",Resources.getIcon("save-as")).setAccelerator(KeyStroke.getKeyStroke("control shift S"));
+		addMenuItem(fm,"Exit",Resources.getIcon("cancel")).setAccelerator(KeyStroke.getKeyStroke("alt F4"));
 
 		JMenu vm = new JMenu("View");
 		menuBar.add(vm);
-		addMenuItem(vm,"Tiled",getIcon("grid"));
+		addMenuItem(vm,"Tiled",Resources.getIcon("grid"));
 
 		menuBar.add(new TransformMenu(this));
 		menuBar.add(new EffectsMenu(this));
@@ -151,23 +151,23 @@ public class Jeie implements ActionListener
 		toolBar = new JToolBar();
 		toolBar.setFloatable(false);
 
-		addButton(toolBar,new JButton(getIcon("new"))).setActionCommand("New");
-		addButton(toolBar,new JButton(getIcon("open"))).setActionCommand("Open");
-		addButton(toolBar,new JButton(getIcon("save"))).setActionCommand("Save");
+		addButton(toolBar,new JButton(Resources.getIcon("new"))).setActionCommand("New");
+		addButton(toolBar,new JButton(Resources.getIcon("open"))).setActionCommand("Open");
+		addButton(toolBar,new JButton(Resources.getIcon("save"))).setActionCommand("Save");
 		
 		toolBar.addSeparator();
 		
-		bUndo = addButton(toolBar,new JButton(getIcon("undo")));
-		bRedo = addButton(toolBar,new JButton(getIcon("redo")));
+		bUndo = addButton(toolBar,new JButton(Resources.getIcon("undo")));
+		bRedo = addButton(toolBar,new JButton(Resources.getIcon("redo")));
 		
 		toolBar.addSeparator();
 		
-		bZoomOut = addButton(toolBar,new JButton(getIcon("zoom-out")));
-		bZoomIn = addButton(toolBar,new JButton(getIcon("zoom-in")));
+		bZoomOut = addButton(toolBar,new JButton(Resources.getIcon("zoom-out")));
+		bZoomIn = addButton(toolBar,new JButton(Resources.getIcon("zoom-in")));
 		
 		toolBar.addSeparator();
 		
-		bGrid = addButton(toolBar,new JToggleButton(getIcon("grid")));
+		bGrid = addButton(toolBar,new JToggleButton(Resources.getIcon("grid")));
 
 		return toolBar;
 		}
@@ -179,13 +179,7 @@ public class Jeie implements ActionListener
 		return b;
 		}
 
-	public static ImageIcon getIcon(String name)
-		{
-		String location = "org/jeie/icons/actions/" + name + ".png";
-		URL url = Jeie.class.getClassLoader().getResource(location);
-		if (url == null) return new ImageIcon(location);
-		return new ImageIcon(url);
-		}
+
 
 	protected class ToolDelegate extends MouseAdapter
 		{

@@ -29,7 +29,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
 import java.awt.font.TextAttribute;
 import java.util.Hashtable;
 
@@ -45,6 +44,8 @@ import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import org.jeie.resources.Resources;
 
 public class FontDialog
 	{
@@ -170,13 +171,13 @@ public class FontDialog
 		
 		JPanel stylePanel = new JPanel();
 		stylePanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-		bold = new JToggleButton(Jeie.getIcon("text-bold"));
+		bold = new JToggleButton(Resources.getIcon("text-bold"));
 		bold.addActionListener(action);
 		stylePanel.add(bold);
-		italic = new JToggleButton(Jeie.getIcon("text-italic"));
+		italic = new JToggleButton(Resources.getIcon("text-italic"));
 		italic.addActionListener(action);
 		stylePanel.add(italic);
-		underlined = new JToggleButton(Jeie.getIcon("text-underlined"));
+		underlined = new JToggleButton(Resources.getIcon("text-underlined"));
 		underlined.addActionListener(action);
 		stylePanel.add(underlined);
 		

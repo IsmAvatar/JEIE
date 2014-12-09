@@ -30,6 +30,8 @@ import java.awt.image.BufferedImage;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import org.jeie.resources.Resources;
+
 public class TransformMenu extends JMenu implements ActionListener
 	{
 	/**
@@ -170,19 +172,19 @@ public class TransformMenu extends JMenu implements ActionListener
 
 		//	TODO: Menu Icons
 		
-		flipH = new JMenuItem("Flip Horizontally", Jeie.getIcon("flip-h"));
+		flipH = new JMenuItem("Flip Horizontally", Resources.getIcon("flip-h"));
 		flipH.addActionListener(this);
 		add(flipH);
 		
-		flipV = new JMenuItem("Flip Vertically", Jeie.getIcon("flip-v"));
+		flipV = new JMenuItem("Flip Vertically", Resources.getIcon("flip-v"));
 		flipV.addActionListener(this);
 		add(flipV);
 
-		rotate = new JMenuItem("Rotate", Jeie.getIcon("rotate"));
+		rotate = new JMenuItem("Rotate", Resources.getIcon("rotate"));
 		rotate.addActionListener(this);
 		add(rotate);
 		
-		zoom = new JMenuItem("Zoom", Jeie.getIcon("zoom-in"));
+		zoom = new JMenuItem("Zoom", Resources.getIcon("zoom-in"));
 		zoom.addActionListener(this);
 		add(zoom);
 		}

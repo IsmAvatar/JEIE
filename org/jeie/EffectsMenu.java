@@ -40,6 +40,8 @@ import java.awt.image.RescaleOp;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import org.jeie.resources.Resources;
+
 public class EffectsMenu extends JMenu implements ActionListener
 	{
 	private static final long serialVersionUID = 1L;
@@ -224,29 +226,29 @@ public class EffectsMenu extends JMenu implements ActionListener
 
 		//	TODO: Menu Icons
 
-		blur = new JMenuItem("Blur", Jeie.getIcon("blur"));
+		blur = new JMenuItem("Blur", Resources.getIcon("blur"));
 		blur.addActionListener(this);
 		add(blur);
 		
-		saturation = new JMenuItem("Saturation", Jeie.getIcon("saturation"));
+		saturation = new JMenuItem("Saturation", Resources.getIcon("saturation"));
 		saturation.addActionListener(this);
 		add(saturation);
 
-		value = new JMenuItem("Value", Jeie.getIcon("value"));
+		value = new JMenuItem("Value", Resources.getIcon("value"));
 		value.addActionListener(this);
 		add(value);
 
-		invert = new JMenuItem("Invert", Jeie.getIcon("invert"));
+		invert = new JMenuItem("Invert", Resources.getIcon("invert"));
 		invert.addActionListener(this);
 		add(invert);
 
-		fade = new JMenuItem("Fade to Black", Jeie.getIcon("fade"));
+		fade = new JMenuItem("Fade to Black", Resources.getIcon("fade"));
 		fade.addActionListener(this);
 		add(fade);
 
 		addSeparator();
 
-		colorize = new JMenuItem("Colorize", Jeie.getIcon("colorize"));
+		colorize = new JMenuItem("Colorize", Resources.getIcon("colorize"));
 		colorize.setEnabled(false);
 		add(colorize);
 		}

@@ -31,6 +31,7 @@ import org.jeie.Tool.OvalTool;
 import org.jeie.Tool.ColorPickerTool;
 import org.jeie.Tool.TextTool;
 import org.jeie.Tool.GradientTool;
+import org.jeie.resources.Resources;
 
 public class ToolPanel extends JPanel implements ActionListener
 	{
@@ -51,21 +52,21 @@ public class ToolPanel extends JPanel implements ActionListener
 
 		toolGrid = new JPanel(new GridLayout(0,2));
 
-		addButton(new ToolButton(Jeie.getIcon("pencil"),"Pencil - draws freehand strokes",
+		addButton(new ToolButton(Resources.getIcon("pencil"),"Pencil - draws freehand strokes",
 				new PointTool()));
-		defTool = addButton(new ToolButton(Jeie.getIcon("line"),"Line - draws a straight line",
+		defTool = addButton(new ToolButton(Resources.getIcon("line"),"Line - draws a straight line",
 				new LineTool()));
-		addButton(new ToolButton(Jeie.getIcon("rect"),"Rect - draws a rectangle",
+		addButton(new ToolButton(Resources.getIcon("rect"),"Rect - draws a rectangle",
 				new RectangleTool()));
-		addButton(new ToolButton(Jeie.getIcon("oval"),"Oval - draws an oval",
+		addButton(new ToolButton(Resources.getIcon("oval"),"Oval - draws an oval",
 				new OvalTool()));
-		addButton(new ToolButton(Jeie.getIcon("color-fill"),"Fill - flood-fills a region",
+		addButton(new ToolButton(Resources.getIcon("color-fill"),"Fill - flood-fills a region",
 				new FillTool()));
-		addButton(new ToolButton(Jeie.getIcon("color-picker"),"Color Picker - get the color at a point",
+		addButton(new ToolButton(Resources.getIcon("color-picker"),"Color Picker - get the color at a point",
 				new ColorPickerTool()));
-		addButton(new ToolButton(Jeie.getIcon("text"),"Text - Draw text",
+		addButton(new ToolButton(Resources.getIcon("text"),"Text - Draw text",
 				new TextTool()));
-		addButton(new ToolButton(Jeie.getIcon("gradient-linear"),"Gradient - draw gradients",
+		addButton(new ToolButton(Resources.getIcon("gradient-linear"),"Gradient - draw gradients",
 				new GradientTool()));
 
 		toolOptions.setBorder(BorderFactory.createLoweredBevelBorder());

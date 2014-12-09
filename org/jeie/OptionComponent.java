@@ -42,6 +42,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.jeie.resources.Resources;
+
 public class OptionComponent
 	{
 	/**
@@ -134,7 +136,7 @@ public class OptionComponent
 
 		public GradientOptions()
 			{
-			super(new ImageIcon[] { Jeie.getIcon("gradient-linear"), getBrushIcon("gradient-mirrored"),
+			super(new ImageIcon[] { Resources.getIcon("gradient-linear"), getBrushIcon("gradient-mirrored"),
 				getBrushIcon("gradient-radial"), getBrushIcon("gradient-conical"), getBrushIcon("gradient-square")	});
 			setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			setSelectedIndex(0);
