@@ -144,7 +144,7 @@ public class Jeie implements ActionListener
 		addMenuItem(vm,"ZOOM_OUT");
 		vm.addSeparator();
 		addMenuItem(vm,"TILED");
-		addMenuItem(vm,"GRID");
+		addMenuItem(vm,"GRID").setActionCommand("GRID_MENU");
 
 		menuBar.add(new TransformMenu(this));
 		menuBar.add(new EffectsMenu(this));
@@ -183,6 +183,7 @@ public class Jeie implements ActionListener
 		toolBar.addSeparator();
 		
 		bGrid = addButton(toolBar,new JToggleButton(),"GRID");
+		bGrid.setSelected(canvas.isGridDrawn);
 
 		return toolBar;
 		}
@@ -350,6 +351,13 @@ public class Jeie implements ActionListener
 			}
 		if (act.equals("GRID"))
 			{
+			canvas.isGridDrawn = bGrid.isSelected();
+			canvas.repaint();
+			return;
+			}
+		if (act.equals("GRID_MENU"))
+			{
+			bGrid.setSelected(!bGrid.isSelected());
 			canvas.isGridDrawn = bGrid.isSelected();
 			canvas.repaint();
 			return;
