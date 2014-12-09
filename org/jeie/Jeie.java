@@ -173,7 +173,7 @@ public class Jeie implements ActionListener
 		
 		toolBar.addSeparator();
 		
-		bGrid = addButton(toolBar,new JToggleButton(),"TILED");
+		bGrid = addButton(toolBar,new JToggleButton(),"GRID");
 
 		return toolBar;
 		}
@@ -280,7 +280,18 @@ public class Jeie implements ActionListener
 
 	public void actionPerformed(ActionEvent e)
 		{
-		if (e.getSource() == bUndo)
+		String act = e.getActionCommand();
+		if (act.equals("ZOOM_IN"))
+			{
+			canvas.zoomIn();
+			return;
+			}
+		if (act.equals("ZOOM_OUT"))
+			{
+			canvas.zoomOut();
+			return;
+			}
+		if (act.equals("UNDO"))
 			{
 			if (!canvas.acts.isEmpty())
 				{
@@ -289,7 +300,7 @@ public class Jeie implements ActionListener
 				}
 			return;
 			}
-		if (e.getSource() == bRedo)
+		if (act.equals("REDO"))
 			{
 			if (!canvas.redoActs.isEmpty())
 				{
@@ -298,53 +309,42 @@ public class Jeie implements ActionListener
 				}
 			return;
 			}
-		if (e.getSource() == bGrid)
-			{
-			canvas.isGridDrawn = bGrid.isSelected();
-			canvas.repaint();
-			return;
-			}
-		if (e.getSource() == bZoomIn)
-			{
-			canvas.zoomIn();
-			return;
-			}
-		if (e.getSource() == bZoomOut)
-			{
-			canvas.zoomOut();
-			return;
-			}
-		String act = e.getActionCommand();
-		if (act.equals("New"))
+		if (act.equals("NEW"))
 			{
 			doNew();
 			return;
 			}
-		if (act.equals("Open"))
+		if (act.equals("OPEN"))
 			{
 			doOpen();
 			return;
 			}
-		if (act.equals("Save"))
+		if (act.equals("SAVE"))
 			{
 			doSave(false);
 			return;
 			}
-		if (act.equals("Save As"))
+		if (act.equals("SAVE_AS"))
 			{
 			doSave(true);
 			return;
 			}
-		if (act.equals("Exit"))
+		if (act.equals("EXIT"))
 			{
 			doClose();
 			return;
 			}
-		if (act.equals("Tiled"))
+		if (act.equals("TILED"))
 			{
 			canvas.renderMode = (canvas.renderMode != RenderMode.TILED) ? RenderMode.TILED
 					: RenderMode.NORMAL;
 			canvas.repaint();
+			}
+		if (act.equals("GRID"))
+			{
+			canvas.isGridDrawn = bGrid.isSelected();
+			canvas.repaint();
+			return;
 			}
 		}
 
