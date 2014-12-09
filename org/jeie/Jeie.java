@@ -157,31 +157,34 @@ public class Jeie implements ActionListener
 		toolBar = new JToolBar();
 		toolBar.setFloatable(false);
 
-		addButton(toolBar,new JButton(Resources.getIcon("new"))).setActionCommand("New");
-		addButton(toolBar,new JButton(Resources.getIcon("open"))).setActionCommand("Open");
-		addButton(toolBar,new JButton(Resources.getIcon("save"))).setActionCommand("Save");
+		addButton(toolBar,new JButton(),"NEW");
+		addButton(toolBar,new JButton(),"OPEN");
+		addButton(toolBar,new JButton(),"SAVE");
 		
 		toolBar.addSeparator();
 		
-		bUndo = addButton(toolBar,new JButton(Resources.getIcon("undo")));
-		bRedo = addButton(toolBar,new JButton(Resources.getIcon("redo")));
+		bUndo = addButton(toolBar,new JButton(),"UNDO");
+		bRedo = addButton(toolBar,new JButton(),"REDO");
 		
 		toolBar.addSeparator();
 		
-		bZoomOut = addButton(toolBar,new JButton(Resources.getIcon("zoom-out")));
-		bZoomIn = addButton(toolBar,new JButton(Resources.getIcon("zoom-in")));
+		bZoomOut = addButton(toolBar,new JButton(),"ZOOM_OUT");
+		bZoomIn = addButton(toolBar,new JButton(),"ZOOM_IN");
 		
 		toolBar.addSeparator();
 		
-		bGrid = addButton(toolBar,new JToggleButton(Resources.getIcon("grid")));
+		bGrid = addButton(toolBar,new JToggleButton(),"TILED");
 
 		return toolBar;
 		}
 
-	public <K extends AbstractButton>K addButton(Container c, K b)
+	public <K extends AbstractButton>K addButton(Container c, K b, String key)
 		{
 		c.add(b);
+		b.setActionCommand(key);
 		b.addActionListener(this);
+		b.setIcon(Resources.getIconForKey("Jeie." + key));
+		b.setToolTipText(Resources.getString("Jeie." + key));
 		return b;
 		}
 
