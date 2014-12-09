@@ -37,10 +37,12 @@ public final class Resources
 
 	private static final String LANGUAGE_BUNDLE_NAME = "org.jeie.resources.messages"; //$NON-NLS-1$
 	private static final String INPUT_BUNDLE_NAME = "org.jeie.resources.keyboard"; //$NON-NLS-1$
+	private static final String IMAGE_BUNDLE_NAME = "org.jeie.resources.icons"; //$NON-NLS-1$
 	
 	// NOTE: See comments about locale below.
 	private static ResourceBundle LANGUAGE_BUNDLE = ResourceBundle.getBundle(LANGUAGE_BUNDLE_NAME);
 	private static ResourceBundle KEYBOARD_BUNDLE = ResourceBundle.getBundle(INPUT_BUNDLE_NAME);
+	private static ResourceBundle IMAGE_BUNDLE = ResourceBundle.getBundle(IMAGE_BUNDLE_NAME);
 	
 	public static String getString(String key)
 		{
@@ -64,6 +66,14 @@ public final class Resources
 			{
 			return '!' + key + '!';
 			}
+		}
+	
+	public static ImageIcon getIconForKey(String key)
+		{
+		String location = "org/jeie/icons/actions/" + IMAGE_BUNDLE.getString(key) + ".png";
+		URL url = Jeie.class.getClassLoader().getResource(location);
+		if (url == null) return new ImageIcon(location);
+		return new ImageIcon(url);
 		}
 	
 	public static ImageIcon getIcon(String name)

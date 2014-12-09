@@ -125,27 +125,28 @@ public class Jeie implements ActionListener
 	public JMenuBar makeMenuBar()
 		{
 		menuBar = new JMenuBar();
-		JMenu fm = new JMenu("File");
+		JMenu fm = new JMenu(Resources.getString("Jeie.FILE"));
 		menuBar.add(fm);
-		addMenuItem(fm,"New",Resources.getIcon("new")).setAccelerator(KeyStroke.getKeyStroke("control N"));
-		addMenuItem(fm,"Open",Resources.getIcon("open")).setAccelerator(KeyStroke.getKeyStroke("control O"));
-		addMenuItem(fm,"Save",Resources.getIcon("save")).setAccelerator(KeyStroke.getKeyStroke("control S"));
-		addMenuItem(fm,"Save As",Resources.getIcon("save-as")).setAccelerator(KeyStroke.getKeyStroke("control shift S"));
-		addMenuItem(fm,"Exit",Resources.getIcon("cancel")).setAccelerator(KeyStroke.getKeyStroke("alt F4"));
+		addMenuItem(fm,"NEW");
+		addMenuItem(fm,"OPEN");
+		addMenuItem(fm,"SAVE");
+		addMenuItem(fm,"SAVE_AS");
+		addMenuItem(fm,"EXIT");
 
-		JMenu vm = new JMenu("View");
+		JMenu vm = new JMenu(Resources.getString("Jeie.VIEW"));
 		menuBar.add(vm);
-		addMenuItem(vm,"Tiled",Resources.getIcon("grid"));
+		addMenuItem(vm,"TILED");
 
 		menuBar.add(new TransformMenu(this));
 		menuBar.add(new EffectsMenu(this));
 		return menuBar;
 		}
 
-	public JMenuItem addMenuItem(JMenu menu, String name, ImageIcon icon)
+	public JMenuItem addMenuItem(JMenu menu, String key)
 		{
-		JMenuItem mi = new JMenuItem(name,icon);
-		mi.setActionCommand(name);
+		JMenuItem mi = new JMenuItem(Resources.getString("Jeie." + key),Resources.getIconForKey("Jeie." + key));
+		mi.setAccelerator(KeyStroke.getKeyStroke(Resources.getKeyboardString("Jeie." + key)));
+		mi.setActionCommand(key);
 		mi.addActionListener(this);
 		menu.add(mi);
 		return mi;
