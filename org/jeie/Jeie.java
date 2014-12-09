@@ -129,13 +129,24 @@ public class Jeie implements ActionListener
 		menuBar.add(fm);
 		addMenuItem(fm,"NEW");
 		addMenuItem(fm,"OPEN");
+		fm.addSeparator();
 		addMenuItem(fm,"SAVE");
 		addMenuItem(fm,"SAVE_AS");
+		fm.addSeparator();
 		addMenuItem(fm,"EXIT");
+		
+		JMenu em = new JMenu(Resources.getString("Jeie.EDIT"));
+		menuBar.add(em);
+		addMenuItem(em,"UNDO");
+		addMenuItem(em,"REDO");
 
 		JMenu vm = new JMenu(Resources.getString("Jeie.VIEW"));
 		menuBar.add(vm);
+		addMenuItem(vm,"ZOOM_IN");
+		addMenuItem(vm,"ZOOM_OUT");
+		vm.addSeparator();
 		addMenuItem(vm,"TILED");
+		addMenuItem(vm,"GRID");
 
 		menuBar.add(new TransformMenu(this));
 		menuBar.add(new EffectsMenu(this));
