@@ -46,7 +46,6 @@ public class TransformMenu extends JMenu implements ActionListener
 	 */
 	private static final long serialVersionUID = 1L;
 	public Jeie jeie;
-	JMenuItem rotate, flipH, flipV, zoom;
 
 	public class Rotate implements ImageAction
 		{
@@ -178,18 +177,11 @@ public class TransformMenu extends JMenu implements ActionListener
 		this.jeie = jeie;
 
 		//	TODO: Menu Icons
-		
-		flipH = makeMenuItem("FLIP_HORIZONTALLY");
-		add(flipH);
-		
-		flipV = makeMenuItem("FLIP_VERTICALLY");
-		add(flipV);
+		add(makeMenuItem("FLIP_HORIZONTALLY"));
+		add(makeMenuItem("FLIP_VERTICALLY"));
 
-		rotate = makeMenuItem("ROTATE");
-		add(rotate);
-		
-		zoom = makeMenuItem("ZOOM");
-		add(zoom);
+		add(makeMenuItem("ROTATE"));
+		add(makeMenuItem("ZOOM"));
 		}
 	
 	public JMenuItem makeMenuItem(String key) {
@@ -203,24 +195,25 @@ public class TransformMenu extends JMenu implements ActionListener
 
 	public void actionPerformed(ActionEvent e)
 		{
-		if (e.getSource() == rotate)
+		String act = e.getActionCommand();
+		if (act.equals("ROTATE"))
 			{
 			Integer integer = IntegerDialog.getInteger("Rotation",0,360,0,60);
 			if (integer != null) applyAction(new Rotate(integer));
 			return;
 			}
-		if (e.getSource() == zoom)
+		if (act.equalsIgnoreCase("ZOOM"))
 			{
 			Integer integer = IntegerDialog.getInteger("Zoom (%)",0,400,100,100);
 			if (integer != null) applyAction(new Zoom(integer));
 			return;
 			}
-		if (e.getSource() == flipH)
+		if (act.equals("FLIP_HORIZONTALLY"))
 			{
 			applyAction(new FlipH());
 			return;
 			}
-		if (e.getSource() == flipV)
+		if (act.equals("FLIP_VERTICALLY"))
 			{
 			applyAction(new FlipV());
 			return;

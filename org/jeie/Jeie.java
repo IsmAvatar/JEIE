@@ -46,7 +46,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -68,7 +67,6 @@ import org.jeie.resources.Resources;
 public class Jeie implements ActionListener
 	{
 	private JFrame frame;
-	private JButton bUndo, bRedo, bZoomIn, bZoomOut;
 	private JToggleButton bGrid;
 	private JScrollPane scroll;
 
@@ -174,13 +172,13 @@ public class Jeie implements ActionListener
 		
 		toolBar.addSeparator();
 		
-		bUndo = addButton(toolBar,new JButton(),"UNDO");
-		bRedo = addButton(toolBar,new JButton(),"REDO");
+		addButton(toolBar,new JButton(),"UNDO");
+		addButton(toolBar,new JButton(),"REDO");
 		
 		toolBar.addSeparator();
 		
-		bZoomOut = addButton(toolBar,new JButton(),"ZOOM_OUT");
-		bZoomIn = addButton(toolBar,new JButton(),"ZOOM_IN");
+		addButton(toolBar,new JButton(),"ZOOM_OUT");
+		addButton(toolBar,new JButton(),"ZOOM_IN");
 		
 		toolBar.addSeparator();
 		
@@ -198,7 +196,6 @@ public class Jeie implements ActionListener
 		b.setToolTipText(Resources.getString("Jeie." + key));
 		return b;
 		}
-
 
 
 	protected class ToolDelegate extends MouseAdapter
@@ -422,7 +419,9 @@ public class Jeie implements ActionListener
 			}
 		catch (IOException e)
 			{
-			JOptionPane.showMessageDialog(frame,"Cannot load file \"" + f.getPath() + "\"","Error",
+			JOptionPane.showMessageDialog(frame,
+					Resources.getString("Jeie.OPEN_FAIL_MESSAGE") + " \"" + f.getPath() + "\"",
+					Resources.getString("Jeie.OPEN_FAIL_TITLE"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 			}

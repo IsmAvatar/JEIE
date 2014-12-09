@@ -52,7 +52,6 @@ public class EffectsMenu extends JMenu implements ActionListener
 	{
 	private static final long serialVersionUID = 1L;
 	public Jeie jeie;
-	JMenuItem blur, value, invert, fade, colorize, saturation;
 
 	public class Blur implements ImageAction
 		{
@@ -232,24 +231,15 @@ public class EffectsMenu extends JMenu implements ActionListener
 
 		//	TODO: Menu Icons
 
-		blur = makeMenuItem("BLUR");
-		add(blur);
-		
-		saturation = makeMenuItem("SATURATION");
-		add(saturation);
-
-		value = makeMenuItem("VALUE");
-		add(value);
-
-		invert = makeMenuItem("INVERT");
-		add(invert);
-
-		fade = makeMenuItem("FADE");
-		add(fade);
+		add(makeMenuItem("BLUR"));
+		add(makeMenuItem("SATURATION"));
+		add(makeMenuItem("VALUE"));
+		add(makeMenuItem("INVERT"));
+		add(makeMenuItem("FADE"));
 
 		addSeparator();
 
-		colorize = makeMenuItem("COLORIZE");
+		JMenuItem colorize = makeMenuItem("COLORIZE");
 		colorize.setEnabled(false);
 		add(colorize);
 		}
@@ -265,30 +255,31 @@ public class EffectsMenu extends JMenu implements ActionListener
 
 	public void actionPerformed(ActionEvent e)
 		{
-		if (e.getSource() == blur)
+		String act = e.getActionCommand();
+		if (act.equals("BLUR"))
 			{
 			Integer integer = IntegerDialog.getInteger("Blur amount (1-9)",1,9,3,3);
 			if (integer != null) applyAction(new Blur(integer));
 			return;
 			}
-		if (e.getSource() == saturation)
+		if (act.equals("SATURATION"))
 			{
 			Integer integer = IntegerDialog.getInteger("Saturation",0,200,100,50);
 			if (integer != null) applyAction(new Saturation(integer));
 			return;
 			}
-		if (e.getSource() == value)
+		if (act.equalsIgnoreCase("VALUE"))
 			{
 			Integer integer = IntegerDialog.getInteger("Value",-10,10,0,5);
 			if (integer != null) applyAction(new Value((integer + 10) / 10.0f));
 			return;
 			}
-		if (e.getSource() == invert)
+		if (act.equals("INVERT"))
 			{
 			applyAction(new Invert());
 			return;
 			}
-		if (e.getSource() == fade)
+		if (act.equals("FADE"))
 			{
 			Integer integer = IntegerDialog.getInteger("Fade amount (0-256)",0,256,128,64);
 			if (integer != null) applyAction(new Fade(Color.BLACK,((float) integer) / 256.0f));
