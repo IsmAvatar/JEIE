@@ -154,6 +154,9 @@ public interface Tool
 		}
 
 	static final SizeOptions so = new SizeOptions();
+	static final FillOptions fills = new FillOptions();
+	static final GradientOptions go = new GradientOptions();
+	static final TextOptions opts = new TextOptions();
 	
 	public static class LineTool extends GenericTool<LineAction> implements ChangeListener
 		{
@@ -269,8 +272,6 @@ public interface Tool
 				canvas.repaint();
 				}
 			}
-
-		private static final GradientOptions go = new GradientOptions();
 
 		public GradientTool()
 			{
@@ -452,8 +453,6 @@ public interface Tool
 				}
 			}
 
-		private static final FillOptions fills = new FillOptions();
-
 		@Override
 		public JComponent getOptionsComponent()
 			{
@@ -532,8 +531,6 @@ public interface Tool
 			canvas.repaint(r);
 			}
 		}
-	
-	private static final FillOptions fills = new FillOptions();
 	
 	@Override
 	public JComponent getOptionsComponent()
@@ -615,8 +612,6 @@ public interface Tool
 				}
 			}
 
-		private static final FillOptions fills = new FillOptions();
-
 		@Override
 		public JComponent getOptionsComponent()
 			{
@@ -689,8 +684,6 @@ public interface Tool
 		public void mouseMove(MouseEvent e, Canvas c, Palette p, boolean drag)
 			{ //Unused
 			}
-
-		private static final FillOptions fills = new FillOptions();
 
 		@Override
 		public JComponent getOptionsComponent()
@@ -789,8 +782,6 @@ public interface Tool
 		public void mouseMove(MouseEvent e, Canvas c, Palette p, boolean drag)
 			{ //Unused
 			}
-
-		private static final TextOptions opts = new TextOptions();
 
 		public JComponent getOptionsComponent()
 			{
