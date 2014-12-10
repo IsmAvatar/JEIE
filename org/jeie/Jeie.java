@@ -33,6 +33,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -48,7 +49,9 @@ import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -60,6 +63,7 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.text.NumberFormatter;
 
 import org.jeie.Canvas.RenderMode;
 import org.jeie.resources.Resources;
@@ -321,7 +325,7 @@ public class Jeie implements ActionListener
 			}
 		if (act.equals("NEW"))
 			{
-			doNew();
+			doNew(true);
 			return;
 			}
 		if (act.equals("OPEN"))
@@ -370,12 +374,42 @@ public class Jeie implements ActionListener
 		return !canvas.acts.isEmpty();
 		}
 
-	public boolean doNew()
+	public boolean doNew(boolean askforsize)
 		{
 		if (!checkSave()) return false;
+		int width = 256;
+		int height = 256;
+		if (askforsize)
+			{
+			NumberFormatter nf = new NumberFormatter();  
+			nf.setMinimum(new Integer(1)); 
+			JFormattedTextField wField = new JFormattedTextField(nf);
+			wField.setValue(new Integer(width));
+			JFormattedTextField hField = new JFormattedTextField(nf);
+			hField.setValue(new Integer(height));
+
+			JPanel myPanel = new JPanel();
+			GridLayout layout = new GridLayout(0,2);
+			myPanel.setLayout(layout);
+			myPanel.add(new JLabel(Resources.getString("Jeie.NEW_WIDTH")));
+			myPanel.add(wField);
+			//myPanel.add(Box.createHorizontalStrut(15)); // a spacer
+			myPanel.add(new JLabel(Resources.getString("Jeie.NEW_HEIGHT")));
+			myPanel.add(hField);
+
+			int result = JOptionPane.showConfirmDialog(frame,myPanel,Resources.getString("Jeie.NEW_TITLE"),
+					JOptionPane.OK_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE);
+			if (result == JOptionPane.CANCEL_OPTION)
+				{
+					return false;
+				}
+
+			width = (Integer) wField.getValue();
+			height = (Integer) hField.getValue();
+		}
 		//TODO: Ask for sizes
 		file = null;
-		BufferedImage img = createWhiteBufferedImage(120,120);
+		BufferedImage img = createWhiteBufferedImage(width,height);
 		canvas.setImage(img);
 		scroll.updateUI();
 		updateTitle();
