@@ -1,22 +1,27 @@
-/*
- * Copyright (C) 2012 IsmAvatar <IsmAvatar@gmail.com>
- * Copyright (C) 2013 jimn346 <jds9496@gmail.com>
- * 
- * This file is part of Jeie.
- * 
- * Jeie is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * Jeie is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License (COPYING) for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+/**
+* @file  Tool.java
+* @brief Collection of various image editing tools.
+*
+* @section License
+*
+* Copyright (C) 2012 IsmAvatar <IsmAvatar@gmail.com>
+* Copyright (C) 2013 jimn346 <jds9496@gmail.com>
+* 
+* This file is a part of JEIE.
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+**/
 
 package org.jeie;
 
@@ -29,26 +34,23 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 
+import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.jeie.Canvas.RenderMode;
-import org.jeie.ImageAction.FillAction;
-import org.jeie.ImageAction.GradientAction;
-import org.jeie.ImageAction.LineAction;
-import org.jeie.ImageAction.PointAction;
-import org.jeie.ImageAction.RectangleAction;
-import org.jeie.ImageAction.OvalAction;
-import org.jeie.ImageAction.TextAction;
+import org.jeie.ImageAction.*;
 import org.jeie.OptionComponent.FillOptions;
 import org.jeie.OptionComponent.FillOptions.FillType;
 import org.jeie.OptionComponent.GradientOptions;
 import org.jeie.OptionComponent.SizeOptions;
 import org.jeie.OptionComponent.TextOptions;
+import org.jeie.resources.Resources;
 
 public interface Tool
 	{
@@ -151,6 +153,11 @@ public interface Tool
 			}
 		}
 
+	static final SizeOptions so = new SizeOptions();
+	static final FillOptions fills = new FillOptions();
+	static final GradientOptions go = new GradientOptions();
+	static final TextOptions opts = new TextOptions();
+	
 	public static class LineTool extends GenericTool<LineAction> implements ChangeListener
 		{
 		long mouseTime;
@@ -197,8 +204,6 @@ public interface Tool
 				canvas.repaint(r);
 				}
 			}
-
-		private static final SizeOptions so = new SizeOptions();
 
 		public LineTool()
 			{
@@ -268,8 +273,6 @@ public interface Tool
 				}
 			}
 
-		private static final GradientOptions go = new GradientOptions();
-
 		public GradientTool()
 			{
 			go.addListSelectionListener(this);
@@ -326,6 +329,66 @@ public interface Tool
 				c.repaint(r);
 				}
 			}
+		}
+	
+	public static class PaintbrushTool extends GenericTool<PaintbrushAction> implements ChangeListener
+		{
+		private static JPanel op;
+		private int diameter;
+		
+		public PaintbrushTool() {
+			so.addChangeListener(this);
+		}
+		
+		@Override
+		public JComponent getOptionsComponent()
+			{
+			op = new JPanel();
+			op.setLayout(new BoxLayout(op,BoxLayout.PAGE_AXIS));
+			op.add(so);
+			return op;
+			}
+		
+		public void stateChanged(ChangeEvent e)
+			{
+			diameter = so.getValue();
+			}
+
+		public void mousePress(MouseEvent e, Canvas c, Palette p)
+			{
+			if (active != null)
+				{
+				cancel(c);
+				return;
+				}
+			if (!isValid(e,c,p) && c.renderMode != RenderMode.TILED) return;
+			c.active = active = new PaintbrushAction(c, p.getSelectedColor(e.getButton()), diameter);
+			active.add(e.getPoint());
+			c.repaint();
+			}
+
+		public void mouseRelease(MouseEvent e, Canvas c, Palette p)
+			{
+			finish(c,p);
+			}
+
+		public void mouseMove(MouseEvent e, Canvas c, Palette p, boolean drag)
+			{
+			if (active != null)
+				{
+				Point pt = e.getPoint();
+				if (!active.pts.isEmpty() && active.pts.getLast().equals(pt)) return;
+				Rectangle r = new Rectangle(pt);
+				r.x -= active.diameter << 1;
+				r.y -= active.diameter << 1;
+				r.width += active.diameter << 2;
+				r.height += active.diameter << 2;
+				if (!active.pts.isEmpty()) r.add(active.pts.getLast());
+				active.add(pt);
+				c.repaint(r);
+				}
+			}
+		
 		}
 
 	public static class RectangleTool extends GenericTool<RectangleAction> implements
@@ -390,8 +453,6 @@ public interface Tool
 				}
 			}
 
-		private static final FillOptions fills = new FillOptions();
-
 		@Override
 		public JComponent getOptionsComponent()
 			{
@@ -408,6 +469,85 @@ public interface Tool
 			type = fills.getFillType();
 			}
 		}
+	
+	public static class RoundRectangleTool extends GenericTool<RoundRectangleAction> implements
+		ListSelectionListener
+	{
+	long mouseTime;
+	int button;
+	FillType type = FillType.OUTLINE;
+	
+	public void mousePress(MouseEvent e, Canvas canvas, Palette p)
+		{
+		if (active != null)
+			{
+			if (e.getButton() == button)
+				finish(canvas,p);
+			else
+				cancel(canvas);
+			return;
+			}
+		if (!isValid(e,canvas,p)) return;
+		button = e.getButton();
+		mouseTime = e.getWhen();
+		Color c1 = p.getLeft();
+		Color c2 = p.getRight();
+		if (button != MouseEvent.BUTTON1)
+			{ //lol, shut up
+			c1 = c2;
+			c2 = p.getLeft();
+			}
+		switch (type)
+			{
+			case OUTLINE:
+				canvas.active = active = new RoundRectangleAction(canvas, e.getPoint(),c1,null);
+				break;
+			case BOTH:
+				canvas.active = active = new RoundRectangleAction(canvas, e.getPoint(),c1,c2);
+				break;
+			case FILL:
+				canvas.active = active = new RoundRectangleAction(canvas, e.getPoint(),c1,c1);
+				break;
+			}
+		canvas.repaint();
+		}
+	
+	public void mouseRelease(MouseEvent e, Canvas canvas, Palette pal)
+		{
+		if (e.getWhen() - mouseTime < 200) return;
+	
+		if (active != null) active.p2 = e.getPoint();
+		finish(canvas,pal);
+		}
+	
+	public void mouseMove(MouseEvent e, Canvas canvas, Palette p, boolean drag)
+		{
+		if (active != null && !active.p2.equals(e.getPoint()))
+			{
+			Rectangle r = new Rectangle(active.p2); //previous value
+			active.p2 = e.getPoint();
+			r.add(active.p1);
+			r.add(active.p2);
+			canvas.repaint(r);
+			}
+		}
+	
+	@Override
+	public JComponent getOptionsComponent()
+		{
+		return fills;
+		}
+	
+	public RoundRectangleTool()
+		{
+		fills.addListSelectionListener(this);
+		}
+	
+	public void valueChanged(ListSelectionEvent e)
+		{
+		type = fills.getFillType();
+		}
+	}
 	
 
 	public static class OvalTool extends GenericTool<OvalAction> implements
@@ -471,8 +611,6 @@ public interface Tool
 				canvas.repaint(r);
 				}
 			}
-
-		private static final FillOptions fills = new FillOptions();
 
 		@Override
 		public JComponent getOptionsComponent()
@@ -546,8 +684,6 @@ public interface Tool
 		public void mouseMove(MouseEvent e, Canvas c, Palette p, boolean drag)
 			{ //Unused
 			}
-
-		private static final FillOptions fills = new FillOptions();
 
 		@Override
 		public JComponent getOptionsComponent()
@@ -630,7 +766,7 @@ public interface Tool
 			}
 			else cp = e.getPoint();
 			
-			String text = JOptionPane.showInputDialog("Text");
+			String text = JOptionPane.showInputDialog(Resources.getString("TextTool.TEXT"));
 			
 			if (text == null)
 				return;
@@ -646,8 +782,6 @@ public interface Tool
 		public void mouseMove(MouseEvent e, Canvas c, Palette p, boolean drag)
 			{ //Unused
 			}
-
-		private static final TextOptions opts = new TextOptions();
 
 		public JComponent getOptionsComponent()
 			{

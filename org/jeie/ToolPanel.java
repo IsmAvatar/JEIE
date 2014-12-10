@@ -1,10 +1,27 @@
-/*
- * Copyright (C) 2012 IsmAvatar <IsmAvatar@gmail.com>
- * 
- * This file is part of Jeie.
- * Jeie is free software and comes with ABSOLUTELY NO WARRANTY.
- * See LICENSE for details.
- */
+/**
+* @file  ToolPanel.java
+* @brief Image tool container.
+*
+* @section License
+*
+* Copyright (C) 2012 IsmAvatar <IsmAvatar@gmail.com>
+* Copyright (C) 2014 Robert B. Colton
+* 
+* This file is a part of JEIE.
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+**/
 
 package org.jeie;
 
@@ -23,14 +40,8 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
 import org.jeie.Jeie.ToolDelegate;
-import org.jeie.Tool.FillTool;
-import org.jeie.Tool.LineTool;
-import org.jeie.Tool.PointTool;
-import org.jeie.Tool.RectangleTool;
-import org.jeie.Tool.OvalTool;
-import org.jeie.Tool.ColorPickerTool;
-import org.jeie.Tool.TextTool;
-import org.jeie.Tool.GradientTool;
+import org.jeie.Tool.*;
+import org.jeie.resources.Resources;
 
 public class ToolPanel extends JPanel implements ActionListener
 	{
@@ -41,6 +52,15 @@ public class ToolPanel extends JPanel implements ActionListener
 	protected JPanel toolOptions = new JPanel();
 
 	AbstractButton defTool;
+	
+	public ToolButton makeToolButton(String key, Tool t) {
+		ToolButton tb = new ToolButton(Resources.getString("ToolPanel." + key), t);
+		tb.setActionCommand(key);
+		tb.addActionListener(this);
+		//tb.setAccelerator(KeyStroke.getKeyStroke(Resources.getKeyboardString("TransformMenu." + key)));
+		tb.setIcon(Resources.getIconForKey("ToolPanel." + key));
+		return tb;
+	}
 
 	public ToolPanel(ToolDelegate del)
 		{
@@ -51,22 +71,17 @@ public class ToolPanel extends JPanel implements ActionListener
 
 		toolGrid = new JPanel(new GridLayout(0,2));
 
-		addButton(new ToolButton(Jeie.getIcon("pencil"),"Pencil - draws freehand strokes",
-				new PointTool()));
-		defTool = addButton(new ToolButton(Jeie.getIcon("line"),"Line - draws a straight line",
-				new LineTool()));
-		addButton(new ToolButton(Jeie.getIcon("rect"),"Rect - draws a rectangle",
-				new RectangleTool()));
-		addButton(new ToolButton(Jeie.getIcon("oval"),"Oval - draws an oval",
-				new OvalTool()));
-		addButton(new ToolButton(Jeie.getIcon("color-fill"),"Fill - flood-fills a region",
-				new FillTool()));
-		addButton(new ToolButton(Jeie.getIcon("color-picker"),"Color Picker - get the color at a point",
-				new ColorPickerTool()));
-		addButton(new ToolButton(Jeie.getIcon("text"),"Text - Draw text",
-				new TextTool()));
-		addButton(new ToolButton(Jeie.getIcon("gradient-linear"),"Gradient - draw gradients",
-				new GradientTool()));
+		addButton(makeToolButton("PENCIL",new PointTool()));
+		addButton(makeToolButton("PAINTBRUSH",new PaintbrushTool()));
+		//addButton(makeToolButton("ERASE",new EraseTool()));
+		defTool = addButton(makeToolButton("LINE",new LineTool()));
+		addButton(makeToolButton("OVAL",new OvalTool()));
+		addButton(makeToolButton("RECT",new RectangleTool()));
+		addButton(makeToolButton("ROUNDRECT",new RoundRectangleTool()));
+		addButton(makeToolButton("COLOR_FILL",new FillTool()));
+		addButton(makeToolButton("COLOR_PICKER",new ColorPickerTool()));
+		addButton(makeToolButton("TEXT",new TextTool()));
+		addButton(makeToolButton("GRADIENT_LINEAR",new GradientTool()));
 
 		toolOptions.setBorder(BorderFactory.createLoweredBevelBorder());
 		toolOptions.setMaximumSize(toolGrid.getPreferredSize());
@@ -95,7 +110,17 @@ public class ToolPanel extends JPanel implements ActionListener
 		private static final long serialVersionUID = 1L;
 
 		public final Tool tool;
+		
+		public ToolButton(String tip, Tool t)
+			{
+			this(null,tip,t);
+			}
 
+		public ToolButton(Tool t)
+			{
+			this(null,null,t);
+			}
+		
 		public ToolButton(ImageIcon ico, Tool t)
 			{
 			this(ico,null,t);

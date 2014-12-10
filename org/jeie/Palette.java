@@ -1,12 +1,28 @@
-/*
- * Copyright (C) 2012 IsmAvatar <IsmAvatar@gmail.com>
- * Copyright (C) 2012 Serge Humphrey <bobtheblueberry@gmail.com>
- * Copyright (C) 2013 jimn346 <jds9496@gmail.com>
- * 
- * This file is part of Jeie.
- * Jeie is free software and comes with ABSOLUTELY NO WARRANTY.
- * See LICENSE for details.
- */
+/**
+* @file  Palette.java
+* @brief Color chooser palette.
+*
+* @section License
+*
+* Copyright (C) 2012 IsmAvatar <IsmAvatar@gmail.com>
+* Copyright (C) 2012 Serge Humphrey <bobtheblueberry@gmail.com>
+* Copyright (C) 2013 jimn346 <jds9496@gmail.com>
+* 
+* This file is a part of JEIE.
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+**/
 
 package org.jeie;
 
@@ -25,6 +41,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.border.BevelBorder;
+
+import org.jeie.resources.Resources;
 
 public class Palette extends JPanel implements MouseListener
 	{
@@ -151,7 +169,7 @@ public class Palette extends JPanel implements MouseListener
 				{
 				if (e.getClickCount() == 2)
 					{
-					Color newcol = JColorChooser.showDialog(getParent(),"Select Color",selectedColor);
+					Color newcol = JColorChooser.showDialog(getParent(),Resources.getString("Palette.SELECT_COLOR"),selectedColor);
 					if (newcol != null) setBackground(selectedColor = newcol);
 					}
 				else
@@ -202,13 +220,13 @@ public class Palette extends JPanel implements MouseListener
 			
 			if (lRect.contains(e.getPoint()))
 				{
-				Color c = JColorChooser.showDialog(null,"Left Color",left);
+				Color c = JColorChooser.showDialog(null,Resources.getString("Palette.LEFT_COLOR"),left);
 				if (c != null)
 					setLeft(c);
 				}
 			else if (rRect.contains(e.getPoint()))
 				{
-				Color c = JColorChooser.showDialog(null,"Right Color",right);
+				Color c = JColorChooser.showDialog(null,Resources.getString("Palette.RIGHT_COLOR"),right);
 				if (c != null)
 					setRight(c);
 				}

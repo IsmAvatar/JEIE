@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
+<jardesc>
+    <jar path="JEIE/jeie.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/JEIE/description.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" mainClassHandleIdentifier="=JEIE/&lt;org.jeie{Jeie.java[Jeie" manifestLocation="/JEIE/META-INF/MANIFEST.MF" manifestVersion="1.0" reuseManifest="false" saveManifest="true" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <javaElement handleIdentifier="=JEIE/&lt;org.jeie"/>
+        <javaElement handleIdentifier="=JEIE/&lt;org.jeie.icons.brushes"/>
+        <javaElement handleIdentifier="=JEIE/&lt;org.jeie.resources"/>
+        <file path="/JEIE/test.png"/>
+        <file path="/JEIE/.project"/>
+        <javaElement handleIdentifier="=JEIE/&lt;org.jeie.icons.actions"/>
+        <javaElement handleIdentifier="=JEIE/&lt;org.jeie.icons"/>
+        <file path="/JEIE/.classpath"/>
+        <folder path="/JEIE/META-INF"/>
+    </selectedElements>
+</jardesc>

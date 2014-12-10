@@ -1,23 +1,29 @@
-/*
- * Copyright (C) 2009, 2012 IsmAvatar <IsmAvatar@gmail.com>
- * Copyright (C) 2009 Serge Humphrey <bob@bobtheblueberry.com>
- * Copyright (C) 2013 jimn346 <jds9496@gmail.com>
- * 
- * This file is part of Jeie.
- * 
- * Jeie is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * Jeie is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License (COPYING) for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+/**
+* @file  EffectsMenu.java
+* @brief Menu holder for various image effects.
+*
+* @section License
+*
+* Copyright (C) 2009, 2012 IsmAvatar <IsmAvatar@gmail.com>
+* Copyright (C) 2009 Serge Humphrey <bob@bobtheblueberry.com>
+* Copyright (C) 2013 jimn346 <jds9496@gmail.com>
+* Copyright (C) 2014 Robert B. Colton
+* 
+* This file is a part of JEIE.
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+**/
 
 package org.jeie;
 
@@ -39,12 +45,14 @@ import java.awt.image.RescaleOp;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
+
+import org.jeie.resources.Resources;
 
 public class EffectsMenu extends JMenu implements ActionListener
 	{
 	private static final long serialVersionUID = 1L;
 	public Jeie jeie;
-	JMenuItem blur, value, invert, fade, colorize, saturation;
 
 	public class Blur implements ImageAction
 		{
@@ -219,66 +227,62 @@ public class EffectsMenu extends JMenu implements ActionListener
 
 	public EffectsMenu(Jeie jeie)
 		{
-		super("Effects");
+		super(Resources.getString("EffectsMenu.EFFECTS"));
 		this.jeie = jeie;
 
 		//	TODO: Menu Icons
 
-		blur = new JMenuItem("Blur", Jeie.getIcon("blur"));
-		blur.addActionListener(this);
-		add(blur);
-		
-		saturation = new JMenuItem("Saturation", Jeie.getIcon("saturation"));
-		saturation.addActionListener(this);
-		add(saturation);
-
-		value = new JMenuItem("Value", Jeie.getIcon("value"));
-		value.addActionListener(this);
-		add(value);
-
-		invert = new JMenuItem("Invert", Jeie.getIcon("invert"));
-		invert.addActionListener(this);
-		add(invert);
-
-		fade = new JMenuItem("Fade to Black", Jeie.getIcon("fade"));
-		fade.addActionListener(this);
-		add(fade);
+		add(makeMenuItem("BLUR"));
+		add(makeMenuItem("SATURATION"));
+		add(makeMenuItem("VALUE"));
+		add(makeMenuItem("INVERT"));
+		add(makeMenuItem("FADE"));
 
 		addSeparator();
 
-		colorize = new JMenuItem("Colorize", Jeie.getIcon("colorize"));
+		JMenuItem colorize = makeMenuItem("COLORIZE");
 		colorize.setEnabled(false);
 		add(colorize);
 		}
+	
+	public JMenuItem makeMenuItem(String key) {
+		JMenuItem mi = new JMenuItem(Resources.getString("EffectsMenu." + key));
+		mi.setActionCommand(key);
+		mi.addActionListener(this);
+		mi.setAccelerator(KeyStroke.getKeyStroke(Resources.getKeyboardString("EffectsMenu." + key)));
+		mi.setIcon(Resources.getIconForKey("EffectsMenu." + key));
+		return mi;
+	}
 
 	public void actionPerformed(ActionEvent e)
 		{
-		if (e.getSource() == blur)
+		String act = e.getActionCommand();
+		if (act.equals("BLUR"))
 			{
-			Integer integer = IntegerDialog.getInteger("Blur amount (1-9)",1,9,3,3);
+			Integer integer = IntegerDialog.getInteger(Resources.getString("EffectsMenu.BLUR_AMOUNT"),1,9,3,3);
 			if (integer != null) applyAction(new Blur(integer));
 			return;
 			}
-		if (e.getSource() == saturation)
+		if (act.equals("SATURATION"))
 			{
-			Integer integer = IntegerDialog.getInteger("Saturation",0,200,100,50);
+			Integer integer = IntegerDialog.getInteger(Resources.getString("EffectsMenu.SATURATION_AMOUNT"),0,200,100,50);
 			if (integer != null) applyAction(new Saturation(integer));
 			return;
 			}
-		if (e.getSource() == value)
+		if (act.equalsIgnoreCase("VALUE"))
 			{
-			Integer integer = IntegerDialog.getInteger("Value",-10,10,0,5);
+			Integer integer = IntegerDialog.getInteger(Resources.getString("EffectsMenu.VALUE_AMOUNT"),-10,10,0,5);
 			if (integer != null) applyAction(new Value((integer + 10) / 10.0f));
 			return;
 			}
-		if (e.getSource() == invert)
+		if (act.equals("INVERT"))
 			{
 			applyAction(new Invert());
 			return;
 			}
-		if (e.getSource() == fade)
+		if (act.equals("FADE"))
 			{
-			Integer integer = IntegerDialog.getInteger("Fade amount (0-256)",0,256,128,64);
+			Integer integer = IntegerDialog.getInteger(Resources.getString("EffectsMenu.FADE_AMOUNT"),0,256,128,64);
 			if (integer != null) applyAction(new Fade(Color.BLACK,((float) integer) / 256.0f));
 			return;
 			}

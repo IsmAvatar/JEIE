@@ -1,21 +1,28 @@
-/*
- * Copyright (C) 2013 jimn346 <jds9496@gmail.com>
- * 
- * This file is part of Jeie.
- * 
- * Jeie is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * Jeie is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License (COPYING) for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+/**
+* @file  TransformMenu.java
+* @brief Collection of transformation menu options.
+*
+* @section License
+*
+* Copyright (C) 2013 jimn346 <jds9496@gmail.com>
+* Copyright (C) 2014 Robert B. Colton
+* 
+* This file is a part of JEIE.
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+**/
+
 package org.jeie;
 
 import java.awt.Color;
@@ -29,6 +36,9 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
+
+import org.jeie.resources.Resources;
 
 public class TransformMenu extends JMenu implements ActionListener
 	{
@@ -37,7 +47,6 @@ public class TransformMenu extends JMenu implements ActionListener
 	 */
 	private static final long serialVersionUID = 1L;
 	public Jeie jeie;
-	JMenuItem rotate, flipH, flipV, zoom;
 
 	public class Rotate implements ImageAction
 		{
@@ -165,48 +174,47 @@ public class TransformMenu extends JMenu implements ActionListener
 
 	public TransformMenu(Jeie jeie)
 		{
-		super("Transform");
+		super(Resources.getString("TransformMenu.TRANSFORM"));
 		this.jeie = jeie;
 
 		//	TODO: Menu Icons
-		
-		flipH = new JMenuItem("Flip Horizontally", Jeie.getIcon("flip-h"));
-		flipH.addActionListener(this);
-		add(flipH);
-		
-		flipV = new JMenuItem("Flip Vertically", Jeie.getIcon("flip-v"));
-		flipV.addActionListener(this);
-		add(flipV);
+		add(makeMenuItem("FLIP_HORIZONTALLY"));
+		add(makeMenuItem("FLIP_VERTICALLY"));
 
-		rotate = new JMenuItem("Rotate", Jeie.getIcon("rotate"));
-		rotate.addActionListener(this);
-		add(rotate);
-		
-		zoom = new JMenuItem("Zoom", Jeie.getIcon("zoom-in"));
-		zoom.addActionListener(this);
-		add(zoom);
+		add(makeMenuItem("ROTATE"));
+		add(makeMenuItem("ZOOM"));
 		}
+	
+	public JMenuItem makeMenuItem(String key) {
+		JMenuItem mi = new JMenuItem(Resources.getString("TransformMenu." + key));
+		mi.setActionCommand(key);
+		mi.addActionListener(this);
+		mi.setAccelerator(KeyStroke.getKeyStroke(Resources.getKeyboardString("TransformMenu." + key)));
+		mi.setIcon(Resources.getIconForKey("TransformMenu." + key));
+		return mi;
+	}
 
 	public void actionPerformed(ActionEvent e)
 		{
-		if (e.getSource() == rotate)
+		String act = e.getActionCommand();
+		if (act.equals("ROTATE"))
 			{
-			Integer integer = IntegerDialog.getInteger("Rotation",0,360,0,60);
+			Integer integer = IntegerDialog.getInteger(Resources.getString("TransformMenu.ROTATION"),0,360,0,60);
 			if (integer != null) applyAction(new Rotate(integer));
 			return;
 			}
-		if (e.getSource() == zoom)
+		if (act.equalsIgnoreCase("ZOOM"))
 			{
-			Integer integer = IntegerDialog.getInteger("Zoom (%)",0,400,100,100);
+			Integer integer = IntegerDialog.getInteger(Resources.getString("TransformMenu.ZOOM_PERCENT"),0,400,100,100);
 			if (integer != null) applyAction(new Zoom(integer));
 			return;
 			}
-		if (e.getSource() == flipH)
+		if (act.equals("FLIP_HORIZONTALLY"))
 			{
 			applyAction(new FlipH());
 			return;
 			}
-		if (e.getSource() == flipV)
+		if (act.equals("FLIP_VERTICALLY"))
 			{
 			applyAction(new FlipV());
 			return;

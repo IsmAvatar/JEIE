@@ -1,24 +1,29 @@
-/*
- * Copyright (C) 2008, 2009, 2012 IsmAvatar <IsmAvatar@gmail.com>
- * Copyright (C) 2009, 2012 Serge Humphrey <bobtheblueberry@gmail.com>
- * Copyright (C) 2013 jimn346 <jds9496@gmail.com>
- * Copyright (C) 2014 Robert B. Colton
- * 
- * This file is part of Jeie.
- * 
- * Jeie is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * Jeie is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License (COPYING) for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+/**
+* @file  Jeie.java
+* @brief Main class
+*
+* @section License
+*
+* Copyright (C) 2008, 2009, 2012 IsmAvatar <IsmAvatar@gmail.com>
+* Copyright (C) 2009, 2012 Serge Humphrey <bobtheblueberry@gmail.com>
+* Copyright (C) 2013 jimn346 <jds9496@gmail.com>
+* Copyright (C) 2014 Robert B. Colton
+* 
+* This file is a part of JEIE.
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+**/
 
 package org.jeie;
 
@@ -28,6 +33,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -38,14 +44,14 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -57,13 +63,14 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.text.NumberFormatter;
 
 import org.jeie.Canvas.RenderMode;
+import org.jeie.resources.Resources;
 
 public class Jeie implements ActionListener
 	{
 	private JFrame frame;
-	private JButton bUndo, bRedo, bZoomIn, bZoomOut;
 	private JToggleButton bGrid;
 	private JScrollPane scroll;
 
@@ -107,6 +114,7 @@ public class Jeie implements ActionListener
 					doClose();
 					}
 			});
+		new FramePrefsHandler(frame);
 		}
 
 	public void updateTitle()
@@ -120,27 +128,39 @@ public class Jeie implements ActionListener
 	public JMenuBar makeMenuBar()
 		{
 		menuBar = new JMenuBar();
-		JMenu fm = new JMenu("File");
+		JMenu fm = new JMenu(Resources.getString("Jeie.FILE"));
 		menuBar.add(fm);
-		addMenuItem(fm,"New",getIcon("new")).setAccelerator(KeyStroke.getKeyStroke("control N"));
-		addMenuItem(fm,"Open",getIcon("open")).setAccelerator(KeyStroke.getKeyStroke("control O"));
-		addMenuItem(fm,"Save",getIcon("save")).setAccelerator(KeyStroke.getKeyStroke("control S"));
-		addMenuItem(fm,"Save As",getIcon("save-as")).setAccelerator(KeyStroke.getKeyStroke("control shift S"));
-		addMenuItem(fm,"Exit",getIcon("cancel")).setAccelerator(KeyStroke.getKeyStroke("alt F4"));
+		addMenuItem(fm,"NEW");
+		addMenuItem(fm,"OPEN");
+		fm.addSeparator();
+		addMenuItem(fm,"SAVE");
+		addMenuItem(fm,"SAVE_AS");
+		fm.addSeparator();
+		addMenuItem(fm,"EXIT");
+		
+		JMenu em = new JMenu(Resources.getString("Jeie.EDIT"));
+		menuBar.add(em);
+		addMenuItem(em,"UNDO");
+		addMenuItem(em,"REDO");
 
-		JMenu vm = new JMenu("View");
+		JMenu vm = new JMenu(Resources.getString("Jeie.VIEW"));
 		menuBar.add(vm);
-		addMenuItem(vm,"Tiled",getIcon("grid"));
+		addMenuItem(vm,"ZOOM_IN");
+		addMenuItem(vm,"ZOOM_OUT");
+		vm.addSeparator();
+		addMenuItem(vm,"TILED");
+		addMenuItem(vm,"GRID").setActionCommand("GRID_MENU");
 
 		menuBar.add(new TransformMenu(this));
 		menuBar.add(new EffectsMenu(this));
 		return menuBar;
 		}
 
-	public JMenuItem addMenuItem(JMenu menu, String name, ImageIcon icon)
+	public JMenuItem addMenuItem(JMenu menu, String key)
 		{
-		JMenuItem mi = new JMenuItem(name,icon);
-		mi.setActionCommand(name);
+		JMenuItem mi = new JMenuItem(Resources.getString("Jeie." + key),Resources.getIconForKey("Jeie." + key));
+		mi.setAccelerator(KeyStroke.getKeyStroke(Resources.getKeyboardString("Jeie." + key)));
+		mi.setActionCommand(key);
 		mi.addActionListener(this);
 		menu.add(mi);
 		return mi;
@@ -151,41 +171,38 @@ public class Jeie implements ActionListener
 		toolBar = new JToolBar();
 		toolBar.setFloatable(false);
 
-		addButton(toolBar,new JButton(getIcon("new"))).setActionCommand("New");
-		addButton(toolBar,new JButton(getIcon("open"))).setActionCommand("Open");
-		addButton(toolBar,new JButton(getIcon("save"))).setActionCommand("Save");
+		addButton(toolBar,new JButton(),"NEW");
+		addButton(toolBar,new JButton(),"OPEN");
+		addButton(toolBar,new JButton(),"SAVE");
 		
 		toolBar.addSeparator();
 		
-		bUndo = addButton(toolBar,new JButton(getIcon("undo")));
-		bRedo = addButton(toolBar,new JButton(getIcon("redo")));
+		addButton(toolBar,new JButton(),"UNDO");
+		addButton(toolBar,new JButton(),"REDO");
 		
 		toolBar.addSeparator();
 		
-		bZoomOut = addButton(toolBar,new JButton(getIcon("zoom-out")));
-		bZoomIn = addButton(toolBar,new JButton(getIcon("zoom-in")));
+		addButton(toolBar,new JButton(),"ZOOM_OUT");
+		addButton(toolBar,new JButton(),"ZOOM_IN");
 		
 		toolBar.addSeparator();
 		
-		bGrid = addButton(toolBar,new JToggleButton(getIcon("grid")));
+		bGrid = addButton(toolBar,new JToggleButton(),"GRID");
+		bGrid.setSelected(canvas.isGridDrawn);
 
 		return toolBar;
 		}
 
-	public <K extends AbstractButton>K addButton(Container c, K b)
+	public <K extends AbstractButton>K addButton(Container c, K b, String key)
 		{
 		c.add(b);
+		b.setActionCommand(key);
 		b.addActionListener(this);
+		b.setIcon(Resources.getIconForKey("Jeie." + key));
+		b.setToolTipText(Resources.getString("Jeie." + key));
 		return b;
 		}
 
-	public static ImageIcon getIcon(String name)
-		{
-		String location = "org/jeie/icons/actions/" + name + ".png";
-		URL url = Jeie.class.getClassLoader().getResource(location);
-		if (url == null) return new ImageIcon(location);
-		return new ImageIcon(url);
-		}
 
 	protected class ToolDelegate extends MouseAdapter
 		{
@@ -277,7 +294,18 @@ public class Jeie implements ActionListener
 
 	public void actionPerformed(ActionEvent e)
 		{
-		if (e.getSource() == bUndo)
+		String act = e.getActionCommand();
+		if (act.equals("ZOOM_IN"))
+			{
+			canvas.zoomIn();
+			return;
+			}
+		if (act.equals("ZOOM_OUT"))
+			{
+			canvas.zoomOut();
+			return;
+			}
+		if (act.equals("UNDO"))
 			{
 			if (!canvas.acts.isEmpty())
 				{
@@ -286,7 +314,7 @@ public class Jeie implements ActionListener
 				}
 			return;
 			}
-		if (e.getSource() == bRedo)
+		if (act.equals("REDO"))
 			{
 			if (!canvas.redoActs.isEmpty())
 				{
@@ -295,53 +323,49 @@ public class Jeie implements ActionListener
 				}
 			return;
 			}
-		if (e.getSource() == bGrid)
+		if (act.equals("NEW"))
+			{
+			doNew(true);
+			return;
+			}
+		if (act.equals("OPEN"))
+			{
+			doOpen();
+			return;
+			}
+		if (act.equals("SAVE"))
+			{
+			doSave(false);
+			return;
+			}
+		if (act.equals("SAVE_AS"))
+			{
+			doSave(true);
+			return;
+			}
+		if (act.equals("EXIT"))
+			{
+			doClose();
+			return;
+			}
+		if (act.equals("TILED"))
+			{
+			canvas.renderMode = (canvas.renderMode != RenderMode.TILED) ? RenderMode.TILED
+					: RenderMode.NORMAL;
+			canvas.repaint();
+			}
+		if (act.equals("GRID"))
 			{
 			canvas.isGridDrawn = bGrid.isSelected();
 			canvas.repaint();
 			return;
 			}
-		if (e.getSource() == bZoomIn)
+		if (act.equals("GRID_MENU"))
 			{
-			canvas.zoomIn();
-			return;
-			}
-		if (e.getSource() == bZoomOut)
-			{
-			canvas.zoomOut();
-			return;
-			}
-		String act = e.getActionCommand();
-		if (act.equals("New"))
-			{
-			doNew();
-			return;
-			}
-		if (act.equals("Open"))
-			{
-			doOpen();
-			return;
-			}
-		if (act.equals("Save"))
-			{
-			doSave(false);
-			return;
-			}
-		if (act.equals("Save As"))
-			{
-			doSave(true);
-			return;
-			}
-		if (act.equals("Exit"))
-			{
-			doClose();
-			return;
-			}
-		if (act.equals("Tiled"))
-			{
-			canvas.renderMode = (canvas.renderMode != RenderMode.TILED) ? RenderMode.TILED
-					: RenderMode.NORMAL;
+			bGrid.setSelected(!bGrid.isSelected());
+			canvas.isGridDrawn = bGrid.isSelected();
 			canvas.repaint();
+			return;
 			}
 		}
 
@@ -350,12 +374,42 @@ public class Jeie implements ActionListener
 		return !canvas.acts.isEmpty();
 		}
 
-	public boolean doNew()
+	public boolean doNew(boolean askforsize)
 		{
 		if (!checkSave()) return false;
+		int width = 256;
+		int height = 256;
+		if (askforsize)
+			{
+			NumberFormatter nf = new NumberFormatter();  
+			nf.setMinimum(new Integer(1)); 
+			JFormattedTextField wField = new JFormattedTextField(nf);
+			wField.setValue(new Integer(width));
+			JFormattedTextField hField = new JFormattedTextField(nf);
+			hField.setValue(new Integer(height));
+
+			JPanel myPanel = new JPanel();
+			GridLayout layout = new GridLayout(0,2);
+			myPanel.setLayout(layout);
+			myPanel.add(new JLabel(Resources.getString("Jeie.NEW_WIDTH")));
+			myPanel.add(wField);
+			//myPanel.add(Box.createHorizontalStrut(15)); // a spacer
+			myPanel.add(new JLabel(Resources.getString("Jeie.NEW_HEIGHT")));
+			myPanel.add(hField);
+
+			int result = JOptionPane.showConfirmDialog(frame,myPanel,Resources.getString("Jeie.NEW_TITLE"),
+					JOptionPane.OK_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE);
+			if (result == JOptionPane.CANCEL_OPTION)
+				{
+					return false;
+				}
+
+			width = (Integer) wField.getValue();
+			height = (Integer) hField.getValue();
+		}
 		//TODO: Ask for sizes
 		file = null;
-		BufferedImage img = createWhiteBufferedImage(120,120);
+		BufferedImage img = createWhiteBufferedImage(width,height);
 		canvas.setImage(img);
 		scroll.updateUI();
 		updateTitle();
@@ -365,10 +419,13 @@ public class Jeie implements ActionListener
 	public void doClose()
 		{
 		if (!hasChanged()) System.exit(0);
-		int c = JOptionPane.showConfirmDialog(frame,"Would you like to save your changes before closing?");
+		int c = JOptionPane.showConfirmDialog(frame,
+				Resources.getString("Jeie.UNSAVED_MESSAGE"),
+				Resources.getString("Jeie.UNSAVED_TITLE"),
+				JOptionPane.YES_NO_CANCEL_OPTION);
 		if (c == JOptionPane.CANCEL_OPTION) return;
-		if (c == JOptionPane.OK_OPTION) doSave(false);
-		System.exit(0);
+		if (c == JOptionPane.YES_OPTION) if (doSave(false)) { System.exit(0); }
+		if (c == JOptionPane.NO_OPTION) System.exit(0);
 		}
 
 	/**
@@ -379,9 +436,12 @@ public class Jeie implements ActionListener
 		if (hasChanged())
 			{
 			int c = JOptionPane.showConfirmDialog(frame,
-					"Image has been modified. Would you like to save first?");
+					Resources.getString("Jeie.UNSAVED_MESSAGE"),
+					Resources.getString("Jeie.UNSAVED_TITLE"),
+					JOptionPane.YES_NO_CANCEL_OPTION);
 			if (c == JOptionPane.CANCEL_OPTION) return false;
-			if (c == JOptionPane.OK_OPTION) doSave(false);
+			if (c == JOptionPane.YES_OPTION) return doSave(false);
+			if (c == JOptionPane.NO_OPTION) return true;
 			}
 		return true;
 		}
@@ -402,7 +462,9 @@ public class Jeie implements ActionListener
 			}
 		catch (IOException e)
 			{
-			JOptionPane.showMessageDialog(frame,"Cannot load file \"" + f.getPath() + "\"","Error",
+			JOptionPane.showMessageDialog(frame,
+					Resources.getString("Jeie.OPEN_FAIL_MESSAGE") + " \"" + f.getPath() + "\"",
+					Resources.getString("Jeie.OPEN_FAIL_TITLE"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 			}

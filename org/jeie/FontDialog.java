@@ -1,21 +1,27 @@
-/*
- * Copyright (C) 2013 jimn346 <jds9496@gmail.com>
- * 
- * This file is part of Jeie.
- * 
- * Jeie is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * Jeie is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License (COPYING) for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+/**
+* @file  FontDialog.java
+* @brief Dialog for choosing fonts.
+*
+* @section License
+*
+* Copyright (C) 2013 jimn346 <jds9496@gmail.com>
+* 
+* This file is a part of JEIE.
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+**/
+
 package org.jeie;
 
 import java.awt.BorderLayout;
@@ -29,7 +35,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
 import java.awt.font.TextAttribute;
 import java.util.Hashtable;
 
@@ -45,6 +50,8 @@ import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import org.jeie.resources.Resources;
 
 public class FontDialog
 	{
@@ -136,7 +143,7 @@ public class FontDialog
 		
 		String[] fontNames = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
 		
-		d = new JDialog((JFrame) null,"Font");
+		d = new JDialog((JFrame) null,Resources.getString("FontDialog.TITLE"));
 		d.setModal(true);
 		d.setLayout(new BorderLayout());
 		d.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -155,13 +162,13 @@ public class FontDialog
 		JPanel topPanel = new JPanel();
 		topPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 		
-		topPanel.add(new JLabel("Font"));
+		topPanel.add(new JLabel(Resources.getString("FontDialog.FONT")));
 		fonts = new JComboBox<String>(fontNames);
 		fonts.setSelectedItem(font.getName());
 		fonts.addActionListener(action);
 		topPanel.add(fonts);
 
-		topPanel.add(new JLabel("Size"));
+		topPanel.add(new JLabel(Resources.getString("FontDialog.SIZE")));
 		size = new JSpinner(new SpinnerNumberModel(font.getSize(),1,2000,1));
 		size.addChangeListener(change);
 		topPanel.add(size);
@@ -170,18 +177,18 @@ public class FontDialog
 		
 		JPanel stylePanel = new JPanel();
 		stylePanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-		bold = new JToggleButton(Jeie.getIcon("text-bold"));
+		bold = new JToggleButton(Resources.getIconForKey("FontDialog.BOLD"));
 		bold.addActionListener(action);
 		stylePanel.add(bold);
-		italic = new JToggleButton(Jeie.getIcon("text-italic"));
+		italic = new JToggleButton(Resources.getIconForKey("FontDialog.ITALIC"));
 		italic.addActionListener(action);
 		stylePanel.add(italic);
-		underlined = new JToggleButton(Jeie.getIcon("text-underlined"));
+		underlined = new JToggleButton(Resources.getIconForKey("FontDialog.UNDERLINED"));
 		underlined.addActionListener(action);
 		stylePanel.add(underlined);
 		
 		gridPanel.add(stylePanel);
-		gridPanel.add(new JLabel("Preview"));
+		gridPanel.add(new JLabel(Resources.getString("FontDialog.PREVIEW")));
 		d.add(gridPanel, BorderLayout.NORTH);
 		
 		preview = new JTextArea();
@@ -192,9 +199,9 @@ public class FontDialog
 		
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-		bottomPanel.add(okButton = new JButton("OK"));
+		bottomPanel.add(okButton = new JButton(Resources.getString("FontDialog.OK")));
 		okButton.addActionListener(action);
-		bottomPanel.add(cancelButton = new JButton("Cancel"));
+		bottomPanel.add(cancelButton = new JButton(Resources.getString("FontDialog.CANCEL")));
 		cancelButton.addActionListener(action);
 		d.add(bottomPanel, BorderLayout.SOUTH);
 

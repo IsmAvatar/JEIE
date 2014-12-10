@@ -1,21 +1,26 @@
-/*
- * Copyright (C) 2009 Serge Humphrey <bob@bobtheblueberry.com>
- * 
- * This file is part of Jeie.
- * 
- * Jeie is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * Jeie is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License (COPYING) for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+/**
+* @file  IntegerDialog.java
+* @brief Dialog for choosing an integer.
+*
+* @section License
+*
+* Copyright (C) 2009 Serge Humphrey <bob@bobtheblueberry.com>
+* 
+* This file is a part of JEIE.
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+**/
 
 package org.jeie;
 
@@ -38,6 +43,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.jeie.resources.Resources;
+
 public class IntegerDialog
 	{
 	public static Integer getInteger(String text, int min, int max, int def, int tickSpacing)
@@ -45,7 +52,7 @@ public class IntegerDialog
 		final Integer[] values = new Integer[1];
 		values[0] = def;
 
-		final JDialog d = new JDialog((JFrame) null,"Input");
+		final JDialog d = new JDialog((JFrame) null,Resources.getString("IntegerDialog.INPUT"));
 		d.setModal(true);
 		d.setLayout(new BorderLayout(12,12));
 		d.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -100,7 +107,7 @@ public class IntegerDialog
 
 		Box box2 = Box.createHorizontalBox();
 		box2.add(Box.createHorizontalGlue());
-		JButton ok = new JButton("OK");
+		JButton ok = new JButton(Resources.getString("IntegerDialog.OK"));
 		ok.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -110,7 +117,7 @@ public class IntegerDialog
 			});
 		box2.add(ok);
 		box2.add(Box.createHorizontalStrut(6));
-		JButton cancel = new JButton("Cancel");
+		JButton cancel = new JButton(Resources.getString("IntegerDialog.CANCEL"));
 		cancel.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)

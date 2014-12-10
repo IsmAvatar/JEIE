@@ -1,22 +1,27 @@
-/*
- * Somebody else's copyright goes here.
- * Copyright (C) 2013 jimn346 <jds9496@gmail.com>
- * 
- * This file is part of Jeie.
- * 
- * Jeie is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * Jeie is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License (COPYING) for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+/**
+* @file  OptionComponent.java
+* @brief Collection of various reusable option panels.
+*
+* @section License
+*
+* Copyright (C) 2013 jimn346 <jds9496@gmail.com>
+* 
+* This file is a part of JEIE.
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+**/
+
 package org.jeie;
 
 import java.awt.BorderLayout;
@@ -25,7 +30,6 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.URL;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -41,6 +45,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import org.jeie.resources.Resources;
 
 public class OptionComponent
 	{
@@ -78,8 +84,8 @@ public class OptionComponent
 
 		public FillOptions()
 			{
-			super(new ImageIcon[] { getBrushIcon("outline"),getBrushIcon("outline-fill"),
-					getBrushIcon("fill") });
+			super(new ImageIcon[] { getBrushIcon("OUTLINE"),getBrushIcon("OUTLINE_FILL"),
+					getBrushIcon("FILL") });
 			setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			setSelectedIndex(0);
 			}
@@ -134,8 +140,8 @@ public class OptionComponent
 
 		public GradientOptions()
 			{
-			super(new ImageIcon[] { Jeie.getIcon("gradient-linear"), getBrushIcon("gradient-mirrored"),
-				getBrushIcon("gradient-radial"), getBrushIcon("gradient-conical"), getBrushIcon("gradient-square")	});
+			super(new ImageIcon[] { Resources.getIconForKey("OptionComponent.GRADIENT_LINEAR"), getBrushIcon("GRADIENT_MIRRORED"),
+				getBrushIcon("GRADIENT_RADIAL"), getBrushIcon("GRADIENT_CONICAL"), getBrushIcon("GRADIENT_SQUARE")	});
 			setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			setSelectedIndex(0);
 			}
@@ -193,12 +199,12 @@ public class OptionComponent
 			
 			JPanel bottomPanel = new JPanel();
 			bottomPanel.setLayout(new GridLayout(2, 3));
-			bottomPanel.add(left = new JToggleButton(getBrushIcon("left"), true));
-			bottomPanel.add(center = new JToggleButton(getBrushIcon("center"), true));
-			bottomPanel.add(right = new JToggleButton(getBrushIcon("right"), true));
-			bottomPanel.add(top = new JToggleButton(getBrushIcon("top"), true));
-			bottomPanel.add(middle = new JToggleButton(getBrushIcon("middle"), true));
-			bottomPanel.add(bottom = new JToggleButton(getBrushIcon("bottom"), true));
+			bottomPanel.add(left = new JToggleButton(getBrushIcon("LEFT"), true));
+			bottomPanel.add(center = new JToggleButton(getBrushIcon("CENTER"), true));
+			bottomPanel.add(right = new JToggleButton(getBrushIcon("RIGHT"), true));
+			bottomPanel.add(top = new JToggleButton(getBrushIcon("TOP"), true));
+			bottomPanel.add(middle = new JToggleButton(getBrushIcon("MIDDLE"), true));
+			bottomPanel.add(bottom = new JToggleButton(getBrushIcon("BOTTOM"), true));
 			
 			ButtonGroup g1 = new ButtonGroup();
 			g1.add(left);
@@ -220,12 +226,12 @@ public class OptionComponent
 			bottom.addActionListener(this);
 			fButton.addActionListener(this);
 			
-			left.setToolTipText("Left aligned");
-			center.setToolTipText("Center aligned");
-			right.setToolTipText("Right aligned");
-			top.setToolTipText("Top aligned");
-			middle.setToolTipText("Middle aligned");
-			bottom.setToolTipText("Bottom aligned");
+			left.setToolTipText(Resources.getString("OptionComponent.LEFT"));
+			center.setToolTipText(Resources.getString("OptionComponent.CENTER"));
+			right.setToolTipText(Resources.getString("OptionComponent.RIGHT"));
+			top.setToolTipText(Resources.getString("OptionComponent.TOP"));
+			middle.setToolTipText(Resources.getString("OptionComponent.MIDDLE"));
+			bottom.setToolTipText(Resources.getString("OptionComponent.BOTTOM"));
 			
 			setPreferredSize(new Dimension(64, 128));
 			}
@@ -289,8 +295,8 @@ public class OptionComponent
 		public SizeOptions()
 			{
 			setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
-			add(visual = new JList<ImageIcon>(new ImageIcon[] { getBrushIcon("line-1px"),getBrushIcon("line-2px"),
-					getBrushIcon("line-3px"),getBrushIcon("line-4px"),getBrushIcon("line-5px") }));
+			add(visual = new JList<ImageIcon>(new ImageIcon[] { getBrushIcon("LINE_1PX"),getBrushIcon("LINE_2PX"),
+					getBrushIcon("LINE_3PX"),getBrushIcon("LINE_4PX"),getBrushIcon("LINE_5PX") }));
 			visual.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			add(spinner = new JSpinner(new SpinnerNumberModel(1,1,999,1)));
 			spinner.setMaximumSize(new Dimension(48,19));
@@ -336,15 +342,8 @@ public class OptionComponent
 			}
 		}
 
-	public static ImageIcon getBrushIcon(String name)
+	public static ImageIcon getBrushIcon(String key)
 		{
-		String location = "org/jeie/icons/brushes/" + name + ".png";
-		URL url = Jeie.class.getClassLoader().getResource(location);
-		if (url == null)
-			{
-			System.out.println("SHIT");
-			return new ImageIcon(location);
-			}
-		return new ImageIcon(url);
+		return Resources.getIconForKey("brushes","OptionComponent." + key);
 		}
 	}
