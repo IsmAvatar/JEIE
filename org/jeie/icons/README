@@ -2,31 +2,28 @@ This directory contains the following icons (.png extension omitted):
 
  Nuvola icon theme for KDE 3.x:
    actions/
-     accept cancel colorize copy cut
-     new next open paste previous redo save
-     save-as undo  color-fill color-picker
+     colorize
+     next previous
+     color-picker
      rotate text
  Copyright 2003-2004 David Vignoni
-
- Stock icons for OpenOffice.org:
-   actions/
-      text-bold text-italic text-underlined zoom-in zoom-out
- Copyright 2003 Novell, Inc.
  
  Icons by jimn346
    actions/
-     blur fade flip-h flip-v gradient-linear
+     fade flip-h flip-v gradient-linear
      invert oval saturation value
    brushes/
-     bottom center gradient-conical gradient-mirrored
-     gradient-radial gradient-square left middle
-     right top
+     bottom gradient-conical gradient-mirrored
+     gradient-radial gradient-square middle top
  Copyright 2013 jimn346
  
  Icons by DaSpirit
  	actions/
  		grid
  Copyright (C) 2013 DaSpirit
+ 
+ Calico Icons Copyright (C) JoshDreamland
+ https://github.com/enigma-dev/Calico-Icon
 
 
 The icons in this directory are part of JEIE.
